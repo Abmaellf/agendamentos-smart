@@ -28,16 +28,8 @@
     width: 400px;
 }
 
-.main button {
-    padding: 10px;
-    border-radius: 5px;
-    border: 0;
-    /* background: var(--ouro-velho1); */
-    background-image: linear-gradient(to top,#8A6828, #F0B446 );
-    color: white;
-    font-family: Roboto  ;
-    font-weight: bold;
-}
+
+
 .name, .titulo {
     font-family: Inter;
     font-size: 20px;

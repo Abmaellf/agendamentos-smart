@@ -1,6 +1,7 @@
 import styles from './Header.module.css';
 import imgLogo from '../assets/BolaUnTra.png';
 import '../global.css';
+import { Button } from './Button';
 
 export function Header() {
     return(
@@ -18,7 +19,9 @@ export function Header() {
 
                     </div>
 
-                    <button> Entrar </button>
+                    <Button> 
+                        Entrar 
+                    </Button>
             </div>
 
         </div>

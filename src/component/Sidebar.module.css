@@ -1,0 +1,22 @@
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image {
+    position: relative;
+    z-index: 1;
+    width: 80rem;
+    height:48rem ;
+    object-fit: cover;
+    opacity: 30%;
+}
+.imgButton {
+    position: absolute;
+    
+    z-index: 2;
+    top: 90%;
+    left: 50%;
+}
