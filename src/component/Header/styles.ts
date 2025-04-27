@@ -1,37 +1,40 @@
-.header {
+import styled from "styled-components";
+
+export const HeaderContainer = styled.div`
     background:#110F0F;
     width: 0 auto;
     margin: 0;
     display: flex;
     align-items: center;
     justify-content: start;
-}
 
-.image {
-    margin: 5px;
-    width: 50px;
-    height: 50px;
-}
-
-.main {
+    img {
+            margin: 5px;
+            width: 50px;
+            height: 50px;
+        }
+` 
+export const HeaderContent = styled.div `
     width: 100%;
     margin: 5px;
     display: flex;
     align-items: center;
     justify-content: space-between;  
-}
-.nameAndTitulo {
+` 
+export const NameAndTitleContainer = styled.div `
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-left: 5px;
     width: 400px;
-}
+
+`
+   
 
 
 
-.name, .titulo {
-    font-family: Inter;
+export const NameAndTitle = styled.div`
+font-family: Inter;
     font-size: 20px;
     /* color: linear-gradient(to top,#8A6828, #F0B446 ); */
     /* Primeiro passo: definir um degradê como fundo */
@@ -41,7 +44,9 @@
     -webkit-background-clip: text;  /*Alguns navegadores precisam do prefixo */
    /* Terceiro passo: apagar o texto, deixando apenas o fundo atrás dele */
    -webkit-text-fill-color: transparent;
-   /* Cor que contraste com o degradê, caso o navegador não suporte `background-clip: text` */
+   /* Cor que contraste com o degradê, caso o navegador não suporte background-clip: text */
    color: black;
-}
+` 
+    
+
 
