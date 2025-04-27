@@ -1,7 +1,6 @@
 import imgLogo from '../../assets/BolaUnTra.png';
 import '../../global.css';
-import { HeaderContainer, HeaderContent, NameAndTitle, NameAndTitleContainer } from './styles';
-import { ButtonContent } from '../Sidebar/styles';
+import { ButtonContent, HeaderContainer, HeaderContent, NameAndTitle, NameAndTitleContainer } from './styles';
 
 export function Header() {
     return(
