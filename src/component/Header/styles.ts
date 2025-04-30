@@ -30,11 +30,13 @@ export const NameAndTitleContainer = styled.div `
 
 `
    
-
-
-
 export const NameAndTitle = styled.div`
-font-family: Inter;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+gap: 3rem;
+
+    font-family: Inter;
     font-size: 20px;
     /* color: linear-gradient(to top,#8A6828, #F0B446 ); */
     /* Primeiro passo: definir um degradê como fundo */
@@ -65,6 +67,12 @@ export const ButtonContent = styled.button`
         
     }
 
+`
+
+export const Avatar = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 `
     
 

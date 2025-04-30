@@ -1,0 +1,44 @@
+{
+    "scheduling": [
+      {
+        "id": "0",
+        "name": "João",
+        "data": "2025-04-01 00:00:00",
+        "pathology": ["Fisioterapia"],
+        "price": 300.00,
+        "image": ""
+      },
+      {
+        "id": "2",
+        "name": "Abmael",
+        "data": "2025-04-01 00:00:00",
+        "pathology": ["Fisioterapia"],
+        "price": 300.00,
+        "image": ""
+      },
+      {
+        "id": "3",
+        "name": "Abmael",
+        "data": "2025-04-01 00:00:00",
+        "pathology": ["Fisioterapia"],
+        "price": 300.00,
+        "image": ""
+      },
+      {
+        "id": "4",
+        "name": "Abmael",
+        "data": "2025-04-01 00:00:00",
+        "pathology": ["Fisioterapia", "Pilates"],
+        "price": 300.00,
+        "image": ""
+      },
+      {
+        "id": "5",
+        "name": "Ana",
+        "data": "2025-04-01 00:00:00",
+        "pathology": ["Pilates"],
+        "price": 300.00,
+        "image": ""
+      }      
+    ]
+  }
