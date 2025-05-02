@@ -11,5 +11,6 @@ export const GlobalStyle = createGlobalStyle`
     body {
         background: #333;
         color: #fff;
+        font-family: Roboto;
     }
 `;

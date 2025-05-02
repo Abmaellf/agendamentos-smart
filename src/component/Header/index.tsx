@@ -1,5 +1,4 @@
 import imgLogo from '../../assets/BolaUnTra.png';
-import '../../global.css';
 import { Avatar, HeaderContainer, HeaderContent, NameAndTitle, NameAndTitleContainer } from './styles';
 import avatar from '../../assets/avatar.png'
 export function Header() {
