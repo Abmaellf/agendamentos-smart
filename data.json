@@ -1,44 +1,54 @@
 {
-    "scheduling": [
+    "schedulings": [
       {
         "id": "0",
-        "name": "João",
-        "data": "2025-04-01 00:00:00",
+        "namePatient": "João",
+        "dateSchenduling": "2025-04-01",
+        "hours": "00:00",
         "pathology": ["Fisioterapia"],
-        "price": 300.00,
-        "image": ""
+        "status": ["Agendar"],
+        "image": "",
+        "variant":"green"
+      },
+      {
+        "id": "1",
+        "namePatient": "Abmael",
+        "dateSchenduling": "2025-04-01",
+        "hours": "00:00",
+        "pathology": ["Fisioterapia"],
+        "status": ["Agendar"],
+        "image": "",
+        "variant":"green"
       },
       {
         "id": "2",
-        "name": "Abmael",
-        "data": "2025-04-01 00:00:00",
+        "namePatient": "Abmael",
+        "dateSchenduling": "2025-04-01",
+        "hours": "00:00",
         "pathology": ["Fisioterapia"],
-        "price": 300.00,
-        "image": ""
+        "status": ["Agendar"],
+        "image": "",
+        "variant":"green"
       },
       {
         "id": "3",
-        "name": "Abmael",
-        "data": "2025-04-01 00:00:00",
-        "pathology": ["Fisioterapia"],
-        "price": 300.00,
-        "image": ""
+        "namePatient": "Abmael",
+        "dateSchenduling": "2025-04-01",
+        "hours": "00:00",
+        "pathology": ["Fisioterapia", "Pilates"],
+        "status": ["Agendar"],
+        "image": "",
+        "variant":"green"
       },
       {
         "id": "4",
-        "name": "Abmael",
-        "data": "2025-04-01 00:00:00",
-        "pathology": ["Fisioterapia", "Pilates"],
-        "price": 300.00,
-        "image": ""
-      },
-      {
-        "id": "5",
-        "name": "Ana",
-        "data": "2025-04-01 00:00:00",
+        "namePatient": "Ana",
+        "dateSchenduling": "2025-04-01",
+        "hours": "00:00",
         "pathology": ["Pilates"],
-        "price": 300.00,
-        "image": ""
+        "status": ["Agendar"],
+        "image": "",
+        "variant":"green"
       }      
     ]
   }

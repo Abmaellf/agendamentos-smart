@@ -1,15 +1,12 @@
-import { CardPatient, CardPatientProps } from "../CardPatient";
-import { CardDayContainer, ListPatient, TitleDayWeek } from "./styles";
+import { CardPatient } from "../CardPatient";
+import { CardDayContainer, ListPatient} from "./styles";
+import { schedulings } from '../../../../data.json';
 
-interface CardDayProps {
-    dayWeek: string,
-    day: string
 
-}
 
 // criar uma lista do tipo cardPatient e percorrer com os pacientes
 
-export function CardDay(cardDay:CardDayProps, cardPatient:CardPatientProps ) {
+export function CardDay( ) {
     return(
         <CardDayContainer>
            {/* <TitleDayWeek>
@@ -18,71 +15,16 @@ export function CardDay(cardDay:CardDayProps, cardPatient:CardPatientProps ) {
            </TitleDayWeek>  */}
 
            <ListPatient>
-                <CardPatient
-                    hours = "07:00"
-                    namePatient = 'Abmael'
-                    pathology = "Fisioterapia"
-                    status = "Atendida"
-                    variant= "red"
-                />
-                 <CardPatient
-                    hours = "08:00"
-                    namePatient = 'Abmael'
-                    pathology = "Pilates"
-                    status = "Cancelado"
-                    variant= "green"
-                />
-               
-               <CardPatient
-                    hours = "09:00"
-                    namePatient = 'Abmael'
-                    pathology = "Fisioterapia"
-                    status = "Em atendimento"
-                    variant= "yellow"
-                />
-               
-               <CardPatient
-                    hours = "10:00"
-                    namePatient = 'Abmael'
-                    pathology = "Pilates"
-                    status = "Atendida"
-                     variant= "green"
-                />
-
-                <CardPatient
-                    hours = "10:00"
-                    namePatient = 'Abmael'
-                    pathology = "Pilates"
-                    status = "Atendida"
-                     variant= "green"
-                />
-
-                <CardPatient
-                    hours = "10:00"
-                    namePatient = 'Abmael'
-                    pathology = "Pilates"
-                    status = "Atendida"
-                    variant= "green"
-                />
-                <CardPatient
-                    hours = "10:00"
-                    namePatient = 'Abmael'
-                    pathology = "Pilates"
-                    status = "Atendida"
-                    variant= "green"
-                />
-
-            <CardPatient
-                    hours = "10:00"
-                    namePatient = 'Abmael'
-                    pathology = "Pilates"
-                    status = "Atendida"
-                    variant= "green"
-                />
 
 
-                
-               
+                {
+                    schedulings.map((schenduling) =>{ 
+                        return (
+                            <CardPatient key={schenduling.id} schenduling={schenduling}
+                         />
+                        )
+                    })
+                }
            </ListPatient>
            
           

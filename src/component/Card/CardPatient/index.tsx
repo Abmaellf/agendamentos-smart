@@ -1,22 +1,28 @@
 import { CardPatientContainer, NameAndPathology, Separator} from "./styles";
 
- export interface CardPatientProps {
-    hours: string,
-    namePatient: string,
-    pathology: string
-    status: 'Em atendimento' | 'Cancelado' | 'Atendida';
-    variant: string
+ type Props = {
+    schenduling: {
+        id: string,
+        namePatient: string,
+        dateSchenduling: string,
+        hours: string,
+        pathology: string[],
+        status: string[];
+        image: string
+        variant: string
+    }
 }
 
-export function CardPatient(cardPatient: CardPatientProps) {
+export function CardPatient({schenduling}: Props) {
     
     return(
-        <CardPatientContainer variant={cardPatient.variant}>
-            <span> {cardPatient.hours} </span>
+        <CardPatientContainer variant={schenduling.variant} >
+            
+            <span> {schenduling.hours} </span>
             <Separator></Separator>
             <NameAndPathology>
-                <h2> {cardPatient.namePatient}  </h2>
-                <h3> {cardPatient.pathology}  </h3> {/*  pathology  */}
+                <h2> {schenduling.namePatient}  </h2>
+                <h3> {schenduling.pathology}  </h3> {/*  pathology  */}
             </NameAndPathology>
         </CardPatientContainer>
     )
