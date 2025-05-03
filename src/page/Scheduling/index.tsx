@@ -2,8 +2,30 @@ import { CaretLeft, CaretRight } from "phosphor-react";
 import { CardDaySchedulingContainer, DataSemana, DateDay, ListOfTheDay, SchedulingContainer, SchedulingHeader, Title, WeekContainer } from "./styles";
 import { CardDay } from "../../component/Card/CardDay";
 import { WeekDates } from "../../component/WeekDate";
+import { startOfWeek, addDays, format, isToday } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR'
 
 export function Scheduling() {
+
+     const today = new Date(); // Pega a data de hoje
+     const start = startOfWeek(today, { weekStartsOn: 1 }); 
+     const days = Array.from({ length: 5 })
+        .map((_, index) => {
+              const date = addDays(start, index);
+                return {
+                  date,
+                  week: format(date, 'EEEE', {locale: ptBR,}), // segunda - 29/04
+                  data: format(date, 'dd/MM/yyyy', {locale: ptBR,}), // segunda - 29/04
+                  isToday: isToday(date), //É hoje
+                  dayWeek: date.getDay(), // Número do dia da semana
+                  hora: date.getHours(),
+                  mes: date.getMonth(),
+                  time: date.getDate() // dia do mes
+                };
+              }
+         );
+
+
     return( 
        <SchedulingContainer>
              <SchedulingHeader>
@@ -23,26 +45,20 @@ export function Scheduling() {
                 </WeekContainer>
              
                 <CardDaySchedulingContainer>
-                    <CardDay
-                        dayWeek="Segunda-Feira"
-                        day="17"
-                    />
-                    <CardDay
-                        dayWeek="Terça-Feira"
-                        day="18"
-                    />
-                    <CardDay
-                        dayWeek="Quarta-Feira"
-                        day="19"
-                    />
-                    <CardDay
-                        dayWeek="Quinta-Feira"
-                        day="20"
-                    />
-                    <CardDay
-                        dayWeek="Sexta-Feira"
-                        day="21"
-                    />
+                    {days.map((day) => {
+                        return <CardDay 
+                                    key={day.data}
+                                    isToday = {day.isToday}
+                                    date={day.data}
+                                    dayWeek={day.dayWeek}
+
+                                />
+                    }) }
+                    
+                    {/* <CardDay />
+                    <CardDay />
+                    <CardDay />
+                    <CardDay /> */}
                 </CardDaySchedulingContainer>
               
              </ListOfTheDay>
