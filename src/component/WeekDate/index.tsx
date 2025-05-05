@@ -1,7 +1,6 @@
 import { startOfWeek, addDays, format, isToday } from 'date-fns';
 import { WeekDatesContainer, WeekDatesLabel } from './styles';
-import ptBR from 'date-fns/locale/pt-BR'
-
+import { ptBR } from 'date-fns/locale/pt-BR'
 
 export function WeekDates() {
 
@@ -36,9 +35,6 @@ export function WeekDates() {
       {days.map((day, idx) => (
         <WeekDatesLabel key={idx} >
           {day.label}
-          <> - </>
-          
-         
         </WeekDatesLabel>
       ))}
     </WeekDatesContainer>

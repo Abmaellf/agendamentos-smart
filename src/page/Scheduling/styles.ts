@@ -44,7 +44,7 @@ export const ListOfTheDay = styled.div`
     align-items: center;  /* desfazer alinhmento a esquerdar */
     flex-direction: column;
     /* justify-content: space-around; */
-    /* background-color: ${({theme}) => theme.colors['yellow-800']}; */
+    background-color: ${({theme}) => theme.colors['gray-800']};
     padding: 1rem 2rem;
     gap: 1rem;
     max-width: 100%;
@@ -65,6 +65,13 @@ export const WeekContainer =styled.div`
 export const CardDaySchedulingContainer = styled.div`
     display: flex;
     gap:0.75rem;
+`
+
+export const ButtonSelectDate = styled.button`
+    /* display: block; */
+    padding: 20px;
+    border-radius: 5px;
+    background-color: ${({theme}) => theme.colors['yellow-dark']};
 `
 
 
