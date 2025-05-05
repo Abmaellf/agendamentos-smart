@@ -1,6 +1,6 @@
 import { CardPatientContainer, NameAndPathology, Separator} from "./styles";
-import { format, formatDate } from 'date-fns';
-import ptBR from 'date-fns/locale/pt-BR';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale/pt-BR';
 
  type Props = {
     schenduling: {
