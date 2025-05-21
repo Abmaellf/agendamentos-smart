@@ -27,4 +27,12 @@ npm run dev
 
 #### Tela de Agendamento em desenvolvimento
 
-![alt text](image.png)
+![alt text](image-1.png)
+
+## Desenvolvimento
+```bash
+Squad Gavião
+scopo de agendamento
+
+```
+![alt text](scopo-de-home-agendamento.jpg)
