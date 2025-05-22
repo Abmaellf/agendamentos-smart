@@ -2,18 +2,21 @@ import { startOfWeek, addDays, format, isToday } from 'date-fns';
 import { WeekDatesContainer, WeekDatesLabel } from './styles';
 import { ptBR } from 'date-fns/locale/pt-BR'
 
-export function WeekDates() {
+interface CurrentDate {
+  date: Date
+}
 
-  const today = new Date(); // Pega a data de hoje
+export function WeekDates(currentDate: CurrentDate) {
+
+   const today = new Date(currentDate.date); //Pega a data de hoje ou da pesquisa efetuada
 
   // Passando a data por parametro definimos o unicio da semana
   // const today = new Date("2025-05-05T10:30:00"); 
-
   // weekStartsOn defino em qual dia da semana vai começar 0=domingo, 1-segunda ...
-  const start = startOfWeek(today, { weekStartsOn: 1 }); 
+  // const start = startOfWeek(today, { weekStartsOn: 1 }); 
+   const start = startOfWeek(today, { weekStartsOn: 1 }); 
 
   //length define quantos dias será apresentado
-  //
   const days = Array.from({ length: 5 })
     .map((_, index) => {
           const date = addDays(start, index);

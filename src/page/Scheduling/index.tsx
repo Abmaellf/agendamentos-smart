@@ -13,7 +13,7 @@ import { useState } from "react";
 export function Scheduling() {
 
    const today = new Date(); // Pega a data de hoje
-  
+   const hoje = format(today, 'dd/MM/yyyy', {locale: ptBR,})
     console.log(today, "today") 
 
     const [startDate, setStartDate] = useState(today);
@@ -39,14 +39,14 @@ export function Scheduling() {
         const dateString = new Date(date)
         setStartDate(dateString)
     }
-        
     return( 
        <SchedulingContainer>
              <SchedulingHeader>
                     <Title> Agendamentos </Title>
                     <DateDay>
                         <CaretLeft size={32} />
-                        <DataSemana> 17 de Outubro de 2024 </DataSemana>
+
+                        <DataSemana> {startDate ? format(startDate, 'dd/MM/yyyy', {locale: ptBR,}) : hoje} </DataSemana>
                        
                         <CaretRight size={32} color="black" />
                     </DateDay>
@@ -55,7 +55,9 @@ export function Scheduling() {
              <ListOfTheDay>
 
                 <WeekContainer>
-                <WeekDates />
+                    <WeekDates
+                        date = {startDate}
+                    />
                 </WeekContainer>
              
                 <CardDaySchedulingContainer>
