@@ -9,9 +9,9 @@
         "dateSchenduling": "2025-03-19T10:30:00",
         "hours": "07:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"red"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "1",
@@ -22,9 +22,8 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "07:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"yellow"
+        "status": ["Agendar"],
+        "image": ""
       },
       {
         "id": "2",
@@ -35,22 +34,19 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "08:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"gray-400"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "3",
-
         "namePatient": "Maria dos Anjos",
         "pathology": ["Fisioterapia"],
-
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "08:00",
+        "status": ["Agendar"],
+        "image": ""
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
       },
       {
         "id": "4",
@@ -61,9 +57,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "08:00",
        
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "5",
@@ -74,9 +70,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "09:00",
        
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "6",
@@ -87,9 +83,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "10:00",
        
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "7",
@@ -100,9 +96,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "10:00",
        
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "8",
@@ -113,9 +109,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "10:00",
        
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "9",
@@ -126,9 +122,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "10:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       } 
       ,
       {
@@ -140,9 +136,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "11:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "11",
@@ -153,9 +149,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "16:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "12",
@@ -166,9 +162,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "16:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "13",
@@ -179,9 +175,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "08:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "14",
@@ -192,9 +188,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "16:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "15",
@@ -205,9 +201,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "17:00",
        
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "16",
@@ -218,9 +214,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "17:00",
        
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "17",
@@ -231,9 +227,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "17:00",
        
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "18",
@@ -244,9 +240,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "17:00",
        
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "19",
@@ -257,9 +253,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "18:00",
        
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       },
       {
         "id": "20",
@@ -270,9 +266,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "18:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       } 
       ,
       {
@@ -284,9 +280,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "19:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       }
       ,
       {
@@ -298,9 +294,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "19:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       }
        ,
       {
@@ -312,9 +308,9 @@
         "dateSchenduling": "2025-05-19T10:30:00",
         "hours": "19:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       }    
       ,
       {
@@ -326,9 +322,9 @@
         "dateSchenduling": "2025-05-20T10:30:00",
         "hours": "07:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       } ,
       {
         "id": "25",
@@ -339,9 +335,9 @@
         "dateSchenduling": "2025-05-20T10:30:00",
         "hours": "07:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       }
        ,
       {
@@ -353,9 +349,9 @@
         "dateSchenduling": "2025-05-20T10:30:00",
         "hours": "07:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       }        
        ,
       {
@@ -367,9 +363,9 @@
         "dateSchenduling": "2025-05-20T10:30:00",
         "hours": "08:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       }        
        ,
       {
@@ -381,9 +377,9 @@
         "dateSchenduling": "2025-05-20T10:30:00",
         "hours": "07:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       }        
        ,
       {
@@ -395,9 +391,9 @@
         "dateSchenduling": "2025-05-20T10:30:00",
         "hours": "08:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       }        
        ,
       {
@@ -409,9 +405,9 @@
         "dateSchenduling": "2025-05-20T10:30:00",
         "hours": "09:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       }        
        ,
       {
@@ -423,9 +419,9 @@
         "dateSchenduling": "2025-05-20T10:30:00",
         "hours": "09:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       }        
        ,
       {
@@ -437,9 +433,9 @@
         "dateSchenduling": "2025-05-20T10:30:00",
         "hours": "09:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       }        
        ,
       {
@@ -451,9 +447,9 @@
         "dateSchenduling": "2025-05-20T10:30:00",
         "hours": "09:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       }        
        ,
       {
@@ -465,9 +461,9 @@
         "dateSchenduling": "2025-05-20T10:30:00",
         "hours": "09:00",
         
-        "status": "Agendar",
-        "image": "",
-        "variant":"green"
+        "status": ["Agendar"],
+        "image": ""
+        
       }        
                             
     ]

@@ -6,12 +6,10 @@ import { ptBR } from 'date-fns/locale/pt-BR';
     schenduling: {
         id: string,
         namePatient: string,
+        pathology: string[],        
         dateSchenduling: Date,
         hours: string,
-        pathology: string[],
         status: string;
-        image: string
-        variant: string
     }
 }
 
@@ -19,7 +17,7 @@ export function CardPatient({schenduling}: Props) {
     
 
     return(
-        <CardPatientContainer variant={schenduling.variant} >
+        <CardPatientContainer variant='green' >
             
             <span> {schenduling.hours} </span>
             <Separator></Separator>

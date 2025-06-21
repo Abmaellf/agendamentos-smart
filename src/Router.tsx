@@ -2,6 +2,8 @@ import { Route, Routes } from "react-router-dom";
 import { Login } from "./page/login";
 import { DefaultLayout } from "./Layout";
 import { Scheduling } from "./page/Scheduling";
+import { Patient } from "./page/patient";
+import { Doctor } from "./page/doctor";
 
 
 export function Router() {
@@ -12,6 +14,8 @@ export function Router() {
            <Route path="/" element={<DefaultLayout />}>            
             <Route path="/" element={<Scheduling /> }/>
             <Route path="/agendamento" element={<Scheduling />}/>
+            <Route path="/patient" element={<Patient/>}/>
+            <Route path="/doctor" element={<Doctor/>}/>
            </Route>
         </Routes>
     )
