@@ -9,10 +9,6 @@ export const WeekDatesContainer = styled.div`
      /* padding: 0 100px; */
      border-radius: 5px;
      /* background: red; */
-     
-     
-
-     
 `
 interface WeekDayProps {
     variant?: 'green';

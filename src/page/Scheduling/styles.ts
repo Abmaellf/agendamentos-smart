@@ -49,6 +49,7 @@ export const ListOfTheDay = styled.div`
     gap: 1rem;
     max-width: 100%;
 `
+//Excluir depois
 export const WeekContainer =styled.div`
     display: flex;
     align-items: center;

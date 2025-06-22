@@ -1,5 +1,5 @@
 import { CaretLeft, CaretRight } from "phosphor-react";
-import { ButtonSelectDate, CardDaySchedulingContainer, DataSemana, DateDay, ListOfTheDay, SchedulingContainer, SchedulingHeader, Title, WeekContainer } from "./styles";
+import { ButtonSelectDate, CardDaySchedulingContainer, DataSemana, DateDay, ListOfTheDay, SchedulingContainer, SchedulingHeader, Title } from "./styles";
 import { CardDay } from "../../component/Card/CardDay";
 import { WeekDates } from "../../component/WeekDate";
 import { startOfWeek, addDays, format, isToday } from 'date-fns';
@@ -24,18 +24,21 @@ export function Scheduling() {
               const date = addDays(start, index);
                 return {
                   date,
-                  week: format(date, 'EEEE', {locale: ptBR,}), 
+                //   week: format(date, 'EEEE', {locale: ptBR,}), 
                   data: format(date, 'dd/MM/yyyy', {locale: ptBR,}), 
                   isToday: isToday(date), 
                   dayWeek: date.getDay(), 
-                  hora: date.getHours(),
-                  mes: date.getMonth(),
-                  time: date.getDate() 
+                //   hora: date.getHours(),
+                //   mes: date.getMonth(),
+                //   time: date.getDate() 
                 };
               }
          );
 
     function setNewStartDate(date: Date | null) {
+        if(!date){
+           throw new Error( "Data não existe");
+        }
         const dateString = new Date(date)
         setStartDate(dateString)
     }
@@ -54,11 +57,11 @@ export function Scheduling() {
 
              <ListOfTheDay>
 
-                <WeekContainer>
+                <div>
                     <WeekDates
                         date = {startDate}
                     />
-                </WeekContainer>
+                </div>
              
                 <CardDaySchedulingContainer>
                     {days.map((day) => {

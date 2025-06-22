@@ -3,17 +3,10 @@ import { CardDayContainer, ListPatient} from "./styles";
 // import { schedulings } from '../../../../data.json';
 import { format} from 'date-fns';
 import {ptBR} from 'date-fns/locale/pt-BR';
-import { useEffect, useState } from "react";
+import { useContext } from "react";
+import { SchedulingContext } from "../../../context/SchedulingContext";
 
-interface Scheduling {
-   id: string;
-   namePatient: string;
-   pathology: ["Fisioterapia", "Pilates"];
-   dateSchenduling: Date;
-   hours: string;
-   status: ["Em Atendimento", "Agendando", "Atendido", "Cancelado"]
-   image: string;
-}
+
 interface CardDayProps{
     date: string,
     isToday: boolean,
@@ -24,20 +17,11 @@ interface CardDayProps{
 
 export function CardDay(cardDay: CardDayProps) {
     // const listSchendulingDay = schedulings.find((patient) => { patient.dateSchenduling ===ardDay.data})
-    const [schedulings, setSchedulings] = useState<Scheduling[]>([]);
 
-    async function loadScheduling() {
-        const response = await fetch('http://localhost:3333/schedulings');
-        const data = await response.json();
-        console.log(data)
-        setSchedulings(data);
-    }
+    // const [schedulings, setSchedulings] = useState<Scheduling[]>([]);
+     const {schedulings} = useContext(SchedulingContext);
 
-    useEffect(
-        ()=> {
-            loadScheduling()
-        }, []
-    )
+   
 
     return(
         <CardDayContainer>
