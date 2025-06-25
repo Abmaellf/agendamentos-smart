@@ -1,23 +1,24 @@
-import { Route, Routes } from "react-router-dom";
-import { Login } from "./page/login";
-import { DefaultLayout } from "./Layout";
-import { Scheduling } from "./page/Scheduling";
-import { Patient } from "./page/patient";
-import { Doctor } from "./page/doctor";
-
+import { Route, Routes } from 'react-router-dom'
+import { Login } from './page/login'
+import { AuthLayout } from './_layout/auth'
+import { Scheduling } from './page/Scheduling'
+import { Patient } from './page/patient'
+import { Doctor } from './page/doctor'
+import { AppLayout } from './_layout/app'
 
 export function Router() {
-    return(
-        <Routes>
-           <Route path="/login" element={<Login />}/>
+  return (
+    <Routes>
+      <Route element={<AuthLayout />}>
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+      </Route>
 
-           <Route path="/" element={<DefaultLayout />}>            
-            <Route path="/" element={<Scheduling /> }/>
-            <Route path="/agendamento" element={<Scheduling />}/>
-            <Route path="/patient" element={<Patient/>}/>
-            <Route path="/doctor" element={<Doctor/>}/>
-           </Route>
-        </Routes>
-    )
-
+      <Route element={<AppLayout />}>
+        <Route path="/agendamento" element={<Scheduling />} />
+        <Route path="/patient" element={<Patient />} />
+        <Route path="/doctor" element={<Doctor />} />
+      </Route>
+    </Routes>
+  )
 }

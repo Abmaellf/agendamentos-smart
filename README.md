@@ -4,19 +4,25 @@
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)![React Hook Form](https://img.shields.io/badge/React%20Hook%20Form-%23EC5990.svg?style=for-the-badge&logo=reacthookform&logoColor=white)![Redux](https://img.shields.io/badge/redux-%23593d88.svg?style=for-the-badge&logo=redux&logoColor=white)![RxJS](https://img.shields.io/badge/rxjs-%23B7178C.svg?style=for-the-badge&logo=reactivex&logoColor=white)![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)![Zod](https://img.shields.io/badge/zod-%233068b7.svg?style=for-the-badge&logo=zod&logoColor=white)![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 
 ## Descrição
+
 Sistema de gestão de atendimentos especializados
 
- 
+## Ferramenta de gestão de projetos Clickup
+
+https://app.clickup.com/9013176627/v/l/8ckma9k-293?pr=90130760846
 
 ## Instrução de instalação
 
 ## Pre requisitos
+
 NodeJS
 
-## Comandos 
+## Comandos
+
 ```bash
 npm install
-``` 
+```
+
 ```bash
 npm run dev
 ```
@@ -30,9 +36,11 @@ npm run dev
 ![alt text](image-1.png)
 
 ## Desenvolvimento
+
 ```bash
 Squad Gavião
 scopo de agendamento
 
 ```
+
 ![alt text](scopo-de-home-agendamento.jpg)
