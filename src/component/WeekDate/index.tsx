@@ -1,4 +1,4 @@
-import { WeekDatesContainer } from './styles'
+import { ListNumberDate, WeekDatesContainer } from './styles'
 import { useContext, useEffect, useState } from 'react'
 import { SchedulingContext } from '../../context/SchedulingContext'
 
@@ -18,11 +18,13 @@ export function WeekDates(currentDate: CurrentDate) {
 
   useEffect(() => {
     dateweeks()
-  }, [])
+  }, [currentDate])
 
   return (
     <WeekDatesContainer>
-      <div>{listWeek}</div>
+      {listWeek.map((l) => (
+        <ListNumberDate> {l}</ListNumberDate>
+      ))}
     </WeekDatesContainer>
   )
 }

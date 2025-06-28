@@ -8,6 +8,7 @@ import {
   SchedulingContainer,
   SchedulingHeader,
   Title,
+  WeekDatesContainer,
 } from './styles'
 import { CardDay } from '../../component/Card/CardDay'
 import { WeekDates } from '../../component/WeekDate'
@@ -22,23 +23,16 @@ import { Helmet } from 'react-helmet-async'
 
 export function Scheduling() {
   const today = new Date() // Pega a data de hoje
-  const hoje = format(today, 'dd/MM/yyyy', { locale: ptBR })
-  console.log(today, 'today')
-
   const [startDate, setStartDate] = useState(today)
-
   const start = startOfWeek(startDate, { weekStartsOn: 1 })
+
   const days = Array.from({ length: 5 }).map((_, index) => {
     const date = addDays(start, index)
     return {
       date,
-      //   week: format(date, 'EEEE', {locale: ptBR,}),
       data: format(date, 'dd/MM/yyyy', { locale: ptBR }),
       isToday: isToday(date),
       dayWeek: date.getDay(),
-      //   hora: date.getHours(),
-      //   mes: date.getMonth(),
-      //   time: date.getDate()
     }
   })
 
@@ -58,10 +52,7 @@ export function Scheduling() {
           <CaretLeft size={32} />
 
           <DataSemana>
-            {' '}
-            {startDate
-              ? format(startDate, 'dd/MM/yyyy', { locale: ptBR })
-              : hoje}{' '}
+            {format(startDate, 'dd/MM/yyyy', { locale: ptBR })}{' '}
           </DataSemana>
 
           <CaretRight size={32} color="black" />
@@ -69,9 +60,9 @@ export function Scheduling() {
       </SchedulingHeader>
 
       <ListOfTheDay>
-        <div>
+        <WeekDatesContainer>
           <WeekDates date={startDate} />
-        </div>
+        </WeekDatesContainer>
 
         <CardDaySchedulingContainer>
           {days.map((day) => {

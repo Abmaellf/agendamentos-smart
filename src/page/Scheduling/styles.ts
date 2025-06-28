@@ -34,7 +34,12 @@ export const Title = styled.h1`
   font-family: Roboto;
   margin-left: 20px;
 `
-export const DataSemana = styled.span``
+export const DataSemana = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-left: 4px;
+  gap: 2rem;
+`
 
 export const ListOfTheDay = styled.div`
   display: flex;
@@ -68,4 +73,11 @@ export const ButtonSelectDate = styled.button`
   padding: 20px;
   border-radius: 5px;
   background-color: ${({ theme }) => theme.colors['yellow-dark']};
+`
+
+export const WeekDatesContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
 `
