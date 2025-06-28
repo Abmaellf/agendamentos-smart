@@ -1,5 +1,5 @@
 import { CardPatient } from '../CardPatient'
-import { CardDayContainer, ListPatient } from './styles'
+import { CardDayContainer } from './styles'
 // import { schedulings } from '../../../../data.json';
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale/pt-BR'
@@ -22,31 +22,29 @@ export function CardDay(cardDay: CardDayProps) {
 
   return (
     <CardDayContainer>
-      <ListPatient>
-        {schedulings.map((schenduling) => {
-          const listSchendulingDay = format(
-            schenduling.dateSchenduling,
-            'dd/MM/yyyy',
-            {
-              locale: ptBR,
-            },
-          )
-          if (listSchendulingDay) {
-            if (listSchendulingDay === cardDay.date) {
-              console.log(listSchendulingDay, 'listSchendulingDay')
-              return (
-                <CardPatient
-                  key={schenduling.id}
-                  schenduling={schenduling}
-                  // listSchendulingDay= {listSchendulingDay}
-                />
-              )
-            }
-          } else {
-            return
+      {schedulings.map((schenduling) => {
+        const listSchendulingDay = format(
+          schenduling.dateSchenduling,
+          'dd/MM/yyyy',
+          {
+            locale: ptBR,
+          },
+        )
+        if (listSchendulingDay) {
+          if (listSchendulingDay === cardDay.date) {
+            console.log(listSchendulingDay, 'listSchendulingDay')
+            return (
+              <CardPatient
+                key={schenduling.id}
+                schenduling={schenduling}
+                // listSchendulingDay= {listSchendulingDay}
+              />
+            )
           }
-        })}
-      </ListPatient>
+        } else {
+          return
+        }
+      })}
     </CardDayContainer>
   )
 }
