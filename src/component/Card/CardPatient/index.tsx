@@ -1,6 +1,6 @@
 import { CardPatientContainer, NameAndPathology, Separator } from './styles'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale/pt-BR'
+// import { format } from 'date-fns'
+// import { ptBR } from 'date-fns/locale/pt-BR'
 
 type Props = {
   schenduling: {
@@ -21,12 +21,12 @@ export function CardPatient({ schenduling }: Props) {
       <NameAndPathology>
         <h2> {schenduling.namePatient} </h2>
         <h3> {schenduling.pathology} </h3> {/*  pathology  */}
-        <span>
+        {/* <span>
           {' '}
-          {format(schenduling.dateSchenduling, 'EEEE - dd/MM', {
+          {format(schenduling.dateSchenduling, 'EEEE - dd/MM/yyyy', {
             locale: ptBR,
           })}
-        </span>
+        </span> */}
         {/* <span> {schenduling.dateSchenduling}</span> */}
       </NameAndPathology>
     </CardPatientContainer>

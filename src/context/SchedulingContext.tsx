@@ -52,7 +52,7 @@ export function SchedulingProvider({ children }: SchedulingProviderType) {
 
       return {
         date,
-        data: format(date, 'dd/MM/yyyy', { locale: ptBR }),
+        data: format(date, 'EEEE dd/MM/yyyy', { locale: ptBR }),
         isToday: isToday(date), //É hoje
         dayWeek: date.getDay(), // Número do dia da semana
       }
