@@ -20,13 +20,29 @@ export const HeaderContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  .mobile {
+    display: none;
+  }
+  @media (max-width: 980px) {
+    width: 100%;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    .mobile {
+      display: block;
+    }
+  }
 `
 export const NameAndTitleContainer = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   margin-left: 5px;
-  width: 400px;
+  width: 900px;
+  @media (max-width: 980px) {
+    display: none;
+  }
 `
 
 export const NameAndTitle = styled.div`
@@ -77,4 +93,9 @@ export const Avatar = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+
+  img {
+    border-radius: 50%;
+    border: solid 2px white;
+  }
 `
