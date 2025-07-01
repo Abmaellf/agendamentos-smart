@@ -7,7 +7,13 @@ import {
   NameAndTitleContainer,
 } from './styles'
 import avatar from '../../assets/avatar.png'
-export function Header() {
+import { Menu } from 'lucide-react'
+import { Link } from 'react-router-dom'
+
+interface setMenuIsVisibleProps {
+  setMenuIsVisible(data: boolean): void
+}
+export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
   return (
     <HeaderContainer>
       <img src={imgLogo} alt="" />
@@ -16,19 +22,34 @@ export function Header() {
         <NameAndTitleContainer>
           <NameAndTitle>
             <div> Equilíbrio </div>
-
             <div> Fisioterapia & Pilates</div>
+            <div> | </div>
+            <Link className="link" to={'agendamento'}>
+              Agendamento{' '}
+            </Link>
+            <Link className="link" to={'pacientes'}>
+              {' '}
+              Paciente{' '}
+            </Link>
+            <Link className="link" to={'contatos'}>
+              {' '}
+              Contato{' '}
+            </Link>
           </NameAndTitle>
         </NameAndTitleContainer>
 
-        {/* <ButtonContent> 
-                        Entrar 
-                    </ButtonContent> */}
-
         <Avatar>
-          <span> Abmael </span>
+          <span> Ana Cristina </span>
           <img src={avatar} alt="" />
         </Avatar>
+        <Menu
+          size={38}
+          onClick={() => {
+            setMenuIsVisible(true)
+          }}
+          className="mobile"
+          color="#8a6828"
+        />
       </HeaderContent>
     </HeaderContainer>
   )
