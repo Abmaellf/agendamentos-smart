@@ -2,16 +2,20 @@ import styled from 'styled-components'
 
 export const HeaderContainer = styled.div`
   background: #110f0f;
-  width: 0 auto;
-  margin: 0;
+  /* width: 0 auto; */
+  width: 100%;
+  /* margin-bottom: 450px; */
   display: flex;
   align-items: center;
-  justify-content: start;
-
+  position: fixed;
   img {
     margin: 5px;
     width: 50px;
     height: 50px;
+  }
+
+  @media (max-width: 980px) {
+    gap: 8rem;
   }
 `
 export const HeaderContent = styled.div`
@@ -23,12 +27,10 @@ export const HeaderContent = styled.div`
   .mobile {
     display: none;
   }
+
   @media (max-width: 980px) {
-    width: 100%;
-    margin: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-start;
+    gap: 1rem;
     .mobile {
       display: block;
     }

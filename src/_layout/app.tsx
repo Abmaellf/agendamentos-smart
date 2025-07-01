@@ -11,7 +11,9 @@ export function AppLayout() {
         menuIsVisible={menuIsVisible}
         setMenuIsVisible={setMenuIsVisible}
       />
+
       <Header setMenuIsVisible={setMenuIsVisible} />
+
       <Outlet />
     </>
   )

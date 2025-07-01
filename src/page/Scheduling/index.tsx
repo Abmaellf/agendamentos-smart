@@ -3,11 +3,12 @@
 import {
   // ButtonSelectDate,
   CardDaySchedulingContainer,
-  DataSemana,
-  DateDay,
+  CurrentDate,
+  // DateDay,
   ListOfTheDay,
   SchedulingContainer,
   SchedulingHeader,
+  SpaceHeader,
   Title,
   WeekDatesContainer,
 } from './styles'
@@ -58,15 +59,18 @@ export function Scheduling() {
     setStartDate(dateString)
   }
   return (
-    <SchedulingContainer>
-      <Helmet title="Agendamentos" />
-      <SchedulingHeader>
-        <Title> Agendamentos </Title>
-        <DateDay>
+    <>
+      <SpaceHeader> </SpaceHeader>
+
+      <SchedulingContainer>
+        <Helmet title="Agendamentos" />
+        <SchedulingHeader>
+          <Title> Agendamentos </Title>
+
+          {/* <DateDay> */}
           {/* <CaretLeft size={32} /> */}
 
-          <DataSemana>
-            {/* {format(startDate, 'dd/MM/yyyy', { locale: ptBR })}{' '} */}
+          <CurrentDate>
             <div className="flex items-center gap-3">
               <Label htmlFor="date" className="px-1">
                 Selecione a data
@@ -98,40 +102,41 @@ export function Scheduling() {
                 </PopoverContent>
               </Popover>
             </div>
-          </DataSemana>
+          </CurrentDate>
 
           {/* <CaretRight size={32} color="black" /> */}
-        </DateDay>
-      </SchedulingHeader>
+          {/* </DateDay> */}
+        </SchedulingHeader>
 
-      <ListOfTheDay>
-        <WeekDatesContainer>
-          <WeekDates date={startDate} />
-        </WeekDatesContainer>
+        <ListOfTheDay>
+          <WeekDatesContainer>
+            <WeekDates date={startDate} />
+          </WeekDatesContainer>
 
-        <CardDaySchedulingContainer>
-          {days.map((day) => {
-            return (
-              <CardDay
-                key={day.dayWeek}
-                isToday={day.isToday}
-                date={day.data}
-                dayWeek={day.dayWeek}
-              />
-            )
-          })}
-        </CardDaySchedulingContainer>
+          <CardDaySchedulingContainer>
+            {days.map((day) => {
+              return (
+                <CardDay
+                  key={day.dayWeek}
+                  isToday={day.isToday}
+                  date={day.data}
+                  dayWeek={day.dayWeek}
+                />
+              )
+            })}
+          </CardDaySchedulingContainer>
 
-        {/* // https://github.com/devsuperior/aula-react-datepicker
+          {/* // https://github.com/devsuperior/aula-react-datepicker
                 // https://github.com/Hacker0x01/react-datepicker */}
 
-        {/* <ButtonSelectDate>
+          {/* <ButtonSelectDate>
           <DatePicker
             selected={startDate}
             onChange={(date) => setNewStartDate(date)}
           />
         </ButtonSelectDate> */}
-      </ListOfTheDay>
-    </SchedulingContainer>
+        </ListOfTheDay>
+      </SchedulingContainer>
+    </>
   )
 }
