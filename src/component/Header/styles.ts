@@ -2,9 +2,7 @@ import styled from 'styled-components'
 
 export const HeaderContainer = styled.div`
   background: #110f0f;
-  /* width: 0 auto; */
   width: 100%;
-  /* margin-bottom: 450px; */
   display: flex;
   align-items: center;
   position: fixed;
@@ -55,16 +53,19 @@ export const NameAndTitle = styled.div`
 
   font-family: Inter;
   font-size: 20px;
-  /* color: linear-gradient(to top,#8A6828, #F0B446 ); */
-  /* Primeiro passo: definir um degradê como fundo */
   background-image: linear-gradient(to bottom, #f0b446, #8a6828);
-  /* Segundo passo: apagar do fundo tudo que não estiver imediatamente atrás de texto */
   background-clip: text;
   -webkit-background-clip: text; /*Alguns navegadores precisam do prefixo */
-  /* Terceiro passo: apagar o texto, deixando apenas o fundo atrás dele */
   -webkit-text-fill-color: transparent;
-  /* Cor que contraste com o degradê, caso o navegador não suporte background-clip: text */
   color: black;
+
+  .link {
+    &:hover {
+      background: ${({ theme }) => theme.colors['gray-100']};
+      color: white;
+      -webkit-background-clip: text;
+    }
+  }
 `
 
 export const ButtonContent = styled.button`

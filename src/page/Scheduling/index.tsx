@@ -1,11 +1,12 @@
 // import { CaretLeft, CaretRight } from 'phosphor-react'
 
 import {
-  // ButtonSelectDate,
   CardDaySchedulingContainer,
+  CardDaySchedulingContainerMobile,
   CurrentDate,
   // DateDay,
   ListOfTheDay,
+  ListOfTheDayMobile,
   SchedulingContainer,
   SchedulingHeader,
   SpaceHeader,
@@ -13,7 +14,6 @@ import {
   WeekDatesContainer,
 } from './styles'
 
-import * as React from 'react'
 import { ChevronDownIcon } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import { Calendar } from '../../components/ui/calendar'
@@ -28,7 +28,6 @@ import { WeekDates } from '../../component/WeekDate'
 import { startOfWeek, addDays, format, isToday } from 'date-fns'
 import { ptBR } from 'date-fns/locale/pt-BR'
 
-// import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
 import { useState } from 'react'
@@ -39,12 +38,13 @@ export function Scheduling() {
   const [startDate, setStartDate] = useState<Date>(today)
   const start = startOfWeek(startDate, { weekStartsOn: 1 })
 
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = useState(false)
 
   const days = Array.from({ length: 5 }).map((_, index) => {
     const date = addDays(start, index)
     return {
       date,
+      label: format(date, 'EEEE', { locale: ptBR }),
       data: format(date, 'dd/MM/yyyy', { locale: ptBR }),
       isToday: isToday(date),
       dayWeek: date.getDay(),
@@ -128,14 +128,29 @@ export function Scheduling() {
 
           {/* // https://github.com/devsuperior/aula-react-datepicker
                 // https://github.com/Hacker0x01/react-datepicker */}
-
-          {/* <ButtonSelectDate>
-          <DatePicker
-            selected={startDate}
-            onChange={(date) => setNewStartDate(date)}
-          />
-        </ButtonSelectDate> */}
         </ListOfTheDay>
+
+        <ListOfTheDayMobile>
+          <WeekDatesContainer>
+            {days.map((semana) => {
+              return (
+                <CardDaySchedulingContainerMobile>
+                  {semana.label}
+                  {!semana.date ? (
+                    <p> Sem agendamentos</p>
+                  ) : (
+                    <CardDay
+                      key={semana.dayWeek}
+                      isToday={semana.isToday}
+                      date={semana.data}
+                      dayWeek={semana.dayWeek}
+                    />
+                  )}
+                </CardDaySchedulingContainerMobile>
+              )
+            })}
+          </WeekDatesContainer>
+        </ListOfTheDayMobile>
       </SchedulingContainer>
     </>
   )

@@ -73,6 +73,10 @@ export const ListOfTheDay = styled.div`
   padding: 1rem 2rem;
   gap: 1rem;
   max-width: 100%;
+
+  @media (max-width: 980px) {
+    display: none;
+  }
 `
 //Excluir depois
 export const WeekContainer = styled.div`
@@ -91,16 +95,40 @@ export const CardDaySchedulingContainer = styled.div`
   gap: 0.75rem;
 `
 
-export const ButtonSelectDate = styled.button`
-  /* display: block; */
-  padding: 20px;
-  border-radius: 5px;
-  background-color: ${({ theme }) => theme.colors['yellow-dark']};
-`
-
 export const WeekDatesContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 0.75rem;
+
+  @media (max-width: 980px) {
+    display: flex;
+    flex-direction: column;
+    /* color: red; */
+  }
+`
+
+export const ListOfTheDayMobile = styled.div`
+  display: none;
+
+  @media (max-width: 980px) {
+    display: block;
+    width: 100%;
+
+    /* flex-direction: column; */
+  }
+`
+
+export const CardDaySchedulingContainerMobile = styled.div`
+  display: none;
+
+  @media (max-width: 980px) {
+    display: block;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 `

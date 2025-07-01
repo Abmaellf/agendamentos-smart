@@ -8,6 +8,7 @@ import {
 } from './styles'
 import avatar from '../../assets/avatar.png'
 import { Menu } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 interface setMenuIsVisibleProps {
   setMenuIsVisible(data: boolean): void
@@ -23,15 +24,19 @@ export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
             <div> Equilíbrio </div>
             <div> Fisioterapia & Pilates</div>
             <div> | </div>
-            <div> Agendamento </div>
-            <div> Paciente </div>
-            <div> Contato </div>
+            <Link className="link" to={'agendamento'}>
+              Agendamento{' '}
+            </Link>
+            <Link className="link" to={'pacientes'}>
+              {' '}
+              Paciente{' '}
+            </Link>
+            <Link className="link" to={'contatos'}>
+              {' '}
+              Contato{' '}
+            </Link>
           </NameAndTitle>
         </NameAndTitleContainer>
-
-        {/* <ButtonContent> 
-                        Entrar 
-                    </ButtonContent> */}
 
         <Avatar>
           <span> Ana Cristina </span>
