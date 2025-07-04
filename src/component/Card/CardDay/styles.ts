@@ -4,7 +4,6 @@ interface IsDayProps {
     variant: 'false' | 'true';
 }
 
-
 export const CardDayContainer = styled.div<IsDayProps>`
   display: flex;
   flex-direction: column;

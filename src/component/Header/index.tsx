@@ -9,8 +9,8 @@ import {
 } from './styles'
 import avatar from '../../assets/avatar.png'
 import { Menu } from 'lucide-react'
-import { Separator } from '@radix-ui/react-separator'
 import { NavLink } from '../nav-link'
+import { Separator } from '../../components/ui/separator'
 
 interface setMenuIsVisibleProps {
   setMenuIsVisible(data: boolean): void
