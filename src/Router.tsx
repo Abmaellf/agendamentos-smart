@@ -16,7 +16,7 @@ export function Router() {
 
       <Route element={<AppLayout />}>
         <Route path="/agendamento" element={<Scheduling />} />
-        <Route path="/patient" element={<Patient />} />
+        <Route path="/paciente" element={<Patient />} />
         <Route path="/doctor" element={<Doctor />} />
       </Route>
     </Routes>

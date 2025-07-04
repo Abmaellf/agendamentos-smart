@@ -416,6 +416,18 @@
 
       "status": ["Agendar"],
       "image": ""
+    },
+    {
+      "id": "35",
+
+      "namePatient": "Jose",
+      "pathology": ["Pilates"],
+
+      "dateSchenduling": "2025-07-04T10:30:00",
+      "hours": "09:00",
+
+      "status": ["Agendar"],
+      "image": ""
     }
   ]
 }

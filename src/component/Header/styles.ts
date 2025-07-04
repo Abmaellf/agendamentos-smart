@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 export const HeaderContainer = styled.div`
-  background: #110f0f;
+  background:${({ theme }) => theme.colors['gray-800']};
   width: 100%;
   display: flex;
   align-items: center;
@@ -53,19 +53,20 @@ export const NameAndTitle = styled.div`
 
   font-family: Inter;
   font-size: 20px;
-  background-image: linear-gradient(to bottom, #f0b446, #8a6828);
-  background-clip: text;
-  -webkit-background-clip: text; /*Alguns navegadores precisam do prefixo */
+  color: ${({ theme }) => theme.colors['gray-300']};
+  /* background-image: linear-gradient(to bottom, #f0b446, #8a6828);  */
+  /* background-clip: text; */
+   /*-webkit-background-clip: text;Alguns navegadores precisam do prefixo 
   -webkit-text-fill-color: transparent;
-  color: black;
-
-  .link {
-    &:hover {
-      background: ${({ theme }) => theme.colors['gray-100']};
-      color: white;
+  color: white;
+*/
+  /* .link {
+    &:hover { */
+      /* background: ${({ theme }) => theme.colors['gray-100']}; */
+      /* color: white;
       -webkit-background-clip: text;
-    }
-  }
+    } 
+  }*/
 `
 
 export const ButtonContent = styled.button`

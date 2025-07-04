@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components'
 
 interface isVisibleProps {
-  isVisible: boolean
+  isvisible: boolean
 }
 export const ContainerMobile = styled.section<isVisibleProps>`
   position: absolute;
@@ -60,8 +60,8 @@ export const ContainerMobile = styled.section<isVisibleProps>`
     transition: 0.7s;
   }
 
-  ${({ isVisible }) =>
-    isVisible &&
+  ${({ isvisible }) =>
+    isvisible &&
     css`
       opacity: 1;
       pointer-events: auto;

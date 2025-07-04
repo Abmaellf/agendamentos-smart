@@ -19,9 +19,10 @@ export function CardDay(cardDay: CardDayProps) {
 
   // const [schedulings, setSchedulings] = useState<Scheduling[]>([]);
   const { schedulings } = useContext(SchedulingContext)
-
+  const isDayConvert = cardDay.isToday ? 'true' : 'false';
   return (
-    <CardDayContainer>
+    <CardDayContainer variant={isDayConvert}>
+      
       {schedulings.map((schenduling) => {
         const listSchendulingDay = format(
           schenduling.dateSchenduling,
@@ -32,7 +33,8 @@ export function CardDay(cardDay: CardDayProps) {
         )
         if (listSchendulingDay) {
           if (listSchendulingDay === cardDay.date) {
-            console.log(listSchendulingDay, 'listSchendulingDay')
+            // console.log(listSchendulingDay, 'listSchendulingDay')
+           
             return (
               <CardPatient
                 key={schenduling.id}

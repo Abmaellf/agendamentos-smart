@@ -1,3 +1,4 @@
+
 import imgLogo from '../../assets/BolaUnTra.png'
 import {
   Avatar,
@@ -8,12 +9,14 @@ import {
 } from './styles'
 import avatar from '../../assets/avatar.png'
 import { Menu } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Separator } from '@radix-ui/react-separator'
+import { NavLink } from '../nav-link'
 
 interface setMenuIsVisibleProps {
   setMenuIsVisible(data: boolean): void
 }
 export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
+  
   return (
     <HeaderContainer>
       <img src={imgLogo} alt="" />
@@ -21,20 +24,27 @@ export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
       <HeaderContent>
         <NameAndTitleContainer>
           <NameAndTitle>
+
             <div> Equilíbrio </div>
+
             <div> Fisioterapia & Pilates</div>
-            <div> | </div>
-            <Link className="link" to={'agendamento'}>
+
+            <Separator orientation="vertical" className="h-6" />
+
+            <NavLink  to='/agendamento'>
               Agendamento{' '}
-            </Link>
-            <Link className="link" to={'pacientes'}>
+            </NavLink>
+
+            <NavLink  to='/paciente'>
               {' '}
               Paciente{' '}
-            </Link>
-            <Link className="link" to={'contatos'}>
+            </NavLink>
+
+            <NavLink  to='/contatos'>
               {' '}
               Contato{' '}
-            </Link>
+            </NavLink>
+
           </NameAndTitle>
         </NameAndTitleContainer>
 

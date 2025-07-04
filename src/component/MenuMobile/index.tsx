@@ -16,7 +16,7 @@ export function MenuMobile({
   }, [menuIsVisible])
   return (
     <>
-      <ContainerMobile isVisible={menuIsVisible}>
+      <ContainerMobile isvisible={menuIsVisible}>
         <X onClick={() => setMenuIsVisible(false)} />
         <nav>
           <div> Agendamento </div>

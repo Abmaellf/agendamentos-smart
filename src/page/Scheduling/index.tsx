@@ -135,17 +135,12 @@ export function Scheduling() {
             {days.map((semana) => {
               return (
                 <CardDaySchedulingContainerMobile>
-                  {semana.label}
-                  {!semana.date ? (
-                    <p> Sem agendamentos</p>
-                  ) : (
-                    <CardDay
+                  <CardDay
                       key={semana.dayWeek}
                       isToday={semana.isToday}
                       date={semana.data}
                       dayWeek={semana.dayWeek}
                     />
-                  )}
                 </CardDaySchedulingContainerMobile>
               )
             })}
