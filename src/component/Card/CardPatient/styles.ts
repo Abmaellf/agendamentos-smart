@@ -1,10 +1,13 @@
 import styled, { css } from 'styled-components'
 
-interface StatusSchedulingProps {
-  variant?: 'green' | 'red' | 'gray' | 'yellow'
-}
-
-export const CardPatientContainer = styled.div<StatusSchedulingProps>`
+interface StatusIsDayPropsProps {
+  status: string,
+  variant: boolean;
+} 
+// interface IsDayProps {
+    
+// }
+export const CardPatientContainer = styled.div<StatusIsDayPropsProps>`
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -12,29 +15,52 @@ export const CardPatientContainer = styled.div<StatusSchedulingProps>`
   /* background-color: ${({ theme }) => theme.colors['green-800']}; */
 
   gap: 2rem;
+  border: 1px solid ${props => props.variant === true ? props.theme.colors.white :  props.theme.colors['gray-600'] };
+  /* background-color: ${props => props.status === 'Agendar' ? props.theme.colors['green-800'] :  props.theme.colors['gray-600'] };  */
 
-  ${(props) =>
-    props.variant === 'green' &&
-    css`
-      background-color: ${({ theme }) => theme.colors['green-800']};
-    `}
+background-color: ${props => {
+    if (props.status === 'Agendar') {
+      return props.theme.colors['green-800'];
+    } else if (props.status === 'cancelado') {
+      return props.theme.colors['gray-700'];
+    } else if (props.status === 'Agendado') {
+      return props.theme.colors['gray-700'];
+    } else {
+      return 'white';
+    }
+  }};
 
+
+color: ${props => {
+    if (props.status === 'Agendar') {
+      return props.theme.colors['gray-700'];
+    } else if (props.status === 'cancelado') {
+      return props.theme.colors['gray-700'];
+    } else if (props.status === 'Agendado') {
+      return props.theme.colors['white'];
+    } else {
+      return props.theme.colors['gray-700'];
+    }
+  }};
+  /* ${props => props.status === "Agendar" &&  css`background-color: ${({ theme }) => theme.colors['green-800']}; `} */
+ /*
+  
   ${(props) =>
-    props.variant === 'red' &&
+    props.status === 'agendado' &&
     css`
       background-color: ${({ theme }) => theme.colors['red-800']};
     `}
     ${(props) =>
-    props.variant === 'yellow' &&
+    props.status === 'agendar' &&
     css`
       background-color: ${({ theme }) => theme.colors['yellow-800']};
     `}
 
     ${(props) =>
-    props.variant === 'gray' &&
+    props.status === 'gray' &&
     css`
       background-color: ${({ theme }) => theme.colors['gray-800']};
-    `}
+    `}  */
 `
 
 export const NameAndPathology = styled.div`

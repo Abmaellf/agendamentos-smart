@@ -12,7 +12,7 @@ export const CardDayContainer = styled.div<IsDayProps>`
   color: ${({ theme }) => theme.colors['gray-800']};
   padding: 10px;
   border-radius: 5px;
-  border: 1px solid white;
+  border: 1px solid ${props => props.variant === 'true' ? props.theme.colors.white :  props.theme.colors['gray-600'] };
   width: 320px; /*Possívelmente retirars*/
   gap: 0.5rem;
 `

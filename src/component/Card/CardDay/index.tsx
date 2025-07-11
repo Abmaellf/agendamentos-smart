@@ -39,6 +39,7 @@ export function CardDay(cardDay: CardDayProps) {
               <CardPatient
                 key={schenduling.id}
                 schenduling={schenduling}
+                isToDay={cardDay.isToday}
                 // listSchendulingDay= {listSchendulingDay}
               />
             )
