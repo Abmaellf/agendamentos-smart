@@ -8,7 +8,8 @@ export function NavLink(props: NavLinkProps) {
     return (
     <Link
         data-current={pathname === props.to}
-        className="text-sidebar-primary-foreground hover:text-sidebar-foreground data-[current=true]:text-muted-foreground flex items-center gap-1.5 text-sm font-medium"
+        // className=" text-sidebar-foreground  hover:text-sidebar-ring data-[current=true]:text-muted-foreground flex items-center justify-center gap-5 text-sm font-medium"
+        className=" text-white  hover:text-sidebar-ring data-[current=true]:text-black flex items-center justify-center text-accent font-light"
         //retirado  
         {...props}
     />

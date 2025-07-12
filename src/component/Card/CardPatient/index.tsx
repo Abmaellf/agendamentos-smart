@@ -1,4 +1,4 @@
-import { isToday } from 'date-fns'
+// import { isToday } from 'date-fns'
 import { CardPatientContainer, NameAndPathology, Separator } from './styles'
 // import { format } from 'date-fns'
 // import { ptBR } from 'date-fns/locale/pt-BR'

@@ -4,13 +4,19 @@ import {
   Avatar,
   HeaderContainer,
   HeaderContent,
+  LiMenu,
+  LiMenuSub,
   NameAndTitle,
   NameAndTitleContainer,
+  NavMenu,
+  UlDropDown,
+  UlMenu
 } from './styles'
 import avatar from '../../assets/avatar.png'
-import { Menu } from 'lucide-react'
+import { Menu as MenuLucida } from 'lucide-react'
 import { NavLink } from '../nav-link'
 import { Separator } from '../../components/ui/separator'
+
 
 interface setMenuIsVisibleProps {
   setMenuIsVisible(data: boolean): void
@@ -23,7 +29,7 @@ export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
 
       <HeaderContent>
         <NameAndTitleContainer>
-          <NameAndTitle>
+          <NameAndTitle className='flex items-center justify-between gap-3 text-color-sidebar-primary'>
 
             <div> Equilíbrio </div>
 
@@ -31,19 +37,44 @@ export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
 
             <Separator orientation="vertical" className="h-6" />
 
-            <NavLink  to='/agendamento'>
-              Agendamento{' '}
-            </NavLink>
+            <NavMenu>
+              <UlMenu className='flex items-center justify-between gap-3 text-color-sidebar-primary'>
 
-            <NavLink  to='/paciente'>
-              {' '}
-              Paciente{' '}
-            </NavLink>
+                <LiMenuSub>
+                    {/* <NavLink  to='/agendamento'> */}
+                      {' '}
+                      Agenda{' '}
+                    {/* </NavLink> */}
 
-            <NavLink  to='/contatos'>
-              {' '}
-              Contato{' '}
-            </NavLink>
+                    <UlDropDown className='dropdown'>
+                      <li> <NavLink  to='/agendamento'> Agendamentos  </NavLink></li>
+                      <li> <NavLink  to='/configuration'> Configurações </NavLink></li>
+                      <li> <NavLink  to='#'>  Ajuda </NavLink> </li>
+                    </UlDropDown>
+                </LiMenuSub>
+
+                <LiMenu>
+                    <NavLink  to='/paciente  '>
+                      {' '}
+                      Pacientes{' '}
+                    </NavLink>
+                </LiMenu>
+
+                <LiMenu>
+                      <NavLink  to='/contatos'>
+                        {' '}
+                        Contato{' '}
+                      </NavLink>
+                </LiMenu>
+              </UlMenu>
+            </NavMenu>
+            
+            
+
+            
+
+
+            
 
           </NameAndTitle>
         </NameAndTitleContainer>
@@ -52,7 +83,7 @@ export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
           <span> Ana Cristina </span>
           <img src={avatar} alt="" />
         </Avatar>
-        <Menu
+        <MenuLucida
           size={38}
           onClick={() => {
             setMenuIsVisible(true)

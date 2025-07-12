@@ -21,6 +21,10 @@ export const defaultTheme = {
     'red-700': '#7A1921',
     'red-800': '#DD4B39',
 
+    'blue-400': '#1d44b8',
+    'blue-500': '#214cce',
+    'blue-600': '#2b58de',
+
     'base-card': '#F3F2F2',
     'base-input': '#EDEDED',
     'base-button': '#E6E6E5',
@@ -39,5 +43,7 @@ export const defaultTheme = {
     'yellow-light': '#F1E9C9',
     yellow: '#DBAC2C',
     'yellow-dark': '#C47F17',
+    
   },
+  
 } as const

@@ -22,9 +22,9 @@ background-color: ${props => {
     if (props.status === 'Agendar') {
       return props.theme.colors['green-800'];
     } else if (props.status === 'cancelado') {
-      return props.theme.colors['gray-700'];
+      return props.theme.colors['gray-400'];
     } else if (props.status === 'Agendado') {
-      return props.theme.colors['gray-700'];
+      return props.theme.colors['gray-500'];
     } else {
       return 'white';
     }
