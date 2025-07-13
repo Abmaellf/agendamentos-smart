@@ -1,3 +1,5 @@
+import 'tailwindcss';
+
 export const defaultTheme = {
   colors: {
     white: '#FFFFFF',
@@ -24,6 +26,8 @@ export const defaultTheme = {
     'blue-400': '#1d44b8',
     'blue-500': '#214cce',
     'blue-600': '#2b58de',
+
+    'orange-600': '#e65729',
 
     'base-card': '#F3F2F2',
     'base-input': '#EDEDED',

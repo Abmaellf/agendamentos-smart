@@ -1,4 +1,6 @@
 import { createGlobalStyle } from 'styled-components'
+import 'tailwindcss';
+
 
 export const GlobalStyle = createGlobalStyle`
     *{

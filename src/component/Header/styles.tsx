@@ -23,7 +23,7 @@ export const NavMenu = styled.div`
 
 `
 export const UlMenu = styled.li`
-  margin: 10px;
+  margin: 15px;
   padding: 10px;
 `
 
@@ -123,18 +123,18 @@ export const NameAndTitle = styled.div`
 // }
 
 export const ButtonContent = styled.button`
-  padding: 10px;
+  /* padding: 10px;
   border-radius: 5px;
-  border: 0;
+  border: 0; */
   /* background-image: linear-gradient(to top, #8a6828, #f0b446); */
   /* color: white; */
-  font-family: Roboto;
+  /* font-family: Roboto;
   font-weight: bold;
-  cursor: pointer;
-
+  cursor: pointer; */
+/* 
   transition:
     color 0.5s,
-    background-color 0.5s;
+    background-color 0.5s; */
 
   /* &:hover {
     background-image: linear-gradient(
@@ -143,7 +143,7 @@ export const ButtonContent = styled.button`
       #f0b446,
       var(--dourado-1)
     );
-  } */
+  } */ 
 `
 
 export const Avatar = styled.div`

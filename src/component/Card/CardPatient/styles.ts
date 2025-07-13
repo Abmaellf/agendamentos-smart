@@ -19,12 +19,15 @@ export const CardPatientContainer = styled.div<StatusIsDayPropsProps>`
   /* background-color: ${props => props.status === 'Agendar' ? props.theme.colors['green-800'] :  props.theme.colors['gray-600'] };  */
 
 background-color: ${props => {
-    if (props.status === 'Agendar') {
-      return props.theme.colors['green-800'];
-    } else if (props.status === 'cancelado') {
+    if (props.status === 'Agendado') {
       return props.theme.colors['gray-400'];
-    } else if (props.status === 'Agendado') {
-      return props.theme.colors['gray-500'];
+    }else if (props.status === 'Atendido') {
+      return props.theme.colors['green-800'];
+    }
+     else if (props.status === 'cancelado') {
+      return props.theme.colors['gray-400'];
+    } else if (props.status === 'Cancelado') {
+      return props.theme.colors['red-800'];
     } else {
       return 'white';
     }

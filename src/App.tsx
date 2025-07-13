@@ -3,8 +3,8 @@ import { defaultTheme } from './styles/themes/default'
 import { Router } from './Router'
 
 import { BrowserRouter } from 'react-router-dom'
-
-import { GlobalStyle } from './styles/global'
+import './globals.css';
+// import { GlobalStyle } from './styles/global'
 import { SchedulingProvider } from './context/SchedulingContext'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
 
@@ -19,7 +19,7 @@ export function App() {
           </HelmetProvider>
         </BrowserRouter>
       </SchedulingProvider>
-      <GlobalStyle />
+      {/* <GlobalStyle /> */}
     </ThemeProvider>
   )
 }

@@ -16,6 +16,7 @@ import avatar from '../../assets/avatar.png'
 import { Menu as MenuLucida } from 'lucide-react'
 import { NavLink } from '../nav-link'
 import { Separator } from '../../components/ui/separator'
+import { AddSchedulingModal } from '../AddSchedulingModal'
 
 
 interface setMenuIsVisibleProps {
@@ -48,6 +49,7 @@ export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
 
                     <UlDropDown className='dropdown'>
                       <li> <NavLink  to='/agendamento'> Agendamentos  </NavLink></li>
+                      <li> <AddSchedulingModal/>  </li>
                       <li> <NavLink  to='/configuration'> Configurações </NavLink></li>
                       <li> <NavLink  to='#'>  Ajuda </NavLink> </li>
                     </UlDropDown>
