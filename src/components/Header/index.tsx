@@ -1,4 +1,4 @@
-import imgLogo from '../../assets/BolaUnTra.png'
+// import imgLogo from '../../assets/BolaUnTra.png'
 import {
   Avatar,
   HeaderContainer,
