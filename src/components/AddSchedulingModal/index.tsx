@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -8,9 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../components/ui/dialog"
-import { Input } from "../../components/ui/input"
-import { Label } from "@/components/ui/label"
+} from '../ui/dialog'
+import { Input } from '../ui/input'
+import { Label } from '@/components/ui/label'
 
 export function AddSchedulingModal() {
   return (
@@ -23,15 +23,14 @@ export function AddSchedulingModal() {
           <DialogHeader>
             <DialogTitle>Adicione um novo agendamento</DialogTitle>
             <DialogDescription>
-              Faça qui o agendamento de seus pacientes, caso não encontre-o, faça o registro
-             no menu Paciente.
+              Faça qui o agendamento de seus pacientes, caso não encontre-o,
+              faça o registro no menu Paciente.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">
-
             <div className="grid gap-3">
               <Label htmlFor="name-1">Nome</Label>
-              <Input id="name-1" name="name" placeholder="Nome do paciente"  />
+              <Input id="name-1" name="name" placeholder="Nome do paciente" />
             </div>
 
             <div className="grid gap-3">
@@ -46,7 +45,6 @@ export function AddSchedulingModal() {
               <Label htmlFor="username-1">status</Label>
               <Input id="username-1" name="username" defaultValue="@peduarte" />
             </div>
-
           </div>
           <DialogFooter>
             <DialogClose asChild>

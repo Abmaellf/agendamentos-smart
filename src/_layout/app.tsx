@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom'
-import { Header } from '../component/Header'
+import { Header } from '../components/Header'
 import { useState } from 'react'
-import { MenuMobile } from '../component/MenuMobile'
+import { MenuMobile } from '../components/MenuMobile'
 
 export function AppLayout() {
   const [menuIsVisible, setMenuIsVisible] = useState(false)

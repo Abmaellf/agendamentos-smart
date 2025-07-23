@@ -23,8 +23,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '../../components/ui/popover'
-import { CardDay } from '../../component/Card/CardDay'
-import { WeekDates } from '../../component/WeekDate'
+import { CardDay } from '../../components/Card/CardDay'
+import { WeekDates } from '../../components/WeekDate'
 import { startOfWeek, addDays, format, isToday } from 'date-fns'
 import { ptBR } from 'date-fns/locale/pt-BR'
 
@@ -135,13 +135,13 @@ export function Scheduling() {
             {days.map((semana) => {
               return (
                 <CardDaySchedulingContainerMobile>
-                   {semana.label}
+                  {semana.label}
                   <CardDay
-                      key={semana.dayWeek}
-                      isToday={semana.isToday}
-                      date={semana.data}
-                      dayWeek={semana.dayWeek}
-                    />
+                    key={semana.dayWeek}
+                    isToday={semana.isToday}
+                    date={semana.data}
+                    dayWeek={semana.dayWeek}
+                  />
                 </CardDaySchedulingContainerMobile>
               )
             })}

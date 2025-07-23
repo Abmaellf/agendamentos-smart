@@ -11,7 +11,7 @@ type Props = {
     dateSchenduling: Date
     hours: string
     status: string
-  },
+  }
   isToDay: boolean
 }
 
@@ -22,8 +22,9 @@ export function CardPatient({ schenduling, isToDay }: Props) {
       <Separator></Separator>
       <NameAndPathology>
         <h2> {schenduling.namePatient} </h2>
-        <h3> {schenduling.pathology} </h3> 
-        <h3> {schenduling.status} </h3>{/*  pathology  */}
+        <h3> {schenduling.pathology} </h3>
+        <h3> {schenduling.status} </h3>
+        {/*  pathology  */}
         {/* <span>
           {' '}
           {format(schenduling.dateSchenduling, 'EEEE - dd/MM/yyyy', {

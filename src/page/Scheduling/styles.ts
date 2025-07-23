@@ -69,7 +69,8 @@ export const ListOfTheDay = styled.div`
   align-items: center; /* desfazer alinhmento a esquerdar */
   flex-direction: column;
   /* justify-content: space-around; */
-  background-color: ${({ theme }) => theme.colors['gray-800']};
+  background-color: ${({ theme }) => theme.colors['gray-600']};
+  background-color: ${({ theme }) => theme.colors.white};
   padding: 1rem 2rem;
   gap: 1rem;
   max-width: 100%;

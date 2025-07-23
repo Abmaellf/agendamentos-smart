@@ -15,20 +15,32 @@ export const CardPatientContainer = styled.div<StatusIsDayPropsProps>`
   /* background-color: ${({ theme }) => theme.colors['green-800']}; */
 
   gap: 2rem;
-  border: 1px solid ${props => props.variant === true ? props.theme.colors.white :  props.theme.colors['gray-600'] };
+  /* border: 1px solid ${props => props.variant === true ? props.theme.colors.white :  null }; */
   /* background-color: ${props => props.status === 'Agendar' ? props.theme.colors['green-800'] :  props.theme.colors['gray-600'] };  */
 
-background-color: ${props => {
+  background-color: ${props => {
     if (props.status === 'Agendado') {
       return props.theme.colors['gray-400'];
-    }else if (props.status === 'Atendido') {
+    }else if (props.status === 'Concluido') {
       return props.theme.colors['green-800'];
     }
-     else if (props.status === 'cancelado') {
-      return props.theme.colors['gray-400'];
-    } else if (props.status === 'Cancelado') {
+      else if (props.status === 'Cancelado') {
+      return props.theme.colors['gray-900'];
+    } else if (props.status === 'Falta') {
       return props.theme.colors['red-800'];
+    }else if (props.status === 'Em atendimento') {
+      return props.theme.colors['yellow-800'];
     } else {
+      return 'white';
+    }
+  }};
+
+  border: 1px solid ${props => {
+    if (props.status === 'Reagendado') {
+      return props.theme.colors['gray-400'];
+    } else if (props.status === 'Em atendimento') {
+      return props.theme.colors.white;
+     } else {
       return 'white';
     }
   }};
@@ -37,9 +49,11 @@ background-color: ${props => {
 color: ${props => {
     if (props.status === 'Agendar') {
       return props.theme.colors['gray-700'];
-    } else if (props.status === 'cancelado') {
-      return props.theme.colors['gray-700'];
+    } else if (props.status === 'Cancelado') {
+      return props.theme.colors.white;
     } else if (props.status === 'Agendado') {
+      return props.theme.colors['white'];
+    }else if (props.status === 'Em atendimento') {
       return props.theme.colors['white'];
     } else {
       return props.theme.colors['gray-700'];

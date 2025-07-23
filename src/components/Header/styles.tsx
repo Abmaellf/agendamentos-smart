@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 export const HeaderContainer = styled.div`
-  background:${({ theme }) => theme.colors['gray-100']};
+  background: ${({ theme }) => theme.colors['gray-100']};
   width: 100%;
   display: flex;
   align-items: center;
@@ -18,50 +18,43 @@ export const HeaderContainer = styled.div`
   }
 `
 
-
-export const NavMenu = styled.div`
-
-`
+export const NavMenu = styled.div``
 export const UlMenu = styled.li`
   margin: 15px;
   padding: 10px;
 `
 
-export const LiMenu = styled.ul`
-
-`
+export const LiMenu = styled.ul``
 export const LiMenuSub = styled.ul`
-      position: relative;
+  position: relative;
 
-      &:hover .dropdown {
-        margin-top: 20px;
-        padding: 5px;
-        display: block;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 1.5rem;
-      }
+  &:hover .dropdown {
+    margin-top: 20px;
+    padding: 5px;
+    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
 `
 export const UlDropDown = styled.ul`
+  background-color: dimgray;
 
-    background-color: dimgray;
-   
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    
-    padding-bottom: 20px;
-    position: absolute;
-    top:5px;
-    /* left: 10px; */
-    display: none;
-    /* z-index: 99; */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+
+  padding-bottom: 20px;
+  position: absolute;
+  top: 5px;
+  /* left: 10px; */
+  display: none;
+  /* z-index: 99; */
   li {
     /* display: block; */
     /* color: white; */
   }
-
 `
 export const HeaderContent = styled.div`
   width: 100%;
@@ -101,26 +94,30 @@ export const NameAndTitle = styled.div`
   font-family: Roboto;
   font-size: 24px;
   color: ${({ theme }) => theme.colors['gray-500']}; */
-
 `
 
-
-
-
 // {
-//   background-image: linear-gradient(to bottom, #f0b446, #8a6828);  
-//    background-clip: text; 
-//   -webkit-background-clip: text;Alguns navegadores precisam do prefixo 
+//   background-image: linear-gradient(to bottom, #f0b446, #8a6828);
+//    background-clip: text;
+//   -webkit-background-clip: text;Alguns navegadores precisam do prefixo
 //   -webkit-text-fill-color: transparent;
 //   color: white;
 //    .link {
-//     &:hover { 
-//       background: ${({ theme }) => theme.colors['gray-100']}; 
+//     &:hover {
+//       background: ${({ theme }) => theme.colors['gray-100']};
 //       color: white;
 //       -webkit-background-clip: text;
-//     } 
+//     }
 //   }
 // }
+
+export const ImagePerfil = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+`
 
 export const ButtonContent = styled.button`
   /* padding: 10px;
@@ -131,7 +128,7 @@ export const ButtonContent = styled.button`
   /* font-family: Roboto;
   font-weight: bold;
   cursor: pointer; */
-/* 
+  /* 
   transition:
     color 0.5s,
     background-color 0.5s; */
@@ -143,7 +140,7 @@ export const ButtonContent = styled.button`
       #f0b446,
       var(--dourado-1)
     );
-  } */ 
+  } */
 `
 
 export const Avatar = styled.div`
