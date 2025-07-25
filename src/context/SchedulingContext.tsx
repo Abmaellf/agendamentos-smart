@@ -11,16 +11,21 @@ interface Scheduling {
   status: string
   image: string
 }
-
 interface WeekDatesProps {
   date: Date
   data: string
   isToday: boolean
   dayWeek: number
 }
-
+interface Patient {
+  id: string
+  name: string
+  createdAt: Date
+  status: string
+}
 interface SchedulingContextType {
   schedulings: Scheduling[]
+  patients: Patient[]
   WeekDates: (date: Date) => WeekDatesProps[]
 }
 
@@ -30,18 +35,29 @@ interface SchedulingProviderType {
   children: ReactNode
 }
 export function SchedulingProvider({ children }: SchedulingProviderType) {
+
   const [schedulings, setSchedulings] = useState<Scheduling[]>([])
+  const [patients, setPatients] = useState<Patient[]>([]);
 
   async function loadScheduling() {
     const response = await fetch('http://localhost:3333/schedulings')
     const data = await response.json()
-    // console.log(data)
     setSchedulings(data)
   }
 
   useEffect(() => {
     loadScheduling()
   }, [])
+
+   async function loadPatient() {
+    const response = await fetch('http://localhost:3333/patients')
+    const data = await response.json()
+    setPatients(data)
+  }
+
+  useEffect(() => {
+      loadPatient()
+    }, [])
 
   function WeekDates(date: Date) {
     const today = new Date(date) //Pega a data de hoje ou da pesquisa efetuada
@@ -64,6 +80,7 @@ export function SchedulingProvider({ children }: SchedulingProviderType) {
     <SchedulingContext.Provider
       value={{
         schedulings,
+        patients,
         WeekDates,
       }}
     >

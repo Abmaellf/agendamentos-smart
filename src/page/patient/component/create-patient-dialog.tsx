@@ -21,6 +21,7 @@ const createPatientSchema = z.object({
 type CreatePatientSchema = z.infer<typeof createPatientSchema>
 
 export default function CreatePatientDialog() {
+  
   const { register, handleSubmit } = useForm<CreatePatientSchema>({
     resolver: zodResolver(createPatientSchema),
   })
