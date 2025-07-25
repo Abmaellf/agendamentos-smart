@@ -1,8 +1,18 @@
 import { Button } from '@/components/ui/button'
 import { TableRow, TableCell } from '@/components/ui/table'
+import { dateFormatter } from '@/utils/formatter'
 import { Search, ArrowRight, X } from 'lucide-react'
 
-export default function PatientTableRows() {
+type Props = {
+    patientObj: {
+          id: string
+          name: string
+          createdAt: Date
+          status: string
+    }
+}
+
+export default function PatientTableRows({patientObj}: Props) {
   return (
     <TableRow>
       <TableCell>
@@ -12,9 +22,9 @@ export default function PatientTableRows() {
         </Button>
       </TableCell>
 
-      <TableCell className="font-mono text-xs font-medium">1245</TableCell>
+      <TableCell className="font-mono text-xs font-medium"> { patientObj.id }</TableCell>
 
-      <TableCell className="font-medium">Abmael Ferreira</TableCell>
+      <TableCell className="font-medium"> { patientObj.name }</TableCell>
 
       <TableCell>
         <div className="flex items-center gap-2">
@@ -23,9 +33,10 @@ export default function PatientTableRows() {
         </div>
       </TableCell>
 
-      <TableCell className="text-muted-foreground">01/07/2025</TableCell>
-
-      <TableCell className="font-medium">Fisioterapia</TableCell>
+      <TableCell className="text-muted-foreground"> 
+        {dateFormatter.format(new Date(patientObj.createdAt) )}
+        
+      </TableCell>
 
       <TableCell className="bg-green-600">
         <Button variant="outline" size="xs">
