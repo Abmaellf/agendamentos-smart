@@ -1,3 +1,4 @@
+import { api } from '@/lib/axios'
 import { addDays, format, isToday, startOfWeek } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { createContext, ReactNode, useEffect, useState } from 'react'
@@ -26,6 +27,7 @@ interface Patient {
 interface SchedulingContextType {
   schedulings: Scheduling[]
   patients: Patient[]
+  fetchPatients:(query?: string)=> Promise<void>
   WeekDates: (date: Date) => WeekDatesProps[]
 }
 
@@ -40,23 +42,26 @@ export function SchedulingProvider({ children }: SchedulingProviderType) {
   const [patients, setPatients] = useState<Patient[]>([]);
 
   async function loadScheduling() {
-    const response = await fetch('http://localhost:3333/schedulings')
-    const data = await response.json()
-    setSchedulings(data)
+    const response = await api.get('schedulings', {
+    })
+    setSchedulings(response.data)
   }
 
   useEffect(() => {
     loadScheduling()
   }, [])
 
-   async function loadPatient() {
-    const response = await fetch('http://localhost:3333/patients')
-    const data = await response.json()
-    setPatients(data)
+   async function fetchPatients(query?: string) {
+    const response = await api.get('patients', {
+      params: {
+        q:query
+      }
+    })
+    setPatients(response.data)
   }
 
   useEffect(() => {
-      loadPatient()
+      fetchPatients()
     }, [])
 
   function WeekDates(date: Date) {
@@ -81,6 +86,7 @@ export function SchedulingProvider({ children }: SchedulingProviderType) {
       value={{
         schedulings,
         patients,
+        fetchPatients,
         WeekDates,
       }}
     >
