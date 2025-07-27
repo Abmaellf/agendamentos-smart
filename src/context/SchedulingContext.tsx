@@ -1,7 +1,9 @@
 import { api } from '@/lib/axios'
 import { addDays, format, isToday, startOfWeek } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { createContext, ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useState } from 'react'
+import { createContext } from "use-context-selector";
+import { uuid } from 'zod'
 
 interface Scheduling {
   id: string
@@ -21,6 +23,7 @@ interface WeekDatesProps {
 interface Patient {
   id: string
   name: string
+  empresa: string
   createdAt: Date
   status: string
 }
@@ -29,6 +32,10 @@ interface SchedulingContextType {
   patients: Patient[]
   fetchPatients:(query?: string)=> Promise<void>
   WeekDates: (date: Date) => WeekDatesProps[]
+  CreatePatients:(data:CreatePatientSchema) => Promise<void>
+}
+interface CreatePatientSchema {
+  name: string
 }
 
 export const SchedulingContext = createContext({} as SchedulingContextType)
@@ -51,7 +58,7 @@ export function SchedulingProvider({ children }: SchedulingProviderType) {
     loadScheduling()
   }, [])
 
-   async function fetchPatients(query?: string) {
+  async function fetchPatients(query?: string) {
     const response = await api.get('patients', {
       params: {
         q:query
@@ -79,7 +86,21 @@ export function SchedulingProvider({ children }: SchedulingProviderType) {
       }
     })
     return days
-  }
+  } 
+
+  const  CreatePatients = useCallback(async (data: CreatePatientSchema) => {
+   const { name } = data;
+
+   const response = await api.post('patients', {
+      uuid,
+      name,
+      empresa: 'Equilibrio',
+      createdAt: new Date(),
+      status: 'Ativo'
+    })
+    setPatients(state => [response.data, ...state])
+}, 
+  [])
 
   return (
     <SchedulingContext.Provider
@@ -88,6 +109,7 @@ export function SchedulingProvider({ children }: SchedulingProviderType) {
         patients,
         fetchPatients,
         WeekDates,
+        CreatePatients
       }}
     >
       {children}

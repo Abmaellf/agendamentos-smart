@@ -7,6 +7,7 @@ type Props = {
     patientObj: {
           id: string
           name: string
+          empresa: string
           createdAt: Date
           status: string
     }
@@ -25,11 +26,12 @@ export default function PatientTableRows({patientObj}: Props) {
       <TableCell className="font-mono text-xs font-medium"> { patientObj.id }</TableCell>
 
       <TableCell className="font-medium"> { patientObj.name }</TableCell>
+      <TableCell className="font-medium"> { patientObj.empresa }</TableCell>
 
       <TableCell>
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-slate-400" />
-          <span className="text-muted-foreground font-medium"> Ativo </span>
+          <span className="text-muted-foreground font-medium"> { patientObj.status } </span>
         </div>
       </TableCell>
 
@@ -38,14 +40,14 @@ export default function PatientTableRows({patientObj}: Props) {
         
       </TableCell>
 
-      <TableCell className="bg-green-600">
+      <TableCell >
         <Button variant="outline" size="xs">
           <ArrowRight className="mr-2 h-3 w-3" />
           Editar
         </Button>
       </TableCell>
 
-      <TableCell className="bg-red-500">
+      <TableCell >
         <Button variant="ghost" size="xs">
           <X className="mr-2 h-3 w-3" />
           Desativar

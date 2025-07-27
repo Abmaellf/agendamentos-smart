@@ -11,13 +11,16 @@ import { Dialog, DialogTrigger } from '@radix-ui/react-dialog'
 import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react'
 import CreatePatientDialog from './component/create-patient-dialog'
-// import { useContext, useEffect, useState } from 'react'
 import { SchedulingContext } from '@/context/SchedulingContext'
-import { useContext } from 'react'
+import { useContextSelector } from 'use-context-selector'
 
 export function Patient() {
 
-  const { patients } = useContext(SchedulingContext);
+  const patients = useContextSelector(
+				SchedulingContext, 
+				    (context) => {
+				    return context.patients
+			    })
 
   return (
     <div>
@@ -45,6 +48,7 @@ export function Patient() {
                 <TableHead className="w-[64px]"></TableHead>
                 <TableHead className="w-[140px]"> Código </TableHead>
                 <TableHead> Paciente </TableHead>
+                  <TableHead> Empresa </TableHead>
                 <TableHead className="w-[140px]"> Status </TableHead>
                 <TableHead className="w-[180px]"> Data de cadastro </TableHead>
                 
