@@ -13,7 +13,8 @@ import { Label } from '@/components/ui/label'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-// import { Input } from './ui/input'
+import { useContextSelector } from 'use-context-selector'
+import { SchedulingContext } from '@/context/SchedulingContext'
  
 const createPatientSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -21,17 +22,29 @@ const createPatientSchema = z.object({
 
 type CreatePatientSchema = z.infer<typeof createPatientSchema>
 
-
 export function AddPatientModal() {
+
+   const  CreatePatients  = useContextSelector(
+        SchedulingContext, 
+        (context) => {
+         return context.CreatePatients
+    });
+    
 const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<CreatePatientSchema>({
     resolver: zodResolver(createPatientSchema),
   })
 
-  function handlePatient(data: CreatePatientSchema) {
+  async function handlePatient(data: CreatePatientSchema) {
+    const { name } = data;
+    await CreatePatients({
+      name
+    }) 
+    reset()
     console.log('✅ Dados enviados:', data)
   }
 
@@ -80,6 +93,5 @@ const {
         </DialogContent>
       </Dialog>
     </div>
-    
   )
 }

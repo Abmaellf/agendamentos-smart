@@ -1,6 +1,7 @@
 import { ListNumberDate, WeekDatesContainer } from './styles'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SchedulingContext } from '../../context/SchedulingContext'
+import { useContextSelector } from 'use-context-selector'
 
 interface CurrentDate {
   date: Date
@@ -8,7 +9,13 @@ interface CurrentDate {
 export function WeekDates(currentDate: CurrentDate) {
   const [listWeek, setListWeek] = useState([''])
 
-  const { WeekDates } = useContext(SchedulingContext)
+  // const { WeekDates } = useContext(SchedulingContext)
+
+    const  WeekDates  = useContextSelector(
+			SchedulingContext, 
+			(context) => {
+			 return context.WeekDates
+		    });
 
   function dateweeks() {
     const label = WeekDates(currentDate.date).map((day) => day.data)

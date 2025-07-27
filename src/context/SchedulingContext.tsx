@@ -1,6 +1,9 @@
+import { api } from '@/lib/axios'
 import { addDays, format, isToday, startOfWeek } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { createContext, ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useState } from 'react'
+import { createContext } from "use-context-selector";
+import { uuid } from 'zod'
 
 interface Scheduling {
   id: string
@@ -11,17 +14,28 @@ interface Scheduling {
   status: string
   image: string
 }
-
 interface WeekDatesProps {
   date: Date
   data: string
   isToday: boolean
   dayWeek: number
 }
-
+interface Patient {
+  id: string
+  name: string
+  empresa: string
+  createdAt: Date
+  status: string
+}
 interface SchedulingContextType {
   schedulings: Scheduling[]
+  patients: Patient[]
+  fetchPatients:(query?: string)=> Promise<void>
   WeekDates: (date: Date) => WeekDatesProps[]
+  CreatePatients:(data:CreatePatientSchema) => Promise<void>
+}
+interface CreatePatientSchema {
+  name: string
 }
 
 export const SchedulingContext = createContext({} as SchedulingContextType)
@@ -30,18 +44,32 @@ interface SchedulingProviderType {
   children: ReactNode
 }
 export function SchedulingProvider({ children }: SchedulingProviderType) {
+
   const [schedulings, setSchedulings] = useState<Scheduling[]>([])
+  const [patients, setPatients] = useState<Patient[]>([]);
 
   async function loadScheduling() {
-    const response = await fetch('http://localhost:3333/schedulings')
-    const data = await response.json()
-    // console.log(data)
-    setSchedulings(data)
+    const response = await api.get('schedulings', {
+    })
+    setSchedulings(response.data)
   }
 
   useEffect(() => {
     loadScheduling()
   }, [])
+
+  async function fetchPatients(query?: string) {
+    const response = await api.get('patients', {
+      params: {
+        q:query
+      }
+    })
+    setPatients(response.data)
+  }
+
+  useEffect(() => {
+      fetchPatients()
+    }, [])
 
   function WeekDates(date: Date) {
     const today = new Date(date) //Pega a data de hoje ou da pesquisa efetuada
@@ -58,13 +86,30 @@ export function SchedulingProvider({ children }: SchedulingProviderType) {
       }
     })
     return days
-  }
+  } 
+
+  const  CreatePatients = useCallback(async (data: CreatePatientSchema) => {
+   const { name } = data;
+
+   const response = await api.post('patients', {
+      uuid,
+      name,
+      empresa: 'Equilibrio',
+      createdAt: new Date(),
+      status: 'Ativo'
+    })
+    setPatients(state => [response.data, ...state])
+}, 
+  [])
 
   return (
     <SchedulingContext.Provider
       value={{
         schedulings,
+        patients,
+        fetchPatients,
         WeekDates,
+        CreatePatients
       }}
     >
       {children}

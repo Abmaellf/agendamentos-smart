@@ -50,38 +50,28 @@ export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
                         <DropdownMenuItem >
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          Settings
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          Keyboard shortcuts
+                          Configurações
                         </DropdownMenuItem>
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>
-                        <DropdownMenuItem>Team</DropdownMenuItem>
+                        <DropdownMenuItem>Pacote</DropdownMenuItem>
                         <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
+                          <DropdownMenuSubTrigger>Tempo do pacote</DropdownMenuSubTrigger>
                           <DropdownMenuPortal>
                             <DropdownMenuSubContent>
-                              <DropdownMenuItem>Email</DropdownMenuItem>
-                              <DropdownMenuItem>Message</DropdownMenuItem>
+                              <DropdownMenuItem>Quantidade no mês</DropdownMenuItem>
+                              <DropdownMenuItem>Quantidade na Semana</DropdownMenuItem>
+                              <DropdownMenuItem>Atendimento no dia</DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem>More...</DropdownMenuItem>
+                              <DropdownMenuItem>Horas do atendimento</DropdownMenuItem>
                             </DropdownMenuSubContent>
                           </DropdownMenuPortal>
                         </DropdownMenuSub>
                         <DropdownMenuItem>
-                          New Team
+                          Valores
                         </DropdownMenuItem>
                       </DropdownMenuGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>GitHub</DropdownMenuItem>
-                      <DropdownMenuItem>Support</DropdownMenuItem>
-                      <DropdownMenuItem disabled>API</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>
-                        Log out
-                      </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -100,35 +90,25 @@ export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
                         </DropdownMenuItem>
                         
                         <DropdownMenuItem>
-                          Settings
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          Keyboard shortcuts
+                          Configurações
                         </DropdownMenuItem>
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>
-                        <DropdownMenuItem>Team</DropdownMenuItem>
+                        <DropdownMenuItem>Prontuário</DropdownMenuItem>
+                        <DropdownMenuItem>Evolução</DropdownMenuItem>
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
                           <DropdownMenuPortal>
                             <DropdownMenuSubContent>
                               <DropdownMenuItem>Email</DropdownMenuItem>
-                              <DropdownMenuItem>Message</DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem>More...</DropdownMenuItem>
                             </DropdownMenuSubContent>
                           </DropdownMenuPortal>
                         </DropdownMenuSub>
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem>GitHub</DropdownMenuItem>
-                      <DropdownMenuItem>Support</DropdownMenuItem>
-                      <DropdownMenuItem disabled>API</DropdownMenuItem>
+                      <DropdownMenuItem disabled>Financeiro</DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem>
-                        Log out
-                      </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </NavMenu>

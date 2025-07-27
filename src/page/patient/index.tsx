@@ -11,26 +11,17 @@ import { Dialog, DialogTrigger } from '@radix-ui/react-dialog'
 import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react'
 import CreatePatientDialog from './component/create-patient-dialog'
-import { useEffect, useState } from 'react'
-
-interface Patient {
-  id: string
-  name: string
-  createdAt: Date
-  status: string
-}
+import { SchedulingContext } from '@/context/SchedulingContext'
+import { useContextSelector } from 'use-context-selector'
 
 export function Patient() {
-  const [patients, setPatients] = useState<Patient[]>();
 
-  async function loadPatient() {
-    const response = await fetch('http://localhost:3333/patients')
-    const data = await response.json()
-    setPatients(data)
-  }
-  useEffect(() => {
-      loadPatient()
-    }, [])
+  const patients = useContextSelector(
+				SchedulingContext, 
+				    (context) => {
+				    return context.patients
+			    })
+
   return (
     <div>
       <div className="flex flex-col gap-4 w-auto p-2 pt-20">
@@ -57,6 +48,7 @@ export function Patient() {
                 <TableHead className="w-[64px]"></TableHead>
                 <TableHead className="w-[140px]"> Código </TableHead>
                 <TableHead> Paciente </TableHead>
+                  <TableHead> Empresa </TableHead>
                 <TableHead className="w-[140px]"> Status </TableHead>
                 <TableHead className="w-[180px]"> Data de cadastro </TableHead>
                 

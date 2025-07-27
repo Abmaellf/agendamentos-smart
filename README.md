@@ -7,9 +7,9 @@
 
 Sistema de gestão de atendimentos especializados
 
-## Ferramenta de gestão de projetos Clickup
+## Github Issue
 
-https://app.clickup.com/9013176627/v/l/8ckma9k-293?pr=90130760846
+https://github.com/Abmaellf/agendamentos-smart/issues
 
 ## Instrução de instalação
 
