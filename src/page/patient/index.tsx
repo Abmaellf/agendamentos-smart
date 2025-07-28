@@ -8,11 +8,11 @@ import {
 import PatientTableRows from './component/patient-table-rows'
 import { PatientTableFilter } from './component/patient-table-filter'
 import { Dialog, DialogTrigger } from '@radix-ui/react-dialog'
-import { Button } from '@/components/ui/button'
-import { PlusCircle } from 'lucide-react'
 import CreatePatientDialog from './component/create-patient-dialog'
 import { SchedulingContext } from '@/context/SchedulingContext'
 import { useContextSelector } from 'use-context-selector'
+import { AddPatientModal } from '@/components/AddPatientModal'
+import { Pagination } from '@/components/pagination'
 
 export function Patient() {
 
@@ -28,18 +28,17 @@ export function Patient() {
         <h1 className="text-3xl font-bold tracking-tight"> Pacientes </h1>
       </div>
       <div className="space-y-2.5 p-2">
-        <PatientTableFilter />
+       <div className='flex justify-between'>
+         <PatientTableFilter />
 
         <Dialog>
           <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="size-4 mr-2" />
-              Novo Paciente
-            </Button>
+              <AddPatientModal />
           </DialogTrigger>
 
           <CreatePatientDialog />
         </Dialog>
+       </div>
 
         <div className="rounded-md border">
           <Table>
@@ -65,6 +64,7 @@ export function Patient() {
               }
             </TableBody>
           </Table>
+          <Pagination pageIndex={0} totalCount={10} perPage={10} />
         </div>
       </div>
     </div>

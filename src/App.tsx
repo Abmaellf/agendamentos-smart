@@ -1,25 +1,32 @@
 import { ThemeProvider } from 'styled-components'
 import { defaultTheme } from './styles/themes/default'
 import { Router } from './Router'
+import { Toaster } from 'sonner'
 
 import { BrowserRouter } from 'react-router-dom'
 import './globals.css';
 // import { GlobalStyle } from './styles/global'
 import { SchedulingProvider } from './context/SchedulingContext'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
+// import { ThemeProvider } from './components/theme/theme-provider';
 
 export function App() {
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <SchedulingProvider>
+    <ThemeProvider theme={defaultTheme} >
+        {/* // <ThemeProvider defaultTheme="dark" storageKey="agendamentos"> */}
+        <SchedulingProvider>
         <BrowserRouter>
           <HelmetProvider>
             <Helmet titleTemplate="%s | Fisioterapia e Pilates" />
-            <Router />
+            <Toaster richColors />
+             
+              <Router />
+             
           </HelmetProvider>
         </BrowserRouter>
       </SchedulingProvider>
       {/* <GlobalStyle /> */}
-    </ThemeProvider>
+      {/* </ThemeProvider> */}
+     </ThemeProvider>
   )
 }

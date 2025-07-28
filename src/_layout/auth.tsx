@@ -6,7 +6,7 @@ export function AuthLayout() {
       <div className="grid min-h-screen grid-cols-2">
         <div className="border-foreground/5 bg-muted text-muted-foreground flex h-full flex-col justify-between border-r p-10">
           <div className="text-foreground flex items-center gap-3 text-lg">
-            <span className="font-semibold"> Clínica Equilíbrio</span>
+            <span className="font-semibold"> Crie o futuro de sua Clínica </span>
           </div>
           <footer>
             Gestão de agendamento &copy; Equilibrio Fisioterapia & Pilates -{' '}

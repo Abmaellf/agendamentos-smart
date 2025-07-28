@@ -1,15 +1,13 @@
 // import imgLogo from '../../assets/BolaUnTra.png'
 import {
-  Avatar,
   HeaderContainer,
   HeaderContent,
-  ImagePerfil,
   NameAndTitle,
   NameAndTitleContainer,
   NavMenu,
 } from './styles'
 // import avatar from '../../assets/avatar.png'
-import { Menu as MenuLucida, UserRound } from 'lucide-react'
+import { ChartLine, FileSliders, Menu as MenuLucida, Settings } from 'lucide-react'
 // import { NavLink } from '../nav-link'
 import { Separator } from '../ui/separator'
 // import { AddSchedulingModal } from '../AddSchedulingModal'
@@ -17,6 +15,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { Button } from '../ui/button'
 import { AddPatientModal } from '../AddPatientModal'
 import { NavLink } from 'react-router-dom'
+import AccountMenu from '../account-menu'
+// import { ModeToggle } from '../theme/ mode-toggle'
 
 interface setMenuIsVisibleProps {
   setMenuIsVisible(data: boolean): void
@@ -81,8 +81,10 @@ export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
                       <Button variant="link">Paciente</Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="start">
-                      <DropdownMenuLabel>
-                         <NavLink to="/paciente  "> Pacientes </NavLink>
+                      <DropdownMenuLabel>                        
+                         <NavLink to="/paciente  "> 
+                            Pacientes 
+                         </NavLink>
                       </DropdownMenuLabel>
                       <DropdownMenuGroup>
                         <DropdownMenuItem asChild className='flex justify-items-start'>
@@ -90,13 +92,20 @@ export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
                         </DropdownMenuItem>
                         
                         <DropdownMenuItem>
+                          <Settings />
                           Configurações
                         </DropdownMenuItem>
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>
-                        <DropdownMenuItem>Prontuário</DropdownMenuItem>
-                        <DropdownMenuItem>Evolução</DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <FileSliders />
+                          Prontuário
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <ChartLine />
+                          Evolução
+                        </DropdownMenuItem>
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
                           <DropdownMenuPortal>
@@ -115,13 +124,13 @@ export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
           </NameAndTitle>
         </NameAndTitleContainer>
 
-        <Avatar>
-          <span> Usuário </span>
-          <ImagePerfil>
+         <AccountMenu />
+        {/* <Avatar> */}
+          {/* <ImagePerfil> */}
             {/* <img src={avatar} alt="" /> */}
-            <UserRound size={45} />
-          </ImagePerfil>
-        </Avatar>
+            {/* <UserRound size={45} /> */}
+          {/* {/* </ImagePerfil> */}
+        {/* </Avatar> */}
         <MenuLucida
           size={38}
           onClick={() => {

@@ -5,7 +5,7 @@ import { Input } from '../../components/ui/input'
 import { Label } from '@radix-ui/react-label'
 import { Link, redirect } from 'react-router-dom'
 
-export function Login() {
+export function SignUp() {
   function onSubmit() {
     return redirect('/agendamento')
   }
@@ -16,23 +16,36 @@ export function Login() {
         <div className="flex w-[350px] flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Acessar Painel
+              Faça seu cadastro
             </h1>
             <p className="text-muted-foreground text-sm">
-              Acompanhe suas vendas pelo painel do parceiro!
+              Crie sua clinica digital customizada, faça agora o seu cadastro!
             </p>
           </div>
 
           <form className="flex flex-col gap-4">
+
             <div className="space-y-2">
+              <Label htmlFor="nome-empresa"> Nome da clinica</Label>
+              <Input id="nome-empresa" type="text" />
+            </div>
+
+             <div className="space-y-2">
               <Label htmlFor="email"> Seu e-mail</Label>
               <Input id="email" type="email" />
             </div>
+
+             <div className="space-y-2">
+              <Label htmlFor="cpf-cnpj"> CPF ou CNPJ</Label>
+              <Input id="cpf0-cnpj" type="text" />
+            </div>
+
             <Link to={'/agendamento'}>
               <Button onClick={onSubmit} className="w-full" type="submit">
-                Acessar painel
+                Salvar cadastro
               </Button>
             </Link>
+
           </form>
         </div>
       </div>

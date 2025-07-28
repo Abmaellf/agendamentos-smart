@@ -15,6 +15,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useContextSelector } from 'use-context-selector'
 import { SchedulingContext } from '@/context/SchedulingContext'
+import { toast } from 'sonner'
+import { PlusCircle } from 'lucide-react'
  
 const createPatientSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -33,7 +35,7 @@ export function AddPatientModal() {
 const {
     register,
     handleSubmit,
-    reset,
+    // reset,
     formState: { errors },
   } = useForm<CreatePatientSchema>({
     resolver: zodResolver(createPatientSchema),
@@ -41,11 +43,17 @@ const {
 
   async function handlePatient(data: CreatePatientSchema) {
     const { name } = data;
-    await CreatePatients({
-      name
-    }) 
-    reset()
-    console.log('✅ Dados enviados:', data)
+    try{
+         await CreatePatients({
+          name
+        }) 
+        toast.success('Paciente cadastrado com sucesso', {
+          position:'bottom-center',
+          duration:500000
+        })
+    } catch {
+         toast.error('Dados incorretos')
+    }
   }
 
   return (
@@ -53,14 +61,19 @@ const {
 
       <Dialog>
         <DialogTrigger >
-          <Button className='m-0 p-2' variant={'ghost'}>
+          <Button  variant={'ghost'}>
+             <PlusCircle className='m-0' />
             Novo Paciente
           </Button>
         </DialogTrigger>
 
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Novo Paciente</DialogTitle>
+            
+            <DialogTitle>
+             
+              Novo Paciente
+            </DialogTitle>
             <DialogDescription>
               Criar um novo paciente no sistema
             </DialogDescription>
