@@ -137,7 +137,7 @@ export function Scheduling() {
                 <CardDaySchedulingContainerMobile>
                   {semana.label}
                   <CardDay
-                    key={semana.dayWeek}
+                    key={semana.data}
                     isToday={semana.isToday}
                     date={semana.data}
                     dayWeek={semana.dayWeek}
