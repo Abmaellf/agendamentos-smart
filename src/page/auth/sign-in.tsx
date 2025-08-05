@@ -1,14 +1,65 @@
 import { Helmet } from 'react-helmet-async'
 import { Button } from '../../components/ui/button'
 import '../../globals.css'
-import { Input } from '../../components/ui/input'
+// import { Input } from '../../components/ui/input'
 import { Label } from '@radix-ui/react-label'
-import { Link, redirect } from 'react-router-dom'
+import { useState } from 'react'
+import z from 'zod'
+import { useForm } from 'react-hook-form'
+import axios from 'axios'
+import { toast } from 'sonner'
+import {  useNavigate } from 'react-router-dom'
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const  signinSchema = z.object({
+  email: z.string(),
+  password: z.string()
+})
+
+type SigninSchema = z.infer<typeof signinSchema >
 
 export function SignIn() {
-  function onSubmit() {
-    return redirect('/agendamento')
+
+  const navigate = useNavigate()
+
+  const { register, handleSubmit } = useForm<SigninSchema>();
+
+  const [email, setMail ] = useState('');
+  
+  const [password, setPassword ] = useState('');
+
+  function onSubmit(data: SigninSchema) {
+    setMail(data.email)
+    setPassword(data.password)
+    console.log(data)
+    handleLogin()
   }
+
+  const handleLogin = async () => {
+          const returnObject = await axios({
+            method: 'post',
+            url: 'http://localhost:8082/auth/login',
+            data: {
+              login: email,
+              password: password
+            },
+          }).then((result) => {
+            alert('Login efetuado')
+          
+            navigate('/agendamento')
+            return result.data;
+          }).catch(()=> {
+              toast.error('Dados incorretos')
+          })
+
+          return returnObject
+            // toast.success('Login efetuado com sucesso', {
+            // position:'bottom-center',
+            // duration:500000
+            // })
+  }
+
+
   return (
     <>
       <Helmet title="Login" />
@@ -23,16 +74,19 @@ export function SignIn() {
             </p>
           </div>
 
-          <form className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <div className="space-y-2">
               <Label htmlFor="email"> Seu e-mail</Label>
-              <Input id="email" type="email" />
+              <input id="email" type="email" {...register('email')} />
             </div>
-            <Link to={'/agendamento'}>
-              <Button onClick={onSubmit} className="w-full" type="submit">
+
+            <div className="space-y-2">
+              <Label htmlFor="password"> Senha</Label>
+              <input id="password" type="password" {...register('password')}/>
+            </div>
+              <Button className="w-full" type="submit">
                 Acessar painel
               </Button>
-            </Link>
           </form>
         </div>
       </div>
