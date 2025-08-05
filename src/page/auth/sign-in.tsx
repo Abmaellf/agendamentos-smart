@@ -6,13 +6,14 @@ import { Label } from '@radix-ui/react-label'
 import { useState } from 'react'
 import z from 'zod'
 import { useForm } from 'react-hook-form'
-import axios from 'axios'
 import { toast } from 'sonner'
 import {  useNavigate } from 'react-router-dom'
+import { useRequest } from '@/hooks/useRequest'
+import { Loader2Icon } from 'lucide-react'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const  signinSchema = z.object({
-  email: z.string(),
+  login: z.string(),
   password: z.string()
 })
 
@@ -20,23 +21,58 @@ type SigninSchema = z.infer<typeof signinSchema >
 
 export function SignIn() {
 
+ const { postRequest, loading, setLoading } =  useRequest()
+
+ const [login, setLogin ] = useState('');
+
   const navigate = useNavigate()
 
-  const { register, handleSubmit } = useForm<SigninSchema>();
-
-  const [email, setMail ] = useState('');
+  const { register, handleSubmit, formState: {isSubmitting}  } = useForm<SigninSchema>();
   
   const [password, setPassword ] = useState('');
 
   function onSubmit(data: SigninSchema) {
-    setMail(data.email)
+    setLogin(data.login)
     setPassword(data.password)
-    console.log(data)
-    handleLogin()
+    console.log(login, password)
+    postRequest(data)
+      .then(
+          (data) => { 
+            if(data?.status === 200) {
+              setLoading(false)
+              toast.success('Acesso liberado')
+              return  navigate('/agendamento')
+            } else {
+              navigate('/')
+              toast.error('Dados incorretos')
+              setLoading(false)
+            }
+          }
+      )
+      .catch(()=>{ alert("Usuário ou senha não identificado")})
   }
-
+/*
   const handleLogin = async () => {
-          const returnObject = await axios({
+         const response = await api.post('/auth/login', {
+            data: {
+              login: email,
+              password: password
+            }
+          }).then((result) => {
+
+            console.log(result.data)
+
+            if(result) {
+              navigate('/agendamento')
+            }
+          })
+          return response
+  }
+*/
+  /*  
+  const handleLogin = async () => {
+        
+    const returnObject = await axios({
             method: 'post',
             url: 'http://localhost:8082/auth/login',
             data: {
@@ -44,22 +80,21 @@ export function SignIn() {
               password: password
             },
           }).then((result) => {
-            alert('Login efetuado')
-          
-            navigate('/agendamento')
+            console.log(result.data.token)
+            
             return result.data;
           }).catch(()=> {
               toast.error('Dados incorretos')
           })
 
           return returnObject
-            // toast.success('Login efetuado com sucesso', {
-            // position:'bottom-center',
-            // duration:500000
-            // })
+        
+            toast.success('Login efetuado com sucesso', {
+            position:'bottom-center',
+            duration:500000
+            })
   }
-
-
+*/
   return (
     <>
       <Helmet title="Login" />
@@ -77,16 +112,19 @@ export function SignIn() {
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <div className="space-y-2">
               <Label htmlFor="email"> Seu e-mail</Label>
-              <input id="email" type="email" {...register('email')} />
+              <input id="email" type="email" {...register('login')} />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="password"> Senha</Label>
               <input id="password" type="password" {...register('password')}/>
             </div>
-              <Button className="w-full" type="submit">
+             
+                <Button disabled={isSubmitting} className="w-full" type="submit">
+                  { loading ? <Loader2Icon className="animate-spin" /> : '' }
                 Acessar painel
               </Button>
+             
           </form>
         </div>
       </div>
