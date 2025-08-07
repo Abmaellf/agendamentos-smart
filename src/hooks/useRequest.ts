@@ -1,3 +1,4 @@
+import { useGlobalContext } from "@/context/useGlobalContext";
 import { api } from "@/lib/axios";
 import { useState } from "react"
 
@@ -7,6 +8,8 @@ interface Props {
 }
 
 export const useRequest = () => {
+
+    const {  setAccessToken } = useGlobalContext()
 
     const [ loading, setLoading ] = useState(false);
 
@@ -24,7 +27,8 @@ export const useRequest = () => {
                     headers: {'Content-Type': 'application/json',}
                 }
             );
-                console.log(response)
+            setAccessToken(response.data.token)   
+            console.log(response)
 
                 return response;
 

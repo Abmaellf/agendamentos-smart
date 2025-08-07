@@ -3,13 +3,14 @@ import { Button } from '../../components/ui/button'
 import '../../globals.css'
 // import { Input } from '../../components/ui/input'
 import { Label } from '@radix-ui/react-label'
-import { useState } from 'react'
+import {  useState } from 'react'
 import z from 'zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {  useNavigate } from 'react-router-dom'
 import { useRequest } from '@/hooks/useRequest'
 import { Loader2Icon } from 'lucide-react'
+import { useGlobalContext } from '@/context/useGlobalContext'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const  signinSchema = z.object({
@@ -20,6 +21,8 @@ const  signinSchema = z.object({
 type SigninSchema = z.infer<typeof signinSchema >
 
 export function SignIn() {
+
+const { accessToken } = useGlobalContext()
 
  const { postRequest, loading, setLoading } =  useRequest()
 
@@ -35,6 +38,7 @@ export function SignIn() {
     setLogin(data.login)
     setPassword(data.password)
     console.log(login, password)
+    console.log(accessToken)
     postRequest(data)
       .then(
           (data) => { 
@@ -102,7 +106,7 @@ export function SignIn() {
         <div className="flex w-[350px] flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Acessar Painel
+              Acessar Painel {accessToken}
             </h1>
             <p className="text-muted-foreground text-sm">
               Acompanhe suas vendas pelo painel do parceiro! s

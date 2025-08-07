@@ -1,7 +1,7 @@
 import { api } from '@/lib/axios'
 import { addDays, format, isToday, startOfWeek } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { ReactNode, useCallback, useEffect, useState } from 'react'
+import { ReactNode, useCallback,  useEffect, useState } from 'react'
 import { createContext } from "use-context-selector";
 import { uuid } from 'zod'
 
@@ -47,6 +47,7 @@ export function SchedulingProvider({ children }: SchedulingProviderType) {
 
   const [schedulings, setSchedulings] = useState<Scheduling[]>([])
   const [patients, setPatients] = useState<Patient[]>([]);
+  
 
   async function loadScheduling() {
     const response = await api.get('schedulings', {
@@ -115,4 +116,4 @@ export function SchedulingProvider({ children }: SchedulingProviderType) {
       {children}
     </SchedulingContext.Provider>
   )
-}
+};
