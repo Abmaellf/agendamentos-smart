@@ -1,7 +1,8 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import { getAuthorizationToken, setAuthorizationToken } from "@/api/auth";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 interface GlobalData {
-  accessToken?: string;
+  token?: string;
 }
 
 interface GlobalContextType {
@@ -35,15 +36,26 @@ export const useGlobalContext = () => {
   
   const { globalData , setGlobalData } = useContext(GlobalContext);
 
-const setAccessToken = (accessToken: string) => {
-  setGlobalData({
-    ...globalData,
-    accessToken,
-  });
-};
+  useEffect(()=>{
+    const token = getAuthorizationToken()
+    if(token) {
+      setAccessToken(token)
+    }
+  },[])
+
+  const setAccessToken = (token: string) => {
+
+    setAuthorizationToken(token);
+
+    setGlobalData({
+      ...globalData,
+      token,
+    });
+    
+  };
 
   return {
-    accessToken: globalData.accessToken,
+    token: globalData.token,
     setAccessToken,
   }
 }

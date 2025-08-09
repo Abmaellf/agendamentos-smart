@@ -22,7 +22,7 @@ type SigninSchema = z.infer<typeof signinSchema >
 
 export function SignIn() {
 
-const { accessToken } = useGlobalContext()
+const { token } = useGlobalContext()
 
  const { postRequest, loading, setLoading } =  useRequest()
 
@@ -38,7 +38,8 @@ const { accessToken } = useGlobalContext()
     setLogin(data.login)
     setPassword(data.password)
     console.log(login, password)
-    console.log(accessToken)
+    console.log(token)
+    
     postRequest(data)
       .then(
           (data) => { 
@@ -106,11 +107,11 @@ const { accessToken } = useGlobalContext()
         <div className="flex w-[350px] flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Acessar Painel {accessToken}
             </h1>
             <p className="text-muted-foreground text-sm">
-              Acompanhe suas vendas pelo painel do parceiro! s
+              Acompanhe suas vendas pelo painel do parceiro! s 
             </p>
+            {token}
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
