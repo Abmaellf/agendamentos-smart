@@ -1,3 +1,4 @@
+import { UserType } from "@/@types/UserTypes";
 import { useGlobalContext } from "@/context/useGlobalContext";
 import { api } from "@/lib/axios";
 import { useState } from "react"
@@ -18,7 +19,7 @@ export const useRequest = () => {
         setLoading(true)
 
         try{
-            const response = await api.post('auth/login',
+            const response = await api.post<UserType>('auth/login',
                 {
                     login: data.login,
                     password: data.password
@@ -28,7 +29,7 @@ export const useRequest = () => {
                 }
             );
             setAccessToken(response.data.token)   
-            console.log(response)
+            console.log(response, 'Aqui é o token')
 
                 return response;
 
