@@ -7,12 +7,15 @@ import { Doctor } from './page/doctor'
 import { AppLayout } from './_layout/app'
 import Configuration from './page/Configuration'
 import { SignUp } from './page/auth/sign-up'
+import { FirstScreen } from './api/firstScreen/first-screen'
 
 export function Router() {
   return (
     <Routes>
+       
+      <Route path="/" element={<FirstScreen />} />
+      
       <Route element={<AuthLayout />}>
-        <Route path="/" element={<SignIn />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
       </Route>

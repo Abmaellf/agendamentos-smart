@@ -29,7 +29,8 @@ export const useRequest = () => {
                 }
             );
             setAccessToken(response.data.token)   
-            console.log(response, 'Aqui é o token')
+            console.log(response.data.token, 'Aqui é o token')
+            console.log(response.data.user, 'Aqui é o usuario')
 
                 return response;
 

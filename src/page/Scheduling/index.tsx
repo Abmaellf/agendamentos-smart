@@ -30,10 +30,13 @@ import { ptBR } from 'date-fns/locale/pt-BR'
 
 import 'react-datepicker/dist/react-datepicker.css'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
+import { getAuthorizationToken } from '@/api/auth'
+import { useNavigate } from 'react-router-dom'
 
 export function Scheduling() {
+  const navigate = useNavigate()
   const today = new Date() // Pega a data de hoje
   const [startDate, setStartDate] = useState<Date>(today)
   const start = startOfWeek(startDate, { weekStartsOn: 1 })
@@ -58,6 +61,14 @@ export function Scheduling() {
     const dateString = new Date(date)
     setStartDate(dateString)
   }
+
+  useEffect(() => {
+          const token = getAuthorizationToken()
+          if(!token) {
+             navigate('/sign-in')
+               
+          }
+      }, []);
   return (
     <>
       <SpaceHeader> </SpaceHeader>
