@@ -1,19 +1,21 @@
 import { api } from '@/lib/axios'
+import { AxiosResponse } from 'axios';
 import { addDays, format, isToday, startOfWeek } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { ReactNode, useCallback,  useEffect, useState } from 'react'
+import { ReactNode, useCallback, useState } from 'react'
+import { useCookies } from 'react-cookie';
 import { createContext } from "use-context-selector";
 import { uuid } from 'zod'
 
-interface Scheduling {
-  id: string
-  namePatient: string
-  pathology: ['Fisioterapia', 'Pilates']
-  dateSchenduling: Date
-  hours: string
-  status: string
-  image: string
-}
+// interface Scheduling {
+//   id: string
+//   namePatient: string
+//   pathology: ['Fisioterapia', 'Pilates']
+//   dateSchenduling: Date
+//   hours: string
+//   status: string
+//   image: string
+// }
 interface WeekDatesProps {
   date: Date
   data: string
@@ -22,15 +24,17 @@ interface WeekDatesProps {
 }
 interface Patient {
   id: string
+  code: string
   name: string
   empresa: string
   createdAt: Date
   status: string
 }
 interface SchedulingContextType {
-  schedulings: Scheduling[]
+  // schedulings: Scheduling[]
   patients: Patient[]
-  fetchPatients:(query?: string)=> Promise<void>
+  // fetchPatients:(query?: string)=> Promise<void>
+  fetchPatients:()=>  Promise<AxiosResponse>
   WeekDates: (date: Date) => WeekDatesProps[]
   CreatePatients:(data:CreatePatientSchema) => Promise<void>
 }
@@ -44,33 +48,33 @@ interface SchedulingProviderType {
   children: ReactNode
 }
 export function SchedulingProvider({ children }: SchedulingProviderType) {
-
-  const [schedulings, setSchedulings] = useState<Scheduling[]>([])
+  const [cookies] = useCookies(["jwt"]);
+  // const [schedulings, setSchedulings] = useState<Scheduling[]>([])
   const [patients, setPatients] = useState<Patient[]>([]);
-  
 
-  async function loadScheduling() {
-    const response = await api.get('schedulings', {
-    })
-    setSchedulings(response.data)
-  }
+  // async function loadScheduling() {
+  //   const response = await api.get('schedulings', {     })
+  //   setSchedulings(response.data)
+  // }
 
-  useEffect(() => {
-    loadScheduling()
-  }, [])
+  // async function fetchPatients(query?: string) {
+  //   const response = await api.get('patients/list', {
+  //     params: {
+  //       q:query
+  //     }
+  //   })
+  //   setPatients(response.data)
+  // }
 
-  async function fetchPatients(query?: string) {
-    const response = await api.get('patients', {
-      params: {
-        q:query
-      }
-    })
+   async function fetchPatients() {
+    const response = await api.get('patient/list' )
+    console.log(response.data)
+    console.log(response.data)
+    console.log(cookies)
     setPatients(response.data)
+    return response;
   }
 
-  useEffect(() => {
-      fetchPatients()
-    }, [])
 
   function WeekDates(date: Date) {
     const today = new Date(date) //Pega a data de hoje ou da pesquisa efetuada
@@ -106,7 +110,7 @@ export function SchedulingProvider({ children }: SchedulingProviderType) {
   return (
     <SchedulingContext.Provider
       value={{
-        schedulings,
+        // schedulings,
         patients,
         fetchPatients,
         WeekDates,

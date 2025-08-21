@@ -1,3 +1,5 @@
+/* PARA FINS DIDÁTICO DE COMO ADICIONAR TOKEN NO LOCAL STORAGE OU ADICIONAR ALGO*/
+
 export const setItemStorage = (key: string, value: string) =>localStorage.setItem(key, value);
 
 export const removeItemStorage = (key: string) => localStorage.removeItem(key);
