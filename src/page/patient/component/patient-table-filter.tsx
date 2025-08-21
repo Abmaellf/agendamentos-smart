@@ -31,8 +31,8 @@ export function PatientTableFilter() {
   })
 
   async function handleSearchPatient(data : PatientTableFilterSchema ) {
-    const { name } = data;
-    await fetchPatients(name);
+    // const { name } = data;
+    await fetchPatients();
     console.log(data)
   }
 
