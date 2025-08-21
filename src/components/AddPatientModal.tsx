@@ -13,10 +13,10 @@ import { Label } from '@/components/ui/label'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useContextSelector } from 'use-context-selector'
+import { SchedulingContext } from '@/context/SchedulingContext'
 import { toast } from 'sonner'
 import { PlusCircle } from 'lucide-react'
-import { useMutation } from '@tanstack/react-query'
-import { RegisterPatient } from '@/api/register-patient'
  
 const createPatientSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -26,32 +26,30 @@ type CreatePatientSchema = z.infer<typeof createPatientSchema>
 
 export function AddPatientModal() {
 
+   const  CreatePatients  = useContextSelector(
+        SchedulingContext, 
+        (context) => {
+         return context.CreatePatients
+    });
+    
 const {
     register,
     handleSubmit,
-    reset,
+    // reset,
     formState: { errors },
   } = useForm<CreatePatientSchema>({
     resolver: zodResolver(createPatientSchema),
   })
 
-  const { mutateAsync: addPatient} = useMutation({
-      mutationFn: RegisterPatient,
-    })
-
   async function handlePatient(data: CreatePatientSchema) {
-    console.log(data)
-
+    const { name } = data;
     try{
-         await addPatient({
-          name: data.name
+         await CreatePatients({
+          name
         }) 
-        console.log(data)
-        await new Promise((resolve) => setTimeout(resolve, 2000))
-        reset()
         toast.success('Paciente cadastrado com sucesso', {
           position:'bottom-center',
-          duration:500
+          duration:500000
         })
     } catch {
          toast.error('Dados incorretos')

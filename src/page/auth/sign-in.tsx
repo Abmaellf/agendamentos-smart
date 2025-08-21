@@ -1,16 +1,14 @@
 import { Helmet } from 'react-helmet-async'
 import { Button } from '../../components/ui/button'
 import '../../globals.css'
+// import { Input } from '../../components/ui/input'
 import { Label } from '@radix-ui/react-label'
 import z from 'zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { signIn } from '@/api/sign-in'
-import { useMutation } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
-// import { setAuthorizationToken } from '@/api/auth'
+import {  useNavigate } from 'react-router-dom'
+import { useRequest } from '@/hooks/useRequest'
 import { Loader2Icon } from 'lucide-react'
-// import { setAuthorizationToken } from '@/api/auth'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const  signinSchema = z.object({
   login: z.string(),
@@ -21,29 +19,76 @@ type SigninSchema = z.infer<typeof signinSchema >
 
 export function SignIn() {
 
-  const navigate = useNavigate();
+const { postRequest, loading, setLoading } =  useRequest()
+
+//  const [login, setLogin ] = useState('');
+
+  const navigate = useNavigate()
 
   const { register, handleSubmit, formState: {isSubmitting}  } = useForm<SigninSchema>();
   
-  const { mutateAsync: authenticate} = useMutation({
-    mutationFn: signIn,
-  })
- async function handleLogin(data: SigninSchema) {
+  function onSubmit(data: SigninSchema) {
   
-    try {
-        const response = await authenticate({ login: data.login, password: data.password})
-        // if(response) {
-          // setAuthorizationToken(response.data.token)
-          console.log(response.data.token,"auth/signin")
-          console.log(response.data.user,"auth/signin")
-        // }
-        navigate('/agendamento')
-        toast.success('Conectado com sucesso', {     })
-    } catch {
-      toast.error('Credenciais inválidas')
-    }
+    postRequest(data)
+      .then(
+          (data) => { 
+            if(data?.status === 200) {
+              setLoading(false)
+              toast.success('Acesso liberado')
+              return  navigate('/agendamento')
+            } else {
+              navigate('/')
+              toast.error('Dados incorretos')
+              setLoading(false)
+            }
+          }
+      )
+      .catch(()=>{ alert("Usuário ou senha não identificado")})
   }
-  
+/*
+  const handleLogin = async () => {
+         const response = await api.post('/auth/login', {
+            data: {
+              login: email,
+              password: password
+            }
+          }).then((result) => {
+
+            console.log(result.data)
+
+            if(result) {
+              navigate('/agendamento')
+            }
+          })
+          return response
+  }
+*/
+  /*  
+  const handleLogin = async () => {
+        
+    const returnObject = await axios({
+            method: 'post',
+            url: 'http://localhost:8082/auth/login',
+            data: {
+              login: email,
+              password: password
+            },
+          }).then((result) => {
+            console.log(result.data.token)
+            
+            return result.data;
+          }).catch(()=> {
+              toast.error('Dados incorretos')
+          })
+
+          return returnObject
+        
+            toast.success('Login efetuado com sucesso', {
+            position:'bottom-center',
+            duration:500000
+            })
+  }
+*/
   return (
     <>
       <Helmet title="Login" />
@@ -57,7 +102,7 @@ export function SignIn() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(handleLogin)} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <div className="space-y-2">
               <Label htmlFor="email"> Seu e-mail</Label>
               <input id="email" type="email" {...register('login')} />
@@ -69,9 +114,10 @@ export function SignIn() {
             </div>
              
                 <Button disabled={isSubmitting} className="w-full" type="submit">
-                  { isSubmitting ? <Loader2Icon className="animate-spin" /> : '' }
+                  { loading ? <Loader2Icon className="animate-spin" /> : '' }
                 Acessar painel
               </Button>
+             
           </form>
         </div>
       </div>
