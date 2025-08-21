@@ -1,13 +1,11 @@
 import { Button } from '@/components/ui/button'
 import { TableRow, TableCell } from '@/components/ui/table'
 import { dateFormatter } from '@/utils/formatter'
-// import { useMutation } from '@tanstack/react-query'
 import { Search, ArrowRight, X } from 'lucide-react'
 
 type Props = {
     patientObj: {
           id: string
-          code: string
           name: string
           empresa: string
           createdAt: Date
@@ -16,7 +14,6 @@ type Props = {
 }
 
 export default function PatientTableRows({patientObj}: Props) {
-
   return (
     <TableRow>
       <TableCell>
@@ -26,7 +23,7 @@ export default function PatientTableRows({patientObj}: Props) {
         </Button>
       </TableCell>
 
-      <TableCell className="font-mono text-xs font-medium"> { patientObj.code }</TableCell>
+      <TableCell className="font-mono text-xs font-medium"> { patientObj.id }</TableCell>
 
       <TableCell className="font-medium"> { patientObj.name }</TableCell>
       <TableCell className="font-medium"> { patientObj.empresa }</TableCell>

@@ -1,62 +1,61 @@
-// import {  setAuthorizationToken } from "@/api/auth";
-// import { createContext, ReactNode, useContext,  useState } from "react";
+import { getAuthorizationToken, setAuthorizationToken } from "@/api/auth";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
-// interface GlobalData {
-//   token?: string;
-// }
+interface GlobalData {
+  token?: string;
+}
 
-// interface GlobalContextType {
-//   globalData: GlobalData
-//   setGlobalData: (globalData: GlobalData) => void;
-// }
+interface GlobalContextType {
+  globalData: GlobalData
+  setGlobalData: (globalData: GlobalData) => void;
+}
 
-// const GlobalContext = createContext({} as GlobalContextType)
+const GlobalContext = createContext({} as GlobalContextType)
 
-// interface GlobalContextProviderType {
-//     children: ReactNode
-// }
+interface GlobalContextProviderType {
+    children: ReactNode
+}
 
-// export function GlobalContextProvider({ children }: GlobalContextProviderType) {
-export function GlobalContextProvider() {
+export function GlobalContextProvider({ children }: GlobalContextProviderType) {
 
-// const [globalData, setGlobalData] = useState<GlobalData>({})
+const [globalData, setGlobalData] = useState<GlobalData>({})
 
 
-    // return(
-    //     <GlobalContext.Provider value={{
-    //         globalData,
-    //         setGlobalData
-    //     }}>
-    //         {children}
-    //     </GlobalContext.Provider>
-    // )
+return(
+    <GlobalContext.Provider value={{
+        globalData,
+        setGlobalData
+    }}>
+        {children}
+    </GlobalContext.Provider>
+)
 }
 
 
 export const useGlobalContext = () => {
   
-  // const { globalData , setGlobalData } = useContext(GlobalContext);
+  const { globalData , setGlobalData } = useContext(GlobalContext);
 
-  // useEffect(()=>{
-  //   const token = getAuthorizationToken()
-  //   if(token) {
-  //     setAccessToken(token)
-  //   }
-  // },[])
+  useEffect(()=>{
+    const token = getAuthorizationToken()
+    if(token) {
+      setAccessToken(token)
+    }
+  },[])
 
-  // const setAccessToken = (token: string) => {
+  const setAccessToken = (token: string) => {
 
-  //   setAuthorizationToken(token);
+    setAuthorizationToken(token);
 
-  //   setGlobalData({
-  //     ...globalData,
-  //     token,
-  //   });
+    setGlobalData({
+      ...globalData,
+      token,
+    });
     
-  // };
+  };
 
-  // return {
-  //   token: globalData.token,
-  //   setAccessToken,
-  // }
+  return {
+    token: globalData.token,
+    setAccessToken,
+  }
 }
