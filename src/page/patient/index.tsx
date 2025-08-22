@@ -13,14 +13,24 @@ import { SchedulingContext } from '@/context/SchedulingContext'
 import { useContextSelector } from 'use-context-selector'
 import { AddPatientModal } from '@/components/AddPatientModal'
 import { Pagination } from '@/components/pagination'
+import { useEffect } from 'react'
 
 export function Patient() {
-
   const patients = useContextSelector(
 				SchedulingContext, 
 				    (context) => {
 				    return context.patients
-			    })
+	})
+
+   const fetchPatients = useContextSelector(
+				SchedulingContext, 
+				    (context) => {
+				    return context.fetchPatients
+	})
+
+   useEffect(() => {
+    fetchPatients()
+    }, [])
 
   return (
     <div>
