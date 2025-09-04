@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 export const HeaderContainer = styled.div`
   background: ${({ theme }) => theme.colors['gray-100']};
+  z-index: 1;
   width: 100%;
   display: flex;
   align-items: center;
