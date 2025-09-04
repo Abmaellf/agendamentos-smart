@@ -25,14 +25,15 @@ export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
   return (
     <HeaderContainer>
       {/* <img src={imgLogo} alt="" /> */}
-      <div className='flex items-center rounded-full justify-center  bg-emerald-500 w-15 h-15 p-8 m-1'>
+      <div className='flex items-center rounded-full justify-center w-15 h-15 p-8 m-1'> 
+        {/*bg-emerald-500 */}
         <span>Logo</span>
       </div>
 
       <HeaderContent>
         <NameAndTitleContainer>
           <NameAndTitle className="flex items-center justify-between gap-3 text-color-sidebar-primary">
-            <div> Equilíbrio </div>
+            <div className='text-white rounded p-2 bg-emerald-500'> Nome Clínica </div>
             <div> Fisioterapia & Pilates</div>
             <Separator orientation="vertical" className="h-6" />
             <NavMenu>
