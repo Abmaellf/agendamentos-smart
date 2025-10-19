@@ -3,7 +3,6 @@ import { AxiosResponse } from 'axios';
 import { addDays, format, isToday, startOfWeek } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { ReactNode, useCallback, useState } from 'react'
-import { useCookies } from 'react-cookie';
 import { createContext } from "use-context-selector";
 import { uuid } from 'zod'
 
@@ -48,7 +47,7 @@ interface SchedulingProviderType {
   children: ReactNode
 }
 export function SchedulingProvider({ children }: SchedulingProviderType) {
-  const [cookies] = useCookies(["jwt"]);
+  // const [cookies] = useCookies(["jwt"]);
   // const [schedulings, setSchedulings] = useState<Scheduling[]>([])
   const [patients, setPatients] = useState<Patient[]>([]);
 
@@ -68,10 +67,7 @@ export function SchedulingProvider({ children }: SchedulingProviderType) {
 
    async function fetchPatients() {
     const response = await api.get('patient/list' )
-    console.log(response.data)
-    console.log(response.data)
-    console.log(cookies)
-    setPatients(response.data)
+    setPatients(response.data.content)
     return response;
   }
 

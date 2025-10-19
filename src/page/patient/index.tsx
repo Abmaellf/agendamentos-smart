@@ -29,7 +29,9 @@ export function Patient() {
 	})
 
    useEffect(() => {
-    fetchPatients()
+    fetchPatients().then(res => {
+      console.log("Dados da api na page",res.data.content)
+    })
     }, [])
 
   return (
@@ -57,21 +59,22 @@ export function Patient() {
                 <TableHead className="w-[64px]"></TableHead>
                 <TableHead className="w-[140px]"> Código </TableHead>
                 <TableHead> Paciente </TableHead>
-                  <TableHead> Empresa </TableHead>
                 <TableHead className="w-[140px]"> Status </TableHead>
                 <TableHead className="w-[180px]"> Data de cadastro </TableHead>
                 
-                <TableHead className="w-[164px]"> </TableHead>
+                <TableHead className="w-[100px]"> </TableHead>
+                <TableHead className="w-[120px]"> Ação</TableHead>
                 <TableHead className="w-[132px]"> </TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
               {
-                patients?.map((patient) => {
+                Array.isArray(patients) && patients.map((patient) => {
                    return <PatientTableRows patientObj={patient} key={patient.id} />
                 })
               }
+              
             </TableBody>
           </Table>
           <Pagination pageIndex={0} totalCount={10} perPage={10} />
