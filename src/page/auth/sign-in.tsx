@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { signIn } from '@/api/sign-in'
 import { useMutation } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 // import { setAuthorizationToken } from '@/api/auth'
 import { Loader2Icon } from 'lucide-react'
 // import { setAuthorizationToken } from '@/api/auth'
@@ -48,6 +48,11 @@ export function SignIn() {
     <>
       <Helmet title="Login" />
       <div className="p-8">
+         <div className="p-8">
+									<Button variant={'ghost'} asChild className="absolute top-8 right-8">
+									  <Link to={'/sign-up'}>Novo Usuário</Link>
+									</Button>
+        </div>
         <div className="flex w-[350px] flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">

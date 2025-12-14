@@ -2,8 +2,15 @@ import { Building, ChevronDown, LogOut } from 'lucide-react'
 
 import { Button } from './ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu'
+import { useQuery } from '@tanstack/react-query'
+import { getProfile } from '@/api/get-profile'
 
 export default function AccountMenu() {
+const { data: profile } = useQuery({
+    queryKey:['profile'],
+    queryFn: getProfile,
+})
+
     return (
     <DropdownMenu>
         <DropdownMenuTrigger >
@@ -12,16 +19,15 @@ export default function AccountMenu() {
                 className="flex items-center gap-2 select-none"
             >
                 {' '}
-                Usuário <ChevronDown />
+               {profile?.clinic.name} <ChevronDown />
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
                 <span className="text-muted-foreground text-xs font-normal">
                 {' '}
-                Abmael Ferreira{' '}
+                {profile?.username}
                 </span>
-                <span> abmaellf@gmail.com</span>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
 
