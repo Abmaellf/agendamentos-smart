@@ -12,6 +12,8 @@ import { Helmet, HelmetProvider } from 'react-helmet-async'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/react-query'
 import { CookiesProvider } from 'react-cookie'
+import { Provider } from 'react-redux'
+import { store } from './features/store'
 // import { ThemeProvider } from './components/theme/theme-provider';
 
 export function App() {
@@ -19,6 +21,7 @@ export function App() {
     <ThemeProvider theme={defaultTheme} >
         {/* // <ThemeProvider defaultTheme="dark" storageKey="agendamentos"> */}
         <CookiesProvider>
+        <Provider store={store}>
         <SchedulingProvider>
         <BrowserRouter>
           <HelmetProvider>
@@ -32,6 +35,7 @@ export function App() {
           </HelmetProvider>
         </BrowserRouter>
       </SchedulingProvider>
+      </Provider>
       </CookiesProvider>
       {/* <GlobalStyle /> */}
       {/* </ThemeProvider> */}

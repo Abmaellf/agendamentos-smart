@@ -1,30 +1,24 @@
 import { Route, Routes } from 'react-router-dom'
-import { SignIn } from './page/auth/sign-in'
-import { AuthLayout } from './_layout/auth'
-import { Scheduling } from './page/Scheduling'
-import { Patient } from './page/patient'
-import { Doctor } from './page/doctor'
-import { AppLayout } from './_layout/app'
-import Configuration from './page/Configuration'
-import { SignUp } from './page/auth/sign-up'
-import { FirstScreen } from './api/firstScreen/first-screen'
+
+import { appLayout, authLayout, publicRoutes } from './config/routes'
 
 export function Router() {
   return (
     <Routes>
-       
-      <Route path="/" element={<FirstScreen />} />
-      
-      <Route element={<AuthLayout />}>
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/sign-up" element={<SignUp />} />
+      {publicRoutes.map((route) => (
+        <Route key={route.path} path={route.path} element={route.element} />
+      ))}
+
+      <Route element={authLayout.element}>
+        {authLayout.routes.map((route) => (
+          <Route key={route.path} path={route.path} element={route.element} />
+        ))}
       </Route>
 
-      <Route element={<AppLayout />}>
-        <Route path="/agendamento" element={<Scheduling />} />
-        <Route path="/paciente" element={<Patient />} />
-        <Route path="/doctor" element={<Doctor />} />
-        <Route path="/configuration" element={<Configuration />} />
+      <Route element={appLayout.element}>
+        {appLayout.routes.map((route) => (
+          <Route key={route.path} path={route.path} element={route.element} />
+        ))}
       </Route>
     </Routes>
   )

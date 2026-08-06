@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Agendamentos Smart",
+    "subtitle": "Arquitetura da SPA React para gestao de atendimentos, pacientes e agenda",
+    "output": "docs/agendamentos-smart-architecture.html",
+    "quality_profile": "showcase",
+    "visual_preset": "blueprint",
+    "views": [
+      {
+        "id": "entrada-e-rotas",
+        "label": "Entrada e rotas",
+        "focus": ["usuario", "vite-assets", "react-shell", "router-layouts", "scheduling-ui"],
+        "note": "Acompanhe a entrada do usuario na SPA ate a rota principal de agendamentos."
+      },
+      {
+        "id": "auth-e-sessao",
+        "label": "Autenticacao e sessao",
+        "focus": ["router-layouts", "auth-ui", "api-client", "backend-api", "browser-state"],
+        "note": "Veja como login, cookies e armazenamento local cercam as chamadas protegidas."
+      },
+      {
+        "id": "dados-pacientes",
+        "label": "Dados de pacientes",
+        "focus": ["patient-ui", "browser-state", "api-client", "backend-api", "json-server"],
+        "note": "Compare a listagem paginada via RTK Query com o servidor mock de desenvolvimento."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "usuario",
+      "type": "external",
+      "label": "Usuario da clinica",
+      "sublabel": "Browser",
+      "pos": [40, 369],
+      "size": [142, 64]
+    },
+    {
+      "id": "toolchain",
+      "type": "cloud",
+      "label": "Toolchain Vite",
+      "sublabel": "React + TS + Tailwind",
+      "tag": "npm run build/dev",
+      "pos": [250, 130],
+      "size": [150, 68]
+    },
+    {
+      "id": "vite-assets",
+      "type": "cloud",
+      "label": "SPA entregue",
+      "sublabel": "Vite :3000 ou dist/",
+      "pos": [250, 369],
+      "size": [150, 64]
+    },
+    {
+      "id": "react-shell",
+      "type": "frontend",
+      "label": "App Shell",
+      "sublabel": "App.tsx providers",
+      "tag": "Theme, Redux, Query",
+      "pos": [470, 365],
+      "size": [158, 72]
+    },
+    {
+      "id": "router-layouts",
+      "type": "frontend",
+      "label": "Router + Layouts",
+      "sublabel": "public / auth / app",
+      "tag": "React Router",
+      "pos": [705, 365],
+      "size": [158, 72]
+    },
+    {
+      "id": "auth-ui",
+      "type": "security",
+      "label": "Auth Screens",
+      "sublabel": "FirstScreen, SignIn, SignUp",
+      "tag": "cookie jwt",
+      "pos": [930, 185],
+      "size": [168, 72]
+    },
+    {
+      "id": "scheduling-ui",
+      "type": "frontend",
+      "label": "Agenda",
+      "sublabel": "Scheduling + WeekDates",
+      "tag": "date-fns",
+      "pos": [930, 365],
+      "size": [168, 72]
+    },
+    {
+      "id": "patient-ui",
+      "type": "frontend",
+      "label": "Pacientes",
+      "sublabel": "PatientContainer/Form",
+      "tag": "paginacao",
+      "pos": [930, 545],
+      "size": [168, 72]
+    },
+    {
+      "id": "browser-state",
+      "type": "database",
+      "label": "Estado no browser",
+      "sublabel": "Redux, Query cache, Context",
+      "tag": "localStorage + cookies",
+      "pos": [1165, 570],
+      "size": [175, 72]
+    },
+    {
+      "id": "api-client",
+      "type": "backend",
+      "label": "Cliente HTTP",
+      "sublabel": "Axios + RTK Query",
+      "tag": "withCredentials",
+      "pos": [1170, 365],
+      "size": [160, 72]
+    },
+    {
+      "id": "backend-api",
+      "type": "external",
+      "label": "Backend REST",
+      "sublabel": "VITE_API_URL",
+      "tag": "/auth/* /patient/*",
+      "pos": [1390, 365],
+      "size": [160, 72]
+    },
+    {
+      "id": "json-server",
+      "type": "database",
+      "label": "Mock local",
+      "sublabel": "json-server :3333",
+      "tag": "data.json",
+      "pos": [1390, 545],
+      "size": [160, 72]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Aplicacao React no browser",
+      "wraps": ["react-shell", "router-layouts", "auth-ui", "scheduling-ui", "patient-ui", "browser-state", "api-client"]
+    },
+    {
+      "kind": "security-group",
+      "label": "Superficie de sessao e dados",
+      "wraps": ["auth-ui", "browser-state", "api-client", "backend-api"]
+    },
+    {
+      "kind": "region",
+      "label": "Fontes HTTP externas",
+      "wraps": ["backend-api", "json-server"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "usuario-to-assets",
+      "from": "usuario",
+      "to": "vite-assets",
+      "label": "abre SPA",
+      "variant": "emphasis"
+    },
+    {
+      "id": "toolchain-to-assets",
+      "from": "toolchain",
+      "to": "vite-assets",
+      "label": "bundle",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [325, 212]
+    },
+    {
+      "id": "assets-to-shell",
+      "from": "vite-assets",
+      "to": "react-shell",
+      "label": "React bundle",
+      "variant": "emphasis",
+      "route": "straight"
+    },
+    {
+      "id": "shell-to-router",
+      "from": "react-shell",
+      "to": "router-layouts",
+      "label": "providers",
+      "variant": "emphasis"
+    },
+    {
+      "id": "router-to-auth",
+      "from": "router-layouts",
+      "to": "auth-ui",
+      "label": "/sign-in",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "left",
+      "via": [[784, 292], [895, 292], [895, 221]],
+      "labelAt": [840, 282]
+    },
+    {
+      "id": "router-to-scheduling",
+      "from": "router-layouts",
+      "to": "scheduling-ui",
+      "label": "/agendamento",
+      "variant": "emphasis"
+    },
+    {
+      "id": "router-to-patient",
+      "from": "router-layouts",
+      "to": "patient-ui",
+      "label": "/paciente",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "via": [[784, 500], [895, 500], [895, 581]],
+      "labelAt": [840, 513]
+    },
+    {
+      "id": "auth-to-api",
+      "from": "auth-ui",
+      "to": "api-client",
+      "label": "POST /auth/login",
+      "variant": "security",
+      "fromSide": "right",
+      "toSide": "top",
+      "via": [[1136, 221], [1250, 221], [1250, 330]],
+      "labelAt": [1194, 209]
+    },
+    {
+      "id": "patient-to-state",
+      "from": "patient-ui",
+      "to": "browser-state",
+      "label": "cache paginada",
+      "fromSide": "bottom",
+      "toSide": "bottom",
+      "via": [[1014, 660], [1253, 660]],
+      "labelAt": [1028, 674]
+    },
+    {
+      "id": "patient-to-api",
+      "from": "patient-ui",
+      "to": "api-client",
+      "label": "patient/list",
+      "variant": "emphasis",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "via": [[1014, 520], [1250, 520]],
+      "labelAt": [1132, 508]
+    },
+    {
+      "id": "api-to-backend",
+      "from": "api-client",
+      "to": "backend-api",
+      "label": "REST JSON",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left",
+      "route": "straight"
+    },
+    {
+      "id": "api-to-mock",
+      "from": "api-client",
+      "to": "json-server",
+      "label": "dev fallback",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "via": [[1250, 505], [1355, 505], [1355, 581]],
+      "labelAt": [1302, 494]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Frontend",
+      "items": [
+        "Vite serve a SPA em :3000 e gera dist/ para entrega estatica",
+        "App.tsx compoe ThemeProvider, CookiesProvider, Redux, SchedulingProvider, BrowserRouter, Helmet e QueryClientProvider",
+        "Router.tsx separa rotas publicas, auth e app"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Dados",
+      "items": [
+        "RTK Query lista pacientes com page/size em patient/list",
+        "Axios cobre auth/login, auth/me, auth/register e patient/save",
+        "Scheduling usa estado local, date-fns e contexto para datas da semana"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Sessao",
+      "items": [
+        "FirstScreen decide entre /sign-in e /agendamento lendo cookies.jwt",
+        "Axios e fetchBaseQuery usam VITE_API_URL com credenciais incluidas",
+        "storageProxy mantem utilitarios para AUTHORIZATION_KEY no localStorage"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Desenvolvimento",
+      "items": [
+        "npm run dev inicia Vite; npm run dev:server inicia json-server data.json em :3333",
+        "data.json contem fixtures de schedulings e patients",
+        "Permissao patient:list ja aparece na configuracao de rota de pacientes"
+      ]
+    }
+  ]
+}

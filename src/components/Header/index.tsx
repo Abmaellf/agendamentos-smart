@@ -68,7 +68,7 @@ export function Header({ setMenuIsVisible }: setMenuIsVisibleProps) {
                {/* Paciente */}
                 <DropdownMenu>
                   
-                         <NavLink to="/paciente  "> 
+                         <NavLink to="/paciente"> 
                             Pacientes 
                          </NavLink>
                   
