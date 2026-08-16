@@ -9,7 +9,14 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "format": "prettier  --write ."
+    "format": "prettier  --write .",
+    "test": "vitest run --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts",
+    "test:coverage": "vitest run --coverage --config vitest.config.ts",
+    "test:postman:setup": "newman run postman/001-criar-agendamento-manual/criar-agendamento-manual.postman_collection.json -e postman/001-criar-agendamento-manual/local.postman_environment.json --env-var baseUrl=http://localhost:8082 --folder \"00 - Autenticação de teste\" --bail",
+    "test:postman:smoke": "newman run postman/001-criar-agendamento-manual/backend-atual-smoke.postman_collection.json -e postman/001-criar-agendamento-manual/local.postman_environment.json --env-var baseUrl=http://localhost:8082 --bail",
+    "test:postman": "newman run postman/001-criar-agendamento-manual/criar-agendamento-manual.postman_collection.json -e postman/001-criar-agendamento-manual/local.postman_environment.json --env-var baseUrl=http://localhost:8082 --bail",
+    "test:postman:race": "newman run postman/001-criar-agendamento-manual/concorrencia-ultima-vaga.postman_collection.json -e postman/001-criar-agendamento-manual/local.postman_environment.json --env-var baseUrl=http://localhost:8082 --bail"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
@@ -51,18 +58,26 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.4",
     "@types/node": "^24.0.13",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9.29.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "globals": "^15.15.0",
+    "jsdom": "^29.1.1",
+    "msw": "^2.15.0",
+    "newman": "^6.2.2",
     "prettier": "^3.6.0",
     "prettier-plugin-tailwindcss": "^0.6.13",
     "tw-animate-css": "^1.3.5",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.35.0",
-    "vite": "^6.0.5"
+    "vite": "^6.0.5",
+    "vitest": "^4.1.10"
   }
 }

@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Criar Especificação de Feature'
+  short_description: 'Cria specs testáveis no padrão Spec Kit'
+  default_prompt: 'Use $create-feature-spec para transformar esta feature em uma especificação testável.'

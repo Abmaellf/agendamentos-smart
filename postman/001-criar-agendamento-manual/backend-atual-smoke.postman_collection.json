@@ -1,0 +1,166 @@
+{
+  "info": {
+    "_postman_id": "68a3aed5-1dad-4b33-9931-001000000005",
+    "name": "001 - Smoke do backend atual",
+    "description": "Valida conectividade, credenciais, ADMIN, criação idempotente do USER e leitura do agendamento seed sem exigir o contrato futuro da feature.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login ADMIN",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"{{adminLogin}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Login ADMIN responde 200', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('Perfil ADMIN pertence à clínica seed', () => { pm.expect(body.user.login).to.eql(pm.environment.get('adminLogin')); pm.expect(body.user.role).to.eql('ADMIN'); pm.expect(body.user.clinic.id).to.eql(pm.environment.get('clinicId')); });",
+              "pm.environment.set('adminToken', body.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Garantir USER de teste",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            { "key": "token", "value": "{{adminToken}}", "type": "string" }
+          ]
+        },
+        "method": "GET",
+        "url": "{{baseUrl}}/auth/list"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('ADMIN lista usuários', () => pm.response.to.have.status(200));",
+              "const users = pm.response.json();",
+              "const login = pm.environment.get('basicLogin');",
+              "const exists = users.some(user => user.login === login);",
+              "pm.collectionVariables.set('basicUserExists', String(exists));",
+              "if (exists) { pm.test('USER já existe', () => pm.expect(true).to.eql(true)); pm.execution.setNextRequest('Login USER'); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Criar USER quando ausente",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            { "key": "token", "value": "{{adminToken}}", "type": "string" }
+          ]
+        },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"{{basicLogin}}\",\n  \"password\": \"{{basicPassword}}\",\n  \"role\": \"USER\"\n}"
+        },
+        "url": "{{baseUrl}}/user/register/{{clinicId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('USER ausente é criado', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('basicUserExists', 'true');"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login USER",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"{{basicLogin}}\",\n  \"password\": \"{{basicPassword}}\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Login USER responde 200', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('Backend mapeia papel operacional como USER', () => pm.expect(body.user.role).to.eql('USER'));",
+              "pm.environment.set('basicToken', body.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Perfil ADMIN autenticado",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            { "key": "token", "value": "{{adminToken}}", "type": "string" }
+          ]
+        },
+        "method": "GET",
+        "url": "{{baseUrl}}/auth/me"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Bearer autentica /auth/me', () => pm.response.to.have.status(200));",
+              "pm.test('Débito conhecido: perfil atual expõe password', () => pm.expect(pm.response.json()).to.have.property('password'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultar agendamento seed pelo contrato legado",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            { "key": "token", "value": "{{adminToken}}", "type": "string" }
+          ]
+        },
+        "method": "GET",
+        "url": "{{baseUrl}}/api/scheduling/{{seedAppointmentId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Consulta seed responde 200', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('Contrato legado é identificável', () => { pm.expect(body.id).to.eql(pm.environment.get('seedAppointmentId')); pm.expect(body).to.have.property('pathology'); pm.expect(body).to.have.property('dateScheduling'); pm.expect(body).to.have.property('hours'); pm.expect(body.status).to.eql('AGENDADO'); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
