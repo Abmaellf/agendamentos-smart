@@ -10,9 +10,9 @@ Exibe horário, nome, lista de patologias e status. O estilo escolhe fundo, bord
 
 ## Dependências internas e externas
 
-- interna: `styles.ts`;
-- externa: styled-components e `defaultTheme` via provider;
-- módulos relacionados: `CardDay` e `styles/themes`.
+- internas: `ui/Card`, `ui/Separator` e utilitário `cn`;
+- externa: Tailwind;
+- módulo relacionado: `CardDay`.
 
 ## Ponto de entrada e fluxo de entrada
 
@@ -20,8 +20,7 @@ Exibe horário, nome, lista de patologias e status. O estilo escolhe fundo, bord
 
 ## Arquivos críticos
 
-- `index.tsx`: contrato local e marcação;
-- `styles.ts`: regras visuais para `Agendado`, `Concluido`, `Cancelado`, `Falta`, `Em atendimento` e `Reagendado`.
+- `index.tsx`: contrato local, marcação e regras visuais para `Agendado`, `Concluido`, `Cancelado`, `Falta`, `Em atendimento` e `Reagendado`.
 
 ## Regras próprias do módulo
 
@@ -35,5 +34,5 @@ Exibe horário, nome, lista de patologias e status. O estilo escolhe fundo, bord
 
 - Status são strings livres e possuem diferenças de acentuação/capitalização.
 - O status `Ativo` usado pelos dados fixos cai no estilo padrão branco.
-- Patologias são renderizadas por coerção do array, sem formatação explícita.
 - Cores de negócio devem ser mapeadas por um tipo canônico.
+- O componente foi migrado para Tailwind/shadcn, mas continua sem consumidor ativo.

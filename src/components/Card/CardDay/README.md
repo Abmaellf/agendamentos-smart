@@ -10,7 +10,7 @@ Recebe `date`, `isToday` e `dayWeek`, monta dois objetos de agendamento em memó
 
 ## Dependências internas e externas
 
-- interna: `../CardPatient` e `styles.ts`;
+- internas: `../CardPatient`, `ui/Card` e utilitário `cn`;
 - externas: date-fns e locale `pt-BR`;
 - módulo relacionado: `features/appointments`.
 
@@ -21,7 +21,7 @@ Componente legado: `CardDay` → filtro por `dd/MM/yyyy` → `CardPatient`.
 ## Arquivos críticos
 
 - `index.tsx`: fonte e filtro dos dados;
-- `styles.ts`: borda/fundo conforme dia atual.
+- `index.tsx`: também define a apresentação Tailwind conforme o dia atual.
 
 ## Regras próprias do módulo
 
@@ -34,6 +34,6 @@ Componente legado: `CardDay` → filtro por `dd/MM/yyyy` → `CardPatient`.
 ## Observações técnicas e débitos
 
 - Dados de pacientes e atendimentos são fixos.
-- `dayWeek` é recebido, mas não usado dentro do componente.
-- O contexto de agendamentos aparece apenas comentado.
+- `dayWeek` é preservado apenas como metadado, sem impacto na apresentação.
 - A integração futura deve fornecer IDs e datas estáveis, sem criar `new Date` durante renderização.
+- O componente foi migrado para Tailwind/shadcn, mas continua sem consumidor ativo.

@@ -15,13 +15,13 @@ Concentrar a SPA React: bootstrap, providers, rotas, páginas, integração HTTP
 ## Dependências internas e externas
 
 - internas: todos os submódulos descritos abaixo;
-- externas: React, React DOM, React Router, React Query, Axios, styled-components, Tailwind, Radix, Zod e bibliotecas auxiliares;
+- externas: React, React DOM, React Router, React Query, Axios, Tailwind, Radix, Zod e bibliotecas auxiliares;
 - módulos relacionados: configurações Vite/TypeScript na raiz e `data.json` para simulação local.
 
 ## Pontos de entrada e fluxos de entrada
 
 - `main.tsx`: entrada do bundle e montagem de `App`;
-- `App.tsx`: composição de tema, cookies, contexto, roteador, metadados, notificações e cache;
+- `App.tsx`: composição de cookies, contexto, roteador, metadados, notificações e cache;
 - `Router.tsx`: entrada de navegação para todas as páginas;
 - `env.ts`: validação antecipada da URL da API;
 - `globals.css`: estilos Tailwind efetivamente carregados.

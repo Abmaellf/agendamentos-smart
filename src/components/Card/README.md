@@ -11,9 +11,9 @@ Agrupar componentes que representam uma coluna diária e cada atendimento exibid
 
 ## Dependências internas e externas
 
-- internas: `CardDay` depende de `CardPatient` e seus respectivos estilos;
-- externas: date-fns e styled-components;
-- módulos relacionados: `features/appointments`, `WeekDate` e tema legado.
+- internas: `CardDay` depende de `CardPatient` e dos primitivos `ui/Card` e `ui/Separator`;
+- externas: date-fns e Tailwind;
+- módulos relacionados: `features/appointments` e `WeekDate`.
 
 ## Pontos de entrada e fluxos de entrada
 
@@ -23,7 +23,7 @@ fixos e não possuem consumidores.
 ## Arquivos críticos
 
 - `CardDay/index.tsx`: contém a fonte de dados atual;
-- `CardPatient/styles.ts`: contém o mapa implícito de status para cores.
+- `CardPatient/index.tsx`: contém o mapa visual dos status legados.
 
 ## Regras próprias do módulo
 
@@ -38,3 +38,4 @@ fixos e não possuem consumidores.
 - Os dados estão embutidos no componente e não representam a API ou `data.json`.
 - Os tipos locais não usam o contrato canônico `Appointment`.
 - Regras de status estão acopladas à apresentação.
+- Os componentes foram migrados para Tailwind/shadcn, mas permanecem sem consumidores.

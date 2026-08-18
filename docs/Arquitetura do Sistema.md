@@ -49,41 +49,41 @@ componentes, página e testes no mesmo limite de feature.
 
 1. `index.html` fornece o elemento `#root`.
 2. `src/main.tsx` monta `App` sem `StrictMode` ativo.
-3. `src/App.tsx` instala, nesta ordem, o tema do styled-components, cookies, `PatientProvider`, `BrowserRouter`, metadados, notificações e `QueryClientProvider`.
+3. `src/App.tsx` carrega os estilos globais e instala, nesta ordem, cookies, `PatientProvider`, `BrowserRouter`, metadados, notificações e `QueryClientProvider`.
 4. `src/Router.tsx` declara a rota inicial, as páginas de autenticação e as páginas internas.
 5. A rota `/` espera um segundo, verifica apenas a presença do cookie `jwt` e navega para login ou agenda.
 
 ### Rotas efetivas
 
-| Rota             | Layout       | Componente      | Estado comprovado                                  |
-| ---------------- | ------------ | --------------- | -------------------------------------------------- |
-| `/`              | nenhum       | `FirstScreen`   | Redirecionamento por presença do cookie `jwt`      |
-| `/sign-in`       | `AuthLayout` | `SignIn`        | Login via `POST /auth/login`                       |
-| `/sign-up`       | `AuthLayout` | `SignUp`        | Formulário visual; não registra usuário            |
-| `/appointments`  | `AppLayout`  | `AppointmentsPage` | Agenda semanal integrada à API e criação manual |
-| `/paciente`      | `AppLayout`  | `Patient`       | Lista e duas implementações de criação de paciente |
-| `/doctor`        | `AppLayout`  | `Doctor`        | Página mínima, sem fluxo funcional                 |
-| `/configuration` | `AppLayout`  | `Configuration` | Página vazia                                       |
+| Rota             | Layout       | Componente         | Estado comprovado                                  |
+| ---------------- | ------------ | ------------------ | -------------------------------------------------- |
+| `/`              | nenhum       | `FirstScreen`      | Redirecionamento por presença do cookie `jwt`      |
+| `/sign-in`       | `AuthLayout` | `SignIn`           | Login via `POST /auth/login`                       |
+| `/sign-up`       | `AuthLayout` | `SignUp`           | Formulário visual; não registra usuário            |
+| `/appointments`  | `AppLayout`  | `AppointmentsPage` | Agenda semanal integrada à API e criação manual    |
+| `/paciente`      | `AppLayout`  | `Patient`          | Lista e duas implementações de criação de paciente |
+| `/doctor`        | `AppLayout`  | `Doctor`           | Página mínima, sem fluxo funcional                 |
+| `/configuration` | `AppLayout`  | `Configuration`    | Página vazia                                       |
 
 Não existe rota curinga (`404`) nem guarda de rota no `AppLayout`.
 
 ## Mapa de módulos e responsabilidades
 
-| Módulo                   | Responsabilidade atual                     | Dependências relevantes           | Consumidores                    |
-| ------------------------ | ------------------------------------------ | --------------------------------- | ------------------------------- |
-| `src/_layout`            | Estrutura visual pública e interna         | Router, Header, MenuMobile        | `Router.tsx`                    |
-| `src/page/auth`          | Telas de entrada e cadastro visual         | API, React Query, forms, router   | `Router.tsx`                    |
-| `src/features/appointments` | Domínio, API, cache, criação e grade semanal | React Query, Zod, date-fns | `Router.tsx` |
-| `src/page/patient`       | Lista, filtro e criação de pacientes       | contexto, UI, forms               | `Router.tsx`                    |
-| `src/page/doctor`        | Placeholder de profissional                | React                             | `Router.tsx`                    |
-| `src/page/Configuration` | Placeholder de configuração                | React                             | `Router.tsx`                    |
-| `src/components`         | Navegação, modais, cartões e paginação     | UI, API, contexto                 | layouts e páginas               |
-| `src/components/ui`      | Primitivos visuais reutilizáveis           | Radix, Tailwind, CVA              | páginas e componentes           |
-| `src/context`            | Estado e operações legadas de pacientes | Axios, context selector           | pacientes                       |
-| `src/api`                | Chamadas HTTP e utilitários de token       | Axios e Web Storage               | autenticação, Header, paciente  |
-| `src/lib`                | Axios, QueryClient e merge de classes      | env, Axios, React Query           | API, contexto e UI              |
-| `src/styles`             | Tema legado do styled-components           | styled-components                 | `App` e componentes estilizados |
-| `src/assets`             | Imagens locais atualmente sem consumidores | bundler Vite                      | nenhum import ativo             |
+| Módulo                      | Responsabilidade atual                       | Dependências relevantes         | Consumidores                   |
+| --------------------------- | -------------------------------------------- | ------------------------------- | ------------------------------ |
+| `src/_layout`               | Estrutura visual pública e interna           | Router, Header, MenuMobile      | `Router.tsx`                   |
+| `src/page/auth`             | Telas de entrada e cadastro visual           | API, React Query, forms, router | `Router.tsx`                   |
+| `src/features/appointments` | Domínio, API, cache, criação e grade semanal | React Query, Zod, date-fns      | `Router.tsx`                   |
+| `src/page/patient`          | Lista, filtro e criação de pacientes         | contexto, UI, forms             | `Router.tsx`                   |
+| `src/page/doctor`           | Placeholder de profissional                  | React                           | `Router.tsx`                   |
+| `src/page/Configuration`    | Placeholder de configuração                  | React                           | `Router.tsx`                   |
+| `src/components`            | Navegação, modais, cartões e paginação       | UI, API, contexto               | layouts e páginas              |
+| `src/components/ui`         | Primitivos visuais reutilizáveis             | Radix, Tailwind, CVA            | páginas e componentes          |
+| `src/context`               | Estado e operações legadas de pacientes      | Axios, context selector         | pacientes                      |
+| `src/api`                   | Chamadas HTTP e utilitários de token         | Axios e Web Storage             | autenticação, Header, paciente |
+| `src/lib`                   | Axios, QueryClient e merge de classes        | env, Axios, React Query         | API, contexto e UI             |
+| `src/globals.css`           | Tailwind e design tokens globais             | Tailwind                        | `App` e componentes visuais    |
+| `src/assets`                | Imagens locais atualmente sem consumidores   | bundler Vite                    | nenhum import ativo            |
 
 ## Padrões de implementação observados
 
@@ -116,12 +116,12 @@ Essa coexistência não define uma fonte única para estado de servidor e provoc
 
 Login e cadastros de paciente combinam React Hook Form e Zod. O cadastro visual de usuário não usa esses mecanismos e não envia dados.
 
-### Duas estratégias de estilo
+### Estratégia de estilo consolidada
 
-- Tailwind CSS, variáveis em `globals.css` e primitivos Radix/shadcn em `components/ui`.
-- styled-components e `defaultTheme` em componentes antigos da agenda, Header e menu móvel.
+- Tailwind CSS e variáveis semânticas em `globals.css`.
+- Primitivos Radix/shadcn em `components/ui` e composição de variantes com CVA/`cn`.
 
-Ambas estão ativas. `index.css` duplica boa parte de `globals.css`, mas não é importado; `styles/global.ts` também não é montado.
+`index.css` duplica boa parte de `globals.css`, mas não é importado. O provider de tema baseado em classes permanece disponível e desconectado.
 
 ## Separação de responsabilidades
 
@@ -149,19 +149,18 @@ Não foram identificados ciclos explícitos no grafo estático de imports, mas e
 
 ## Dependências críticas
 
-| Dependência            | Uso real                           | Impacto arquitetural                                   |
-| ---------------------- | ---------------------------------- | ------------------------------------------------------ |
-| React / React DOM      | Renderização e estado              | Base de toda a SPA                                     |
-| React Router           | Rotas, layouts e navegação         | Acesso e composição de telas dependem dele             |
-| Axios                  | Cliente HTTP com `withCredentials` | Todas as integrações reais usam uma única `baseURL`    |
-| TanStack React Query   | Perfil, catálogos e agendamentos      | Fonte do estado remoto da feature `appointments`          |
-| React Hook Form + Zod  | Formulários e validação            | Contratos de entrada locais às telas                   |
-| react-cookie           | Leitura do cookie `jwt`            | Decide somente o redirecionamento da raiz              |
-| use-context-selector   | Contexto legado de pacientes       | Acopla consumidores ao contrato de `PatientContext`    |
-| date-fns               | Semana útil e formatação           | Cálculos locais da página de agendamentos               |
-| Tailwind + Radix + CVA | Design system novo                 | Sustenta `components/ui`                               |
-| styled-components      | Componentes visuais legados        | Exige `defaultTheme` e tipos próprios                  |
-| Vite                   | Build e ambiente                   | Expõe apenas variáveis `VITE_*` e resolve o alias `@`  |
+| Dependência            | Uso real                           | Impacto arquitetural                                  |
+| ---------------------- | ---------------------------------- | ----------------------------------------------------- |
+| React / React DOM      | Renderização e estado              | Base de toda a SPA                                    |
+| React Router           | Rotas, layouts e navegação         | Acesso e composição de telas dependem dele            |
+| Axios                  | Cliente HTTP com `withCredentials` | Todas as integrações reais usam uma única `baseURL`   |
+| TanStack React Query   | Perfil, catálogos e agendamentos   | Fonte do estado remoto da feature `appointments`      |
+| React Hook Form + Zod  | Formulários e validação            | Contratos de entrada locais às telas                  |
+| react-cookie           | Leitura do cookie `jwt`            | Decide somente o redirecionamento da raiz             |
+| use-context-selector   | Contexto legado de pacientes       | Acopla consumidores ao contrato de `PatientContext`   |
+| date-fns               | Semana útil e formatação           | Cálculos locais da página de agendamentos             |
+| Tailwind + Radix + CVA | Design system                      | Sustenta `components/ui`, páginas e componentes       |
+| Vite                   | Build e ambiente                   | Expõe apenas variáveis `VITE_*` e resolve o alias `@` |
 
 Dependências declaradas sem import ativo identificado: `@headlessui/react`, `@heroicons/react`, `phosphor-react` (apenas comentário) e `scheduler`. `react-datepicker` fornece apenas um CSS importado; o seletor visível usa `react-day-picker`. Pacotes Redux aparecem instalados como extrínsecos em `node_modules`, mas não constam em `package.json` nem são usados pelo código.
 
@@ -178,7 +177,7 @@ Na qualidade estática, o projeto mantém `.eslintrc` legado e `eslint.config.mj
 | `POST /patient/save`      | `src/api/register-patient.ts` | Cadastro pelo modal compartilhado     |
 | `POST patients`           | `PatientContext`              | Cadastro pelo diálogo local da página |
 | `GET /api/scheduling`     | `features/appointments/api`   | Consulta externa de agendamentos      |
-| `POST /api/scheduling`    | `features/appointments/api`   | Criação externa de agendamento       |
+| `POST /api/scheduling`    | `features/appointments/api`   | Criação externa de agendamento        |
 
 ## Regras arquiteturais
 
@@ -188,7 +187,7 @@ Na qualidade estática, o projeto mantém `.eslintrc` legado e `eslint.config.mj
 - Imports podem usar o alias `@/*` para `src/*`.
 - `VITE_API_URL` é obrigatório e validado por Zod.
 - Chamadas HTTP reais devem reutilizar `src/lib/axios.ts` para respeitar `baseURL` e cookies.
-- O tema do styled-components deve corresponder ao tipo declarado em `src/@types/styled.d.ts`.
+- Tokens globais devem ser declarados em `src/globals.css` e consumidos por classes semânticas.
 
 ### Regras oficiais para novas implementações
 
@@ -198,7 +197,7 @@ Estas regras orientam código futuro; módulos legados listados neste documento 
 2. Operações HTTP devem ficar em módulos de API por domínio, com tipos de entrada e saída explícitos. Páginas e componentes visuais não devem importar Axios diretamente.
 3. Rotas internas devem depender de uma guarda de autenticação central, nunca apenas do redirecionamento em `/`.
 4. Componentes de `components/ui` não devem conhecer regras de negócio. Componentes específicos de uma funcionalidade devem permanecer junto da respectiva página/feature ou ser promovidos a compartilhados somente quando houver reuso real.
-5. Não introduzir um terceiro mecanismo de estilo. Novos componentes devem priorizar Tailwind/Radix; alterações em styled-components podem ser mantidas até migração planejada.
+5. Não introduzir outro mecanismo de estilo. Novos componentes devem usar Tailwind e priorizar os primitivos Radix/shadcn existentes.
 6. Não duplicar entidades. `Patient`, `Appointment`, perfil e respostas paginadas devem possuir contratos canônicos compartilhados.
 7. Toda nova rota deve declarar estado de carregamento, erro, vazio, autorização e fallback de navegação quando aplicável.
 8. Valores sensíveis, tokens, usuários e respostas de perfil não podem ser enviados a `console`.
@@ -211,7 +210,7 @@ Estas regras orientam código futuro; módulos legados listados neste documento 
 
 - componentes React em PascalCase, com exportações nomeadas na maioria dos casos;
 - páginas legadas em `src/page` e novas telas de domínio dentro de `features`;
-- estilos styled-components em arquivos `styles.ts(x)` próximos do componente;
+- estilos com classes Tailwind próximos da marcação e tokens globais em `globals.css`;
 - primitivas shadcn/Radix em nomes de arquivo minúsculos;
 - schemas Zod próximos ao formulário;
 - notificações por `sonner`;
@@ -231,23 +230,22 @@ Para código novo: usar nomes de pasta em kebab-case ou minúsculas de forma uni
 
 ## Riscos técnicos e acoplamentos importantes
 
-| Prioridade | Risco comprovado                          | Evidência e impacto                                                                                                        |
-| ---------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Prioridade | Risco comprovado                          | Evidência e impacto                                                                                                         |
+| ---------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | Crítica    | Rotas internas sem proteção               | `/appointments`, `/paciente`, `/doctor` e `/configuration` podem ser abertas diretamente; `FirstScreen` protege somente `/` |
-| Alta       | Exposição de informações no console       | Login registra token e usuário; perfil e pacientes também são registrados; o tipo de perfil inclui `password`              |
-| Alta       | Criação de paciente duplicada             | Dois diálogos coexistem, usam `/patient/save` e `patients`, e atualizam estados diferentes                                 |
-| Alta       | Contrato legado de paciente incorreto       | `PatientContext` importa `uuid` de Zod e envia a própria função no objeto; JSON não produz um identificador UUID           |
-| Alta       | Cadastro de usuário apenas visual         | `SignUp` navega para a agenda sem chamar `registerUser` ou enviar os campos                                                |
-| Média      | Navegação quebrada para pacientes         | O Header aponta para `/paciente  ` em vez de `/paciente`                                                                   |
-| Média      | Logout sem comportamento                  | O item “Sair” não possui callback nem remoção de cookie/token                                                              |
-| Média      | Contexto com responsabilidades excessivas | Pacientes, HTTP e mutação compartilham o mesmo provider global                                                            |
-| Média      | Contratos de backend divergentes          | Endpoints e formatos do mock não são equivalentes; `fetchPatients` exige `response.data.content`                           |
-| Média      | Rotas incompletas                         | Profissional é um título; configuração é vazia; não existe 404                                                             |
-| Média      | Bundle inicial grande                     | Build gera cerca de 800,71 kB minificados e alerta acima de 500 kB; não há lazy loading de rotas                           |
-| Média      | Lint dependente do estado de `dist`       | `eslint .` inclui o bundle quando `dist/` existe e produz milhares de falsos erros no código gerado                        |
-| Média      | Configuração de lint divergente           | `.eslintrc` e flat config coexistem; regras React e simple-import-sort instaladas não estão ativas no lint atual           |
-| Baixa      | Design system duplicado                   | Tailwind/Radix e styled-components exigem temas e padrões paralelos                                                        |
-| Baixa      | Assets e módulos órfãos                   | Aumentam ruído, dependências e custo de manutenção                                                                         |
+| Alta       | Exposição de informações no console       | Login registra token e usuário; perfil e pacientes também são registrados; o tipo de perfil inclui `password`               |
+| Alta       | Criação de paciente duplicada             | Dois diálogos coexistem, usam `/patient/save` e `patients`, e atualizam estados diferentes                                  |
+| Alta       | Contrato legado de paciente incorreto     | `PatientContext` importa `uuid` de Zod e envia a própria função no objeto; JSON não produz um identificador UUID            |
+| Alta       | Cadastro de usuário apenas visual         | `SignUp` navega para a agenda sem chamar `registerUser` ou enviar os campos                                                 |
+| Média      | Navegação quebrada para pacientes         | O Header aponta para `/paciente  ` em vez de `/paciente`                                                                    |
+| Média      | Logout sem comportamento                  | O item “Sair” não possui callback nem remoção de cookie/token                                                               |
+| Média      | Contexto com responsabilidades excessivas | Pacientes, HTTP e mutação compartilham o mesmo provider global                                                              |
+| Média      | Contratos de backend divergentes          | Endpoints e formatos do mock não são equivalentes; `fetchPatients` exige `response.data.content`                            |
+| Média      | Rotas incompletas                         | Profissional é um título; configuração é vazia; não existe 404                                                              |
+| Média      | Bundle inicial grande                     | Build gera cerca de 800,71 kB minificados e alerta acima de 500 kB; não há lazy loading de rotas                            |
+| Média      | Lint dependente do estado de `dist`       | `eslint .` inclui o bundle quando `dist/` existe e produz milhares de falsos erros no código gerado                         |
+| Média      | Configuração de lint divergente           | `.eslintrc` e flat config coexistem; regras React e simple-import-sort instaladas não estão ativas no lint atual            |
+| Baixa      | Assets e módulos órfãos                   | Aumentam ruído, dependências e custo de manutenção                                                                          |
 
 ## Módulos órfãos ou desconectados
 
@@ -264,7 +262,7 @@ Para código novo: usar nomes de pasta em kebab-case ou minúsculas de forma uni
 | `src/components/theme`                                                       | Provider e seletor de tema não montados                     |
 | `src/components/ui/pagination.tsx`                                           | Não usado; existe outra paginação compartilhada             |
 | `src/components/ui/select.tsx`                                               | Sem consumidor ativo                                        |
-| `src/styles/global.ts` e `src/index.css`                                     | Não importados pela entrada da aplicação                    |
+| `src/index.css`                                                              | Não importado pela entrada da aplicação                     |
 | `src/utils/formatter.ts`                                                     | Formatadores sem consumidor                                 |
 | `src/assets/*.png` e `public/vite.svg`                                       | Nenhum import ou referência ativa identificada              |
 

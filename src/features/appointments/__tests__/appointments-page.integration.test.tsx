@@ -132,34 +132,52 @@ describe('integração da criação com a agenda semanal', () => {
     fireEvent.change(dateInput, { target: { value: '2026-08-19' } })
 
     expect(screen.getByText('19 de Agosto de 2026')).toBeVisible()
-    expect(
-      await screen.findByRole('heading', { name: 'Quarta - 19' }),
-    ).toBeVisible()
+    const selectedDay = await screen.findByRole('region', {
+      name: 'Quarta - 19',
+    })
+    expect(selectedDay).toBeVisible()
+    expect(selectedDay).toHaveAttribute('data-selected', 'true')
+  })
+
+  it('navega entre semanas pelos botões do cabeçalho', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<AppointmentsPage />)
+
+    await user.click(screen.getByRole('button', { name: /semana anterior/i }))
+    expect(screen.getByText('06 de Agosto de 2026')).toBeVisible()
+
+    await user.click(screen.getByRole('button', { name: /próxima semana/i }))
+    expect(screen.getByText('13 de Agosto de 2026')).toBeVisible()
   })
 
   it.each([
-    ['AGENDADO', '#02B160'],
-    ['FALTA', '#DD4B39'],
-    ['REAGENDADO', '#FF9D18'],
-    ['CANCELADO', '#4F4D4A'],
-  ] as const)('aplica a cor do status %s', async (status, color) => {
-    apiScenario.appointments = [
-      {
-        ...createdAppointment,
-        id: `appointment-${status.toLowerCase()}`,
-        startsAt: '2026-08-13T14:00:00.000Z',
-        status,
-      },
-    ]
+    ['AGENDADO', 'bg-appointment-scheduled'],
+    ['FALTA', 'bg-appointment-missed'],
+    ['REAGENDADO', 'bg-appointment-rescheduled'],
+    ['CANCELADO', 'bg-appointment-canceled'],
+    ['ATENDENDO', 'bg-appointment-in-progress'],
+    ['FINALIZADO', 'bg-appointment-completed'],
+  ] as const)(
+    'aplica o token visual do status %s',
+    async (status, colorToken) => {
+      apiScenario.appointments = [
+        {
+          ...createdAppointment,
+          id: `appointment-${status.toLowerCase()}`,
+          startsAt: '2026-08-13T14:00:00.000Z',
+          status,
+        },
+      ]
 
-    renderWithProviders(<AppointmentsPage />)
+      renderWithProviders(<AppointmentsPage />)
 
-    expect(
-      await screen.findByTestId(
+      const card = await screen.findByTestId(
         `appointment-appointment-${status.toLowerCase()}`,
-      ),
-    ).toHaveStyle({ backgroundColor: color })
-  })
+      )
+      expect(card).toHaveAttribute('data-status', status)
+      expect(card).toHaveClass(colorToken)
+    },
+  )
 
   it('WB-18 disponibiliza e abre a criação para sessão operacional autenticada', async () => {
     const user = userEvent.setup()

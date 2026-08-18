@@ -6,22 +6,19 @@ Fornecer declarações TypeScript compartilhadas ou extensões de tipos de bibli
 
 ## Responsabilidades e funcionalidades existentes
 
-- `styled.d.ts` estende `DefaultTheme` com a forma de `defaultTheme`;
 - `UserTypes.ts` declara uma resposta de login que não é usada por código ativo.
 
 ## Dependências internas e externas
 
-- `styled.d.ts` depende de `styles/themes/default` e styled-components;
 - `UserTypes.ts` não possui dependência;
-- módulos relacionados: estilos e autenticação.
+- módulo relacionado: autenticação.
 
 ## Pontos de entrada e fluxos de entrada
 
-`styled.d.ts` é incluído automaticamente pelo TypeScript. `UserType` aparece apenas em comentário dentro de `hooks/useRequest.ts`.
+`UserType` aparece apenas em comentário dentro de `hooks/useRequest.ts`.
 
 ## Arquivos críticos
 
-- `styled.d.ts`: necessário aos componentes styled-components tipados;
 - `UserTypes.ts`: órfão.
 
 ## Regras próprias do módulo

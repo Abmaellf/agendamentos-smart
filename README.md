@@ -18,7 +18,7 @@ O repositório contém uma SPA React com autenticação, consulta de perfil, age
 - React Router 7;
 - Axios e TanStack React Query;
 - React Hook Form e Zod;
-- Tailwind CSS 4, componentes Radix/shadcn e styled-components;
+- Tailwind CSS 4 e componentes Radix/shadcn;
 - date-fns para datas;
 - Vitest, React Testing Library, MSW e Newman para testes de caixa branca e preta.
 
@@ -92,8 +92,8 @@ npm run test:postman:race
 | ----------------- | ----------------------------------------------------------- |
 | `src/Router.tsx`  | Rotas públicas e internas                                   |
 | `src/_layout/`    | Cascas visuais das rotas                                    |
-| `src/page/`       | Páginas legadas ainda não migradas para features             |
-| `src/features/`   | Domínios; `appointments` inclui API, modelo, tela e testes   |
+| `src/page/`       | Páginas legadas ainda não migradas para features            |
+| `src/features/`   | Domínios; `appointments` inclui API, modelo, tela e testes  |
 | `src/components/` | Componentes compartilhados e componentes visuais legados    |
 | `src/api/`        | Funções HTTP, autenticação local e redirecionamento inicial |
 | `src/context/`    | Estado compartilhado legado de pacientes                    |

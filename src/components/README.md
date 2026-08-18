@@ -11,8 +11,8 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 | `Header`              | Navegação desktop e menu da conta    | Ativo                       |
 | `MenuMobile`          | Sobreposição de navegação responsiva | Ativo, links apenas visuais |
 | `account-menu.tsx`    | Perfil da clínica/usuário            | Ativo                       |
-| `Card`                | Cartões antigos da agenda             | Legado sem consumidor       |
-| `WeekDate`            | Rótulos antigos dos dias úteis      | Legado sem consumidor       |
+| `Card`                | Cartões antigos da agenda            | Legado sem consumidor       |
+| `WeekDate`            | Rótulos antigos dos dias úteis       | Legado sem consumidor       |
 | `AddPatientModal.tsx` | Cadastro mínimo de paciente          | Ativo, duplicado            |
 | `pagination.tsx`      | Resumo/paginador visual              | Ativo, sem callbacks        |
 | `nav-link.tsx`        | Link com estado atual                | Órfão                       |
@@ -22,7 +22,7 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 ## Dependências internas e externas
 
 - internas: `components/ui`, `context`, `api`, estilos e tipos locais;
-- externas: React, Router, React Query, React Hook Form, Zod, Radix, Lucide, date-fns, styled-components e sonner;
+- externas: React, Router, React Query, React Hook Form, Zod, Radix, Lucide, date-fns, Tailwind e sonner;
 - módulos relacionados: layouts, agenda e pacientes.
 
 ## Pontos de entrada e fluxos de entrada

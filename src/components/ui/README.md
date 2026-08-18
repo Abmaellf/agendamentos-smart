@@ -9,7 +9,10 @@ Fornecer componentes visuais sem regra de negócio, baseados no padrão shadcn, 
 | Arquivo             | Uso ativo identificado                     |
 | ------------------- | ------------------------------------------ |
 | `button.tsx`        | Formulários, navegação, tabela e paginação |
+| `alert.tsx`         | Preparado para feedback da agenda          |
+| `badge.tsx`         | Preparado para status de agendamento       |
 | `calendar.tsx`      | Seletor de data da agenda                  |
+| `card.tsx`          | Preparado para cartões da agenda           |
 | `dialog.tsx`        | Modais de paciente/agendamento             |
 | `dropdown-menu.tsx` | Header, conta e tema órfão                 |
 | `input.tsx`         | Formulários                                |
@@ -19,6 +22,7 @@ Fornecer componentes visuais sem regra de negócio, baseados no padrão shadcn, 
 | `table.tsx`         | Lista de pacientes                         |
 | `pagination.tsx`    | Sem consumidor ativo                       |
 | `select.tsx`        | Sem consumidor ativo                       |
+| `skeleton.tsx`      | Preparado para carregamento da agenda      |
 
 ## Dependências internas e externas
 

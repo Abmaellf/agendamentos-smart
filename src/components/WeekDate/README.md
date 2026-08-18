@@ -6,12 +6,12 @@ Exibir os rótulos formatados dos cinco dias úteis da semana selecionada.
 
 ## Responsabilidades e funcionalidades existentes
 
-Seleciona `WeekDates` do contexto, calcula rótulos ao receber uma nova data e os mantém em estado local.
+Calcula e apresenta os rótulos dos cinco dias úteis a partir da data recebida.
 
 ## Dependências internas e externas
 
-- internas: `styles.ts`;
-- externas: React, use-context-selector e styled-components;
+- internas: tokens Tailwind definidos em `globals.css`;
+- externas: date-fns e locale `pt-BR`;
 - módulo relacionado: `features/appointments`.
 
 ## Ponto de entrada e fluxo de entrada
@@ -21,8 +21,7 @@ rótulos. A página atual de agendamentos não o utiliza.
 
 ## Arquivos críticos
 
-- `index.tsx`: coordenação com o contexto;
-- `styles.ts`: dimensão e destaque do dia.
+- `index.tsx`: cálculo dos dias e apresentação com Tailwind.
 
 ## Regras próprias do módulo
 
@@ -33,7 +32,5 @@ rótulos. A página atual de agendamentos não o utiliza.
 
 ## Observações técnicas e débitos
 
-- O estado é derivável diretamente da propriedade e do contexto.
-- Os elementos produzidos por `map` não recebem `key`.
-- A dependência do efeito usa o objeto `currentDate` inteiro, recriado a cada renderização do pai.
+- O componente usa Tailwind, mas continua sem consumidor ativo.
 - A página também calcula os mesmos dias, duplicando regra de calendário.

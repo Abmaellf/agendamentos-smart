@@ -13,7 +13,7 @@ Oferecer seleção de tema `light`, `dark` ou `system` por classe no elemento ra
 
 - internas: botão e dropdown de `components/ui`;
 - externas: React e Lucide;
-- módulos relacionados: `globals.css` e o `ThemeProvider` distinto de styled-components em `App.tsx`.
+- módulo relacionado: `globals.css`.
 
 ## Pontos de entrada e fluxos de entrada
 
@@ -35,5 +35,4 @@ Não há ponto de entrada ativo. Os imports/montagem em `App` e `AppLayout` est�
 
 - O módulo é órfão.
 - `useTheme` não detecta ausência do provider porque o contexto possui um valor inicial; a validação `context === undefined` nunca ocorre.
-- O sistema já possui outro `ThemeProvider`; imports devem usar alias explícito para evitar ambiguidade.
 - Renomear o arquivo com espaço somente junto da correção dos imports.
