@@ -1,4 +1,3 @@
-import { ListNumberDate, WeekDatesContainer } from './styles'
 import { addDays, format, startOfWeek } from 'date-fns'
 import { ptBR } from 'date-fns/locale/pt-BR'
 
@@ -12,10 +11,15 @@ export function WeekDates(currentDate: CurrentDate) {
   )
 
   return (
-    <WeekDatesContainer>
+    <ol className="flex items-center justify-center gap-3 max-[980px]:flex-col">
       {listWeek.map((label) => (
-        <ListNumberDate key={label}>{label}</ListNumberDate>
+        <li
+          key={label}
+          className="bg-brand-accent text-brand-foreground w-80 rounded-[5px] px-[100px]"
+        >
+          {label}
+        </li>
       ))}
-    </WeekDatesContainer>
+    </ol>
   )
 }

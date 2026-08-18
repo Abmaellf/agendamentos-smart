@@ -3,10 +3,8 @@ import { render, type RenderOptions } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { Toaster } from 'sonner'
-import { ThemeProvider } from 'styled-components'
 import type { PropsWithChildren, ReactElement } from 'react'
 
-import { defaultTheme } from '@/styles/themes/default'
 import { PatientProvider } from '@/context/PatientContext'
 
 interface TestRenderOptions extends Omit<RenderOptions, 'wrapper'> {
@@ -35,18 +33,16 @@ export function renderWithProviders(
 
   function Wrapper({ children }: PropsWithChildren) {
     return (
-      <ThemeProvider theme={defaultTheme}>
-        <MemoryRouter initialEntries={[route]}>
-          <HelmetProvider>
-            <PatientProvider>
-              <QueryClientProvider client={queryClient}>
-                {children}
-                <Toaster richColors />
-              </QueryClientProvider>
-            </PatientProvider>
-          </HelmetProvider>
-        </MemoryRouter>
-      </ThemeProvider>
+      <MemoryRouter initialEntries={[route]}>
+        <HelmetProvider>
+          <PatientProvider>
+            <QueryClientProvider client={queryClient}>
+              {children}
+              <Toaster richColors />
+            </QueryClientProvider>
+          </PatientProvider>
+        </HelmetProvider>
+      </MemoryRouter>
     )
   }
 

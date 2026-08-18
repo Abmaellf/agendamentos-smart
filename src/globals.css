@@ -39,6 +39,28 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-brand: var(--brand);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-muted: var(--brand-muted);
+  --color-agenda-surface: var(--agenda-surface);
+  --color-agenda-surface-strong: var(--agenda-surface-strong);
+  --color-appointment-scheduled: var(--appointment-scheduled);
+  --color-appointment-scheduled-strong: var(--appointment-scheduled-strong);
+  --color-appointment-missed: var(--appointment-missed);
+  --color-appointment-missed-strong: var(--appointment-missed-strong);
+  --color-appointment-rescheduled: var(--appointment-rescheduled);
+  --color-appointment-rescheduled-strong: var(--appointment-rescheduled-strong);
+  --color-appointment-canceled: var(--appointment-canceled);
+  --color-appointment-canceled-strong: var(--appointment-canceled-strong);
+  --color-appointment-in-progress: var(--appointment-in-progress);
+  --color-appointment-in-progress-highlight: var(
+    --appointment-in-progress-highlight
+  );
+  --color-appointment-in-progress-strong: var(--appointment-in-progress-strong);
+  --color-appointment-completed: var(--appointment-completed);
+  --color-appointment-completed-strong: var(--appointment-completed-strong);
 }
 
 :root {
@@ -74,6 +96,26 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --brand: #02b160;
+  --brand-accent: #00b37e;
+  --brand-foreground: #ffffff;
+  --brand-hover: #018e4d;
+  --brand-muted: #edf8f2;
+  --agenda-surface: #29292e;
+  --agenda-surface-strong: #242528;
+  --appointment-scheduled: #02b160;
+  --appointment-scheduled-strong: #019b55;
+  --appointment-missed: #dd4b39;
+  --appointment-missed-strong: #c83e31;
+  --appointment-rescheduled: #ff9d18;
+  --appointment-rescheduled-strong: #e9890f;
+  --appointment-canceled: #4f4d4a;
+  --appointment-canceled-strong: #393735;
+  --appointment-in-progress: #6f7374;
+  --appointment-in-progress-highlight: #7c8182;
+  --appointment-in-progress-strong: #626667;
+  --appointment-completed: #6f7374;
+  --appointment-completed-strong: #55595a;
 }
 
 .dark {
