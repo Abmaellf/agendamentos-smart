@@ -27,7 +27,7 @@ Como a spec ainda contém clarificações, os testes adotam provisoriamente as r
 Razões do vermelho:
 
 - `appointment-form-schema.ts`, `create-appointment-dialog.tsx` e o contrato de sessão ainda não existem;
-- `Scheduling` ainda não consulta a API, não apresenta loading/erro/vazio e não abre o diálogo;
+- a antiga página de agenda ainda não consulta a API, não apresenta loading/erro/vazio e não abre o diálogo;
 - `CardDay` ainda usa agendamentos fixos.
 
 A execução também revelou débitos do código atual que serão tratados somente após aprovação: chaves React ausentes, botão dentro de botão no seletor de data e propriedade visual propagada ao DOM.
@@ -67,3 +67,17 @@ A implementação permanece bloqueada por decisão de processo até aprovação 
 - os seletores/mensagens observáveis definidos nos testes da interface;
 - o contrato HTTP, códigos de erro e seed descritos no README do Postman;
 - a autorização para iniciar os módulos de produção e tornar a suíte gradualmente verde.
+
+## Resultado após a validação e implementação
+
+**Data**: 2026-08-15
+**Estado**: implementado e validado
+
+- caixa branca: `52/52` casos verdes;
+- cobertura: `95,83%` de statements e `96%` de linhas nos módulos instrumentados;
+- contrato Postman: `42` requests e `44` assertions verdes;
+- concorrência/idempotência: `9` requests e `12` assertions verdes;
+- compatibilidade legada: smoke com `5` requests e `10` assertions verdes;
+- build, lint e testes Maven verdes.
+
+O histórico vermelho acima permanece no documento para registrar o gate test-first original.

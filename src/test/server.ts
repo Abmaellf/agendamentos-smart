@@ -20,13 +20,13 @@ interface ApiScenario {
   createDelayMs: number
   createErrorCode: string | null
   createNetworkError: boolean
-  scheduleDelayMs: number
-  scheduleErrorStatus: number | null
+  appointmentDelayMs: number
+  appointmentErrorStatus: number | null
   createdAppointment: TestAppointment
   appointments: TestAppointment[]
   createRequests: Record<string, unknown>[]
   professionalQueries: string[]
-  scheduleQueries: URLSearchParams[]
+  appointmentQueries: URLSearchParams[]
 }
 
 function initialScenario(): ApiScenario {
@@ -42,13 +42,13 @@ function initialScenario(): ApiScenario {
     createDelayMs: 0,
     createErrorCode: null,
     createNetworkError: false,
-    scheduleDelayMs: 0,
-    scheduleErrorStatus: null,
+    appointmentDelayMs: 0,
+    appointmentErrorStatus: null,
     createdAppointment,
     appointments: [],
     createRequests: [],
     professionalQueries: [],
-    scheduleQueries: [],
+    appointmentQueries: [],
   }
 }
 
@@ -105,14 +105,17 @@ const handlers = [
     return catalogResponse('professionals', matchingProfessionals)
   }),
   http.get('http://localhost:8082/api/scheduling', async ({ request }) => {
-    apiScenario.scheduleQueries.push(new URL(request.url).searchParams)
-    if (apiScenario.scheduleDelayMs > 0) {
-      await delay(apiScenario.scheduleDelayMs)
+    apiScenario.appointmentQueries.push(new URL(request.url).searchParams)
+    if (apiScenario.appointmentDelayMs > 0) {
+      await delay(apiScenario.appointmentDelayMs)
     }
-    if (apiScenario.scheduleErrorStatus) {
+    if (apiScenario.appointmentErrorStatus) {
       return HttpResponse.json(
-        { code: 'SCHEDULE_LOAD_FAILED', message: 'Falha ao carregar agenda' },
-        { status: apiScenario.scheduleErrorStatus },
+        {
+          code: 'APPOINTMENT_LOAD_FAILED',
+          message: 'Falha ao carregar agenda',
+        },
+        { status: apiScenario.appointmentErrorStatus },
       )
     }
     return HttpResponse.json({ content: apiScenario.appointments })

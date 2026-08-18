@@ -6,7 +6,7 @@ Compartilhar estado e operações entre componentes sem passagem manual de propr
 
 ## Responsabilidades e funcionalidades existentes
 
-- `SchedulingContext`: mantém pacientes, busca lista, cria paciente e calcula os cinco dias úteis da semana;
+- `PatientContext`: mantém a lista e as operações legadas de pacientes;
 - `useGlobalContext`: esqueleto comentado de um contexto de autenticação, sem comportamento útil.
 
 ## Dependências internas e externas
@@ -17,11 +17,13 @@ Compartilhar estado e operações entre componentes sem passagem manual de propr
 
 ## Pontos de entrada e fluxos de entrada
 
-`App` monta `SchedulingProvider`. Pacientes e componentes selecionam propriedades com `useContextSelector`. A lista entra por `GET patient/list`; uma criação alternativa sai por `POST patients`.
+`App` monta `PatientProvider`. Páginas de pacientes selecionam propriedades com
+`useContextSelector`. A lista entra por `GET patient/list`; uma criação
+alternativa sai por `POST patients`.
 
 ## Arquivos críticos
 
-- `SchedulingContext.tsx`: provider ativo e seu contrato local;
+- `PatientContext.tsx`: provider ativo e seu contrato local;
 - `useGlobalContext.tsx`: módulo órfão de uma estratégia antiga de token.
 
 ## Regras próprias do módulo
@@ -34,7 +36,7 @@ Compartilhar estado e operações entre componentes sem passagem manual de propr
 
 ## Observações técnicas e débitos
 
-- O contexto mistura estado remoto, HTTP, mutação e regra pura de calendário.
+- O contexto ainda mistura estado remoto, HTTP e mutação de pacientes.
 - `CreatePatients` envia o export `uuid` do Zod como valor, não um UUID gerado.
 - A criação usa endpoint distinto do modal compartilhado.
 - O tipo `Patient` é local e exige campos que nem todos os consumidores usam.

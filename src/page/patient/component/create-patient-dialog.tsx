@@ -13,7 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 // import { api } from '@/lib/axios'
-import { SchedulingContext } from '@/context/SchedulingContext'
+import { PatientContext } from '@/context/PatientContext'
 // import { useContext } from 'react'
 import { useContextSelector } from 'use-context-selector'
 
@@ -26,12 +26,10 @@ type CreatePatientSchema = z.infer<typeof createPatientSchema>
 
 export default function CreatePatientDialog() {
 
-  // const  {CreatePatients }  = useContext(SchedulingContext);
-
-    const  CreatePatients  = useContextSelector(
-			SchedulingContext, 
+    const createPatient = useContextSelector(
+			PatientContext,
 			(context) => {
-			 return context.CreatePatients
+			 return context.createPatient
 		    });
 	
   
@@ -42,7 +40,7 @@ export default function CreatePatientDialog() {
   async function handleCreatePatient(data: CreatePatientSchema ) {
     const { name } = data;
 
-     await CreatePatients({
+     await createPatient({
       name
      })
      reset()

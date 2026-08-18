@@ -14,9 +14,9 @@ As regras de isolamento por tenant, conflito de paciente/profissional, capacidad
 ## 2. Estado atual relevante
 
 - O projeto não possui runner, configuração ou arquivos de testes automatizados.
-- `AddSchedulingModal` é apenas um formulário visual, não é renderizado pela página e não possui estado, validação ou integração HTTP.
-- `Scheduling` e `CardDay` exibem agendamentos fixos criados durante a renderização.
-- `SchedulingContext` concentra código parcial de pacientes e não oferece um domínio funcional de agenda.
+- O modal legado de agenda é apenas visual, não possui estado, validação ou integração HTTP.
+- A antiga página de agenda e `CardDay` exibem agendamentos fixos criados durante a renderização.
+- O contexto legado de pacientes não oferece um domínio funcional de agendamentos.
 - O login não mantém um contexto tipado de sessão; a API usa cookie HTTP-only, mas o papel ainda não está disponível de forma confiável para a interface.
 - O front-end usa `ADMIN`/`BASIC` na documentação, enquanto a API atual usa `ADMIN`/`USER`.
 - A API atual expõe `POST /api/scheduling`, mas seu contrato contém apenas paciente, patologia, data, hora, status e variante. Não há unidade, serviço, profissional, duração, preço, tenant, autoria, capacidade ou consultas por intervalo.
@@ -63,7 +63,7 @@ Erros de domínio devem ter um envelope estável, por exemplo `code`, `message` 
 
 ## 4. Arquitetura alvo no front-end
 
-Criar um módulo de feature isolado, sem ampliar o `SchedulingContext` genérico:
+Criar um módulo de feature isolado, sem ampliar o contexto genérico de pacientes:
 
 ```text
 src/
@@ -76,6 +76,7 @@ src/
     model/appointment.ts
     model/appointment-form-schema.ts
     model/appointment-errors.ts
+    pages/appointments-page.tsx
     __tests__/
   test/
     setup.ts
@@ -95,7 +96,7 @@ Responsabilidades:
 - `api`: funções HTTP tipadas, sem estado de tela;
 - `hooks`: queries por tenant/unidade/intervalo, mutação, invalidação e normalização de erro;
 - `components`: acessibilidade, campos, permissões, estados de envio e mensagens;
-- `Scheduling`: seleção de intervalo, abertura do diálogo e renderização dos dados recebidos;
+- `AppointmentsPage`: seleção de intervalo, abertura do diálogo e renderização dos dados recebidos;
 - API/backend: autorização, tenant, snapshots, conflito, capacidade, concorrência, autoria e estado inicial.
 
 ## 5. Ordem obrigatória e gates
@@ -223,7 +224,7 @@ Somente a aprovação deste gate libera a implementação.
 
 ### Fase III — Formulário de criação
 
-1. Substituir ou reescrever `AddSchedulingModal` como diálogo controlado e acessível.
+1. Criar `CreateAppointmentDialog` como diálogo controlado e acessível e remover o modal legado.
 2. Carregar paciente, unidade, serviço e profissional pelos hooks da feature.
 3. Preencher duração/preço ao selecionar serviço e aplicar a permissão de edição por papel.
 4. Combinar data e horário conforme o fuso da unidade.
@@ -232,7 +233,7 @@ Somente a aprovação deste gate libera a implementação.
 
 ### Fase IV — Agenda real
 
-1. Renderizar o disparador na página `Scheduling`.
+1. Renderizar o disparador na página `AppointmentsPage`.
 2. Buscar a agenda do intervalo semanal selecionado.
 3. Remover os agendamentos construídos em memória em `CardDay` e receber registros tipados por props.
 4. Exibir estados de loading, erro, vazio e sucesso em desktop e mobile.

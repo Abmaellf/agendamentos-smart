@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { Search } from 'lucide-react'
 // import { useContext } from 'react'
-import { SchedulingContext } from '@/context/SchedulingContext'
+import { PatientContext } from '@/context/PatientContext'
 // import { useContext } from 'react'
 import { useContextSelector } from 'use-context-selector'
 
@@ -18,10 +18,8 @@ type PatientTableFilterSchema = z.infer<typeof patientTableFilterSchema>
 
 export function PatientTableFilter() {
 
-  // const {  fetchPatients } = useContext(SchedulingContext);
-
    const  fetchPatients  = useContextSelector(
-          SchedulingContext, 
+          PatientContext,
           (context) => {
            return context.fetchPatients
       });

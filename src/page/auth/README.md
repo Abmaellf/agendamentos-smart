@@ -17,8 +17,8 @@ Oferecer telas públicas de login e intenção de cadastro de usuário/clínica.
 
 ## Pontos de entrada e fluxos de entrada
 
-- `/sign-in` → `POST /auth/login` → sucesso: `/agendamento`; falha: toast;
-- `/sign-up` → clique em link/botão → `/agendamento`, sem mutation.
+- `/sign-in` → `POST /auth/login` → sucesso: `/appointments`; falha: toast;
+- `/sign-up` → clique em link/botão → `/appointments`, sem mutation.
 
 ## Arquivos críticos
 

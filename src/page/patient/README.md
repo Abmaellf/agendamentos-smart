@@ -7,14 +7,14 @@ Listar pacientes e oferecer controles iniciais de busca, criação, paginação 
 ## Responsabilidades e funcionalidades existentes
 
 - busca pacientes ao montar;
-- renderiza uma tabela a partir do estado do `SchedulingContext`;
+- renderiza uma tabela a partir do estado do `PatientContext`;
 - aceita nome no filtro, mas apenas refaz a chamada sem parâmetro;
 - compõe dois diálogos de criação simultâneos;
 - mostra controles visuais de editar, desativar e paginar.
 
 ## Dependências internas e externas
 
-- internas: `SchedulingContext`, `components/ui`, `AddPatientModal`, `Pagination` e subpasta `component`;
+- internas: `PatientContext`, `components/ui`, `AddPatientModal`, `Pagination` e subpasta `component`;
 - externas: React, use-context-selector e Radix Dialog;
 - módulos relacionados: `api/register-patient`, `lib/axios` e backend de pacientes.
 

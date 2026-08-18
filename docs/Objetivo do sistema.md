@@ -52,7 +52,7 @@ O módulo `Doctor` apenas exibe “Fisioterapeuta”. Portanto, profissional de 
 1. O usuário acessa `/`.
 2. `FirstScreen` aguarda um segundo.
 3. Se o cookie `jwt` estiver ausente, navega para `/sign-in`.
-4. Se estiver presente, navega para `/agendamento`.
+4. Se estiver presente, navega para `/appointments`.
 
 Esse fluxo verifica presença, não validade ou expiração do cookie. Outras rotas podem ser acessadas diretamente sem essa etapa.
 
@@ -61,7 +61,7 @@ Esse fluxo verifica presença, não validade ou expiração do cookie. Outras ro
 1. O usuário informa login em um campo HTML do tipo e-mail e senha.
 2. React Hook Form entrega os valores a uma mutation do React Query.
 3. `signIn` envia `POST /auth/login`.
-4. Em sucesso, a página navega para `/agendamento` e apresenta uma notificação.
+4. Em sucesso, a página navega para `/appointments` e apresenta uma notificação.
 5. Em falha, apresenta “Credenciais inválidas”.
 
 O cliente Axios usa `withCredentials: true`; o código não persiste o token retornado. **Hipótese:** o backend também grava o cookie esperado, mas isso não pode ser confirmado neste repositório.
@@ -77,13 +77,13 @@ O item de logout não executa nenhuma ação.
 
 ### 4. Visualização da agenda
 
-1. A página inicia na data atual.
-2. O usuário escolhe uma data no calendário.
-3. A aplicação calcula segunda a sexta da semana correspondente.
-4. A grade cria um `CardDay` para cada dia.
-5. Cada `CardDay` filtra dois agendamentos fixos criados com a data do momento da renderização.
-
-O fluxo comprova navegação por semana, mas não uma agenda operacional ligada ao backend.
+1. `AppointmentsPage` inicia na data atual.
+2. O usuário escolhe uma data de referência.
+3. A aplicação calcula o intervalo semanal e consulta a unidade ativa.
+4. `useAppointments` busca os registros remotos do intervalo.
+5. A página apresenta carregamento, erro, estado vazio ou os agendamentos
+   distribuídos de segunda a sexta conforme o fuso da unidade.
+6. `CreateAppointmentDialog` cria um registro e invalida a query da agenda.
 
 ### 5. Listagem e busca de pacientes
 
@@ -104,7 +104,7 @@ Os diálogos são aninhados na composição atual, os endpoints são diferentes 
 
 ### 7. Cadastro de usuário/clínica
 
-A tela coleta nome da clínica, e-mail e CPF/CNPJ, mas o botão está dentro de um `Link` para `/agendamento`. Nenhum dado é enviado e `registerUser` não é chamado. Trata-se de fluxo visual, não de cadastro funcional.
+A tela coleta nome da clínica, e-mail e CPF/CNPJ, mas o botão está dentro de um `Link` para `/appointments`. Nenhum dado é enviado e `registerUser` não é chamado. Trata-se de fluxo visual, não de cadastro funcional.
 
 ## Funcionalidades centrais
 
@@ -113,7 +113,7 @@ A tela coleta nome da clínica, e-mail e CPF/CNPJ, mas o botão está dentro de 
 | Login                       | Implementado com ressalvas | API chamada; proteção e logout incompletos   |
 | Redirecionamento inicial    | Implementado               | Baseado somente na presença do cookie        |
 | Perfil da conta/clínica     | Implementado               | Consulta automática no Header                |
-| Agenda semanal              | Parcial                    | Calendário funciona; agendamentos são fixos  |
+| Agenda semanal              | Implementada no escopo atual | API, semana, estados de consulta e criação manual |
 | Lista de pacientes          | Parcial                    | Backend consultado; várias colunas são fixas |
 | Cadastro de paciente        | Parcial e duplicado        | Dois contratos e duas estratégias de estado  |
 | Filtro de pacientes         | Parcial                    | Entrada não chega à API                      |

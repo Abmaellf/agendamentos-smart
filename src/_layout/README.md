@@ -22,7 +22,7 @@ Fornecer estruturas visuais compartilhadas para rotas de autenticação e para a
 ## Arquivos críticos
 
 - `auth.tsx`: moldura das rotas `/sign-in` e `/sign-up`;
-- `app.tsx`: moldura de `/agendamento`, `/paciente`, `/doctor` e `/configuration`.
+- `app.tsx`: moldura de `/appointments`, `/paciente`, `/doctor` e `/configuration`.
 
 ## Regras próprias do módulo
 

@@ -11,11 +11,10 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 | `Header`              | Navegação desktop e menu da conta    | Ativo                       |
 | `MenuMobile`          | Sobreposição de navegação responsiva | Ativo, links apenas visuais |
 | `account-menu.tsx`    | Perfil da clínica/usuário            | Ativo                       |
-| `Card`                | Cartões da agenda                    | Ativo com dados fixos       |
-| `WeekDate`            | Rótulos dos cinco dias úteis         | Ativo                       |
+| `Card`                | Cartões antigos da agenda             | Legado sem consumidor       |
+| `WeekDate`            | Rótulos antigos dos dias úteis      | Legado sem consumidor       |
 | `AddPatientModal.tsx` | Cadastro mínimo de paciente          | Ativo, duplicado            |
 | `pagination.tsx`      | Resumo/paginador visual              | Ativo, sem callbacks        |
-| `AddSchedulingModal`  | Formulário visual de agenda          | Órfão                       |
 | `nav-link.tsx`        | Link com estado atual                | Órfão                       |
 | `theme`               | Tema claro/escuro Tailwind           | Órfão                       |
 | `ui`                  | Primitivos Radix/shadcn              | Parcialmente ativo          |
@@ -29,7 +28,7 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 ## Pontos de entrada e fluxos de entrada
 
 - `AppLayout` entra por `Header` e `MenuMobile`;
-- `Scheduling` entra por `CardDay` e `WeekDates`;
+- `AppointmentsPage` usa apenas componentes de `features/appointments`;
 - `Patient` entra por `AddPatientModal` e `Pagination`;
 - `Header` entra por `AccountMenu`, que consulta o perfil.
 
@@ -37,7 +36,7 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 
 - `Header/index.tsx` e `account-menu.tsx`: navegação e consulta transversal de perfil;
 - `AddPatientModal.tsx`: mutation de paciente;
-- `Card/CardDay/index.tsx`: fonte atual dos agendamentos fixos;
+- `features/appointments/pages/appointments-page.tsx`: fonte da grade semanal;
 - `ui/`: base visual da maioria dos formulários.
 
 ## Regras próprias do módulo
@@ -52,7 +51,8 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 ## Observações técnicas e débitos
 
 - Há componentes compartilhados que possuem regra de negócio e chamadas de API.
-- Agenda e paciente mantêm implementações duplicadas ou dados fixos.
+- `Card` e `WeekDate` permanecem como componentes legados sem consumidores e
+  podem ser removidos em uma limpeza posterior.
 - O link de pacientes no Header contém espaços finais no caminho.
 - Componentes órfãos devem ser conectados somente após confirmar contrato ou removidos.
 - Novos componentes específicos devem ficar junto à feature até existir reuso comprovado.

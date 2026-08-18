@@ -28,10 +28,10 @@ O environment local já contém:
 
 O backend atual chama o papel operacional de `USER`; nos requisitos da feature ele corresponde a `BASIC`. O setup consulta `/auth/list` e só chama `/user/register/{{clinicId}}` quando esse usuário ainda não existe, evitando falha por duplicidade.
 
-Para executar a coleção completa da feature, use apenas uma base descartável local/CI e restaure a seed antes de cada execução. Além da clínica e dos usuários, a seed futura deve fornecer:
+Para executar a coleção completa da feature, use apenas uma base descartável local/CI e restaure a seed antes de cada execução. A migration backend `V006__manual_appointment_contract.sql` fornece:
 
-- usuários `ADMIN`, `BASIC`, um usuário autenticado sem papel operacional e um administrador de outro tenant;
-- os IDs declarados no environment para dois tenants;
+- usuário `ADMIN` e o cadastro idempotente do `USER` operacional;
+- os IDs determinísticos declarados no environment;
 - serviços com capacidade `1`, capacidade `3` e um serviço mutável;
 - conflitos previamente preparados nos slots `patientConflictSlot`, `professionalConflictSlot` e `capacityOneSlot`;
 - `raceSlot` com duas das três vagas ocupadas; `capacityThreeSlot` começa vazio;
@@ -39,7 +39,7 @@ Para executar a coleção completa da feature, use apenas uma base descartável 
 - profissional indisponível no dia de `unavailableProfessionalSlot`;
 - agendamentos de conflito com duração de 60 minutos, permitindo o teste adjacente.
 
-Tokens são obtidos durante a execução e não são persistidos no arquivo. Os UUIDs de unidade, serviço e profissional são exemplos determinísticos do contrato futuro; esses recursos ainda não existem na API atual.
+Tokens são obtidos durante a execução e não são persistidos no arquivo. O BB-01 limpa o cookie criado pelos logins de setup antes de realizar a requisição realmente sem autenticação; os demais casos usam Bearer token explícito.
 
 ## Execução
 
@@ -54,6 +54,6 @@ Use `test:postman:smoke` primeiro. Ele deve ficar verde no backend atual. `test:
 
 `test:postman:race` dispara duas criações simultâneas para a última vaga e duas confirmações simultâneas com a mesma chave de idempotência. Execução sequencial não satisfaz BB-14/BB-18.
 
-## Resultado esperado nesta etapa
+## Resultado esperado
 
-O smoke atual deve ficar verde. As coleções da feature permanecem vermelhas até o backend implementar o contrato da spec. Nenhum teste está desabilitado.
+Todas as coleções devem ficar verdes em uma seed limpa. A referência validada é: smoke com `5/10`, contrato funcional com `42/44` e concorrência com `9/12` (requests/assertions), sem falhas. Nenhum teste está desabilitado.

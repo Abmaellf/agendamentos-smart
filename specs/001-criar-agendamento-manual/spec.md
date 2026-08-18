@@ -2,7 +2,7 @@
 
 **Feature Branch**: `001-criar-agendamento-manual`  
 **Created**: 2026-08-12  
-**Status**: Draft  
+**Status**: Implemented
 **Input**: User description: "Permitir que usuários ADMIN e BASIC criem manualmente um agendamento para um paciente, unidade, serviço, data e horário, usando duração e preço padrão do serviço, com profissional opcional na criação. O sistema deve impedir conflitos de paciente ou profissional e excesso de capacidade; somente ADMIN pode sobrescrever duração ou preço padrão."
 
 ## User Scenarios & Testing _(mandatory)_
@@ -61,7 +61,7 @@ Como administrador, quero ajustar duração ou preço para uma situação espec�
 - Quando nenhum profissional é atribuído, a validação de conflito de profissional não se aplica, mas as validações de paciente e capacidade continuam obrigatórias.
 - Quando um cadastro selecionado não pertence ao tenant da sessão, a criação é recusada sem revelar dados da outra clínica.
 - Quando duas solicitações disputam a última vaga, a capacidade deve ser verificada no momento da confirmação e nunca terminar acima do limite.
-- O comportamento para data passada, fuso da unidade e dia indisponível do profissional permanece condicionado às três clarificações registradas nos requisitos.
+- Datas passadas são bloqueadas para todos os papéis; o instante usa o fuso IANA da unidade; profissional fora dos dias disponíveis bloqueia a criação.
 
 ## Requirements _(mandatory)_
 
@@ -85,9 +85,9 @@ Como administrador, quero ajustar duração ou preço para uma situação espec�
 - **FR-016**: O sistema DEVE indicar que a criação está em andamento e impedir confirmações duplicadas enquanto a mesma operação estiver pendente.
 - **FR-017**: O sistema DEVE confirmar o sucesso e tornar o novo agendamento visível na agenda após a criação.
 - **FR-018**: O sistema DEVE informar a causa de uma recusa ou falha e preservar os dados válidos já informados para uma nova tentativa.
-- **FR-019**: O sistema DEVE tratar solicitações para datas ou horários passados conforme [NEEDS CLARIFICATION: agendamentos retroativos devem ser bloqueados para todos, permitidos somente para ADMIN ou permitidos para ambos os perfis?]
-- **FR-020**: O sistema DEVE interpretar e apresentar data e horário conforme [NEEDS CLARIFICATION: qual fuso horário é a referência da unidade e como mudanças futuras de fuso entre unidades serão tratadas?]
-- **FR-021**: O sistema DEVE validar o dia da semana do profissional conforme [NEEDS CLARIFICATION: atribuir um profissional fora dos dias disponíveis deve bloquear a criação ou apenas exibir um alerta?]
+- **FR-019**: O sistema DEVE bloquear solicitações para datas ou horários passados para `ADMIN` e `BASIC`.
+- **FR-020**: O sistema DEVE interpretar data e horário pelo identificador IANA da unidade, persistir o instante normalizado e devolver também o fuso usado.
+- **FR-021**: O sistema DEVE bloquear a criação quando o profissional selecionado estiver fora dos dias disponíveis.
 
 ### Key Entities _(include if feature involves data)_
 

@@ -10,8 +10,8 @@ Controla visibilidade por propriedade, bloqueia o scroll vertical do `body`, ani
 
 ## Dependências internas e externas
 
-- interna: `styles.tsx`;
-- externas: React, Lucide e styled-components;
+- interna: utilitário `cn`;
+- externas: React, React Router, Lucide e Tailwind CSS;
 - módulo relacionado: `AppLayout` e `Header`.
 
 ## Ponto de entrada e fluxo de entrada
@@ -20,8 +20,7 @@ Controla visibilidade por propriedade, bloqueia o scroll vertical do `body`, ani
 
 ## Arquivos críticos
 
-- `index.tsx`: efeito de scroll e composição;
-- `styles.tsx`: overlay, transições e estado `isvisible`.
+- `index.tsx`: efeito de scroll, composição, overlay, transições e estado de visibilidade.
 
 ## Regras próprias do módulo
 
@@ -33,7 +32,4 @@ Controla visibilidade por propriedade, bloqueia o scroll vertical do `body`, ani
 
 ## Observações técnicas e débitos
 
-- As opções são `div`s sem links ou callbacks.
-- O seletor CSS `nva` é um erro de grafia e não aplica a escala pretendida ao `nav`.
-- O efeito deveria restaurar o valor anterior de `overflowY` ao desmontar.
-- Acessibilidade de diálogo/menu e foco não é tratada.
+- O foco ainda não fica contido dentro do diálogo enquanto ele está aberto.

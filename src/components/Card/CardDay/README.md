@@ -12,11 +12,11 @@ Recebe `date`, `isToday` e `dayWeek`, monta dois objetos de agendamento em memó
 
 - interna: `../CardPatient` e `styles.ts`;
 - externas: date-fns e locale `pt-BR`;
-- módulo relacionado: `page/Scheduling`.
+- módulo relacionado: `features/appointments`.
 
 ## Ponto de entrada e fluxo de entrada
 
-`Scheduling` → `CardDay` → filtro por `dd/MM/yyyy` → `CardPatient`.
+Componente legado: `CardDay` → filtro por `dd/MM/yyyy` → `CardPatient`.
 
 ## Arquivos críticos
 

@@ -7,7 +7,7 @@ import { ThemeProvider } from 'styled-components'
 import type { PropsWithChildren, ReactElement } from 'react'
 
 import { defaultTheme } from '@/styles/themes/default'
-import { SchedulingProvider } from '@/context/SchedulingContext'
+import { PatientProvider } from '@/context/PatientContext'
 
 interface TestRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   route?: string
@@ -28,7 +28,7 @@ export function renderWithProviders(
   options: TestRenderOptions = {},
 ) {
   const {
-    route = '/agendamento',
+    route = '/appointments',
     queryClient = createTestQueryClient(),
     ...renderOptions
   } = options
@@ -38,12 +38,12 @@ export function renderWithProviders(
       <ThemeProvider theme={defaultTheme}>
         <MemoryRouter initialEntries={[route]}>
           <HelmetProvider>
-            <SchedulingProvider>
+            <PatientProvider>
               <QueryClientProvider client={queryClient}>
                 {children}
                 <Toaster richColors />
               </QueryClientProvider>
-            </SchedulingProvider>
+            </PatientProvider>
           </HelmetProvider>
         </MemoryRouter>
       </ThemeProvider>

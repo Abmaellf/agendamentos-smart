@@ -9,7 +9,7 @@ import PatientTableRows from './component/patient-table-rows'
 import { PatientTableFilter } from './component/patient-table-filter'
 import { Dialog, DialogTrigger } from '@radix-ui/react-dialog'
 import CreatePatientDialog from './component/create-patient-dialog'
-import { SchedulingContext } from '@/context/SchedulingContext'
+import { PatientContext } from '@/context/PatientContext'
 import { useContextSelector } from 'use-context-selector'
 import { AddPatientModal } from '@/components/AddPatientModal'
 import { Pagination } from '@/components/pagination'
@@ -17,13 +17,13 @@ import { useEffect } from 'react'
 
 export function Patient() {
   const patients = useContextSelector(
-				SchedulingContext, 
+				PatientContext,
 				    (context) => {
 				    return context.patients
 	})
 
    const fetchPatients = useContextSelector(
-				SchedulingContext, 
+				PatientContext,
 				    (context) => {
 				    return context.fetchPatients
 	})

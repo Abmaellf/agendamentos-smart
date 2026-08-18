@@ -1,12 +1,12 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent, { type UserEvent } from '@testing-library/user-event'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createdAppointment } from '@/test/builders/appointment'
 import { renderWithProviders } from '@/test/render'
 import { apiScenario } from '@/test/server'
 
-import { Scheduling } from './index'
+import { AppointmentsPage } from '../pages/appointments-page'
 
 async function chooseOption(
   user: UserEvent,
@@ -40,15 +40,20 @@ async function fillAndSubmitAppointment(user: UserEvent) {
 
 describe('integração da criação com a agenda semanal', () => {
   beforeEach(() => {
+    vi.setSystemTime(new Date('2026-08-13T12:00:00-04:00'))
     apiScenario.createdAppointment = {
       ...createdAppointment,
       startsAt: '2026-08-14T12:30:00.000Z',
     }
   })
 
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('WB-16 refaz a consulta e apresenta uma única vez o agendamento criado', async () => {
     const user = userEvent.setup()
-    renderWithProviders(<Scheduling />)
+    renderWithProviders(<AppointmentsPage />)
     expect(
       await screen.findByText(/nenhum agendamento nesta semana/i),
     ).toBeVisible()
@@ -72,22 +77,22 @@ describe('integração da criação com a agenda semanal', () => {
   })
 
   it('WB-17 apresenta carregamento da agenda', () => {
-    apiScenario.scheduleDelayMs = 1_000
+    apiScenario.appointmentDelayMs = 1_000
 
-    renderWithProviders(<Scheduling />)
+    renderWithProviders(<AppointmentsPage />)
 
     expect(screen.getByRole('status')).toHaveTextContent(/carregando agenda/i)
   })
 
   it('WB-17 apresenta erro e permite repetir a consulta', async () => {
-    apiScenario.scheduleErrorStatus = 500
+    apiScenario.appointmentErrorStatus = 500
     const user = userEvent.setup()
-    renderWithProviders(<Scheduling />)
+    renderWithProviders(<AppointmentsPage />)
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       /não foi possível carregar a agenda/i,
     )
-    apiScenario.scheduleErrorStatus = null
+    apiScenario.appointmentErrorStatus = null
     await user.click(screen.getByRole('button', { name: /tentar novamente/i }))
 
     expect(
@@ -96,7 +101,7 @@ describe('integração da criação com a agenda semanal', () => {
   })
 
   it('WB-17 apresenta estado vazio sem usar os fixtures antigos de CardDay', async () => {
-    renderWithProviders(<Scheduling />)
+    renderWithProviders(<AppointmentsPage />)
 
     expect(
       await screen.findByText(/nenhum agendamento nesta semana/i),
@@ -111,18 +116,18 @@ describe('integração da criação com a agenda semanal', () => {
         startsAt: '2026-08-13T14:00:00.000Z',
       },
     ]
-    renderWithProviders(<Scheduling />)
+    renderWithProviders(<AppointmentsPage />)
 
     expect(await screen.findByText('Ana Paciente')).toBeVisible()
     expect(screen.getByText('10:00')).toBeVisible()
-    expect(apiScenario.scheduleQueries[0]?.get('unitId')).toBe('unit-a')
-    expect(apiScenario.scheduleQueries[0]?.get('from')).toBeTruthy()
-    expect(apiScenario.scheduleQueries[0]?.get('to')).toBeTruthy()
+    expect(apiScenario.appointmentQueries[0]?.get('unitId')).toBe('unit-a')
+    expect(apiScenario.appointmentQueries[0]?.get('from')).toBeTruthy()
+    expect(apiScenario.appointmentQueries[0]?.get('to')).toBeTruthy()
   })
 
   it('WB-18 disponibiliza e abre a criação para sessão operacional autenticada', async () => {
     const user = userEvent.setup()
-    renderWithProviders(<Scheduling />)
+    renderWithProviders(<AppointmentsPage />)
 
     const trigger = await screen.findByRole('button', {
       name: /novo agendamento/i,

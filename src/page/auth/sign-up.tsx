@@ -7,7 +7,7 @@ import { Link, redirect } from 'react-router-dom'
 
 export function SignUp() {
   function onSubmit() {
-    return redirect('/agendamento')
+    return redirect('/appointments')
   }
   return (
     <>
@@ -45,7 +45,7 @@ export function SignUp() {
               <Input id="cpf0-cnpj" type="text" />
             </div>
 
-            <Link to={'/agendamento'}>
+            <Link to={'/appointments'}>
               <Button onClick={onSubmit} className="w-full" type="submit">
                 Salvar cadastro
               </Button>

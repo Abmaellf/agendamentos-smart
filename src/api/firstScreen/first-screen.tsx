@@ -14,7 +14,7 @@ export function FirstScreen() {
       if (!cookies.jwt) {
         navigate("/sign-in");
       } else {
-        navigate("/agendamento");
+        navigate("/appointments");
       }
       setLoading(false);
     }, 1000); // 100ms geralmente resolve

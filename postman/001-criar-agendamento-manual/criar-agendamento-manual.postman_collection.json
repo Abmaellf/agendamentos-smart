@@ -141,6 +141,14 @@
           },
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.cookies.jar().clear(pm.environment.get('baseUrl'), (error) => { if (error) { throw error; } });"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "exec": [
