@@ -16,7 +16,7 @@ Exibe horário, nome, lista de patologias e status. O estilo escolhe fundo, bord
 
 ## Ponto de entrada e fluxo de entrada
 
-`CardDay` entrega um objeto `schenduling` e o indicador `isToDay`; não há acesso direto a contexto ou API.
+`CardDay` entrega um objeto `appointment` e o indicador `isToDay`; não há acesso direto a contexto ou API.
 
 ## Arquivos críticos
 

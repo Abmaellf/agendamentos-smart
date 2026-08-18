@@ -13,11 +13,12 @@ Agrupar componentes que representam uma coluna diária e cada atendimento exibid
 
 - internas: `CardDay` depende de `CardPatient` e seus respectivos estilos;
 - externas: date-fns e styled-components;
-- módulos relacionados: `page/Scheduling`, `WeekDate` e tema legado.
+- módulos relacionados: `features/appointments`, `WeekDate` e tema legado.
 
 ## Pontos de entrada e fluxos de entrada
 
-`Scheduling` cria cinco `CardDay`. Cada cartão diário cria dois agendamentos fixos e entrega os compatíveis por data a `CardPatient`.
+O fluxo atual usa `AppointmentsPage`. Estes componentes antigos mantêm dados
+fixos e não possuem consumidores.
 
 ## Arquivos críticos
 
@@ -35,5 +36,5 @@ Agrupar componentes que representam uma coluna diária e cada atendimento exibid
 ## Observações técnicas e débitos
 
 - Os dados estão embutidos no componente e não representam a API ou `data.json`.
-- Tipos e grafia de `Scheduling` não são compartilhados.
+- Os tipos locais não usam o contrato canônico `Appointment`.
 - Regras de status estão acopladas à apresentação.

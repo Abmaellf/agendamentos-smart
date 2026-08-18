@@ -6,7 +6,7 @@ Decidir a primeira rota do usuário com base na presença do cookie `jwt`.
 
 ## Responsabilidades e funcionalidades existentes
 
-`FirstScreen` apresenta um ícone de carregamento, espera `1000 ms` e navega para `/sign-in` sem cookie ou `/agendamento` com cookie.
+`FirstScreen` apresenta um ícone de carregamento, espera `1000 ms` e navega para `/sign-in` sem cookie ou `/appointments` com cookie.
 
 ## Dependências internas e externas
 

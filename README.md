@@ -4,7 +4,7 @@ Aplicação web para gestão de atendimentos especializados, atualmente direcion
 
 ## Estado atual
 
-O repositório contém uma SPA React com autenticação, consulta de perfil, agenda semanal e gestão inicial de pacientes. A agenda usa dados fixos no cliente; cadastro de usuário, profissionais, configurações e parte da gestão de pacientes ainda estão incompletos. Consulte os documentos oficiais antes de implementar novos fluxos:
+O repositório contém uma SPA React com autenticação, consulta de perfil, agenda semanal integrada à API, criação manual de agendamentos e gestão inicial de pacientes. O fluxo manual aplica os padrões do serviço, diferencia `ADMIN`/`BASIC`, permite profissional opcional e atualiza a semana após a criação. Cadastro de profissionais, configurações e parte da gestão de pacientes ainda estão incompletos. Consulte os documentos oficiais antes de implementar novos fluxos:
 
 - [Arquitetura do Sistema](docs/Arquitetura%20do%20Sistema.md)
 - [Objetivo do sistema](docs/Objetivo%20do%20sistema.md)
@@ -20,7 +20,7 @@ O repositório contém uma SPA React com autenticação, consulta de perfil, age
 - React Hook Form e Zod;
 - Tailwind CSS 4, componentes Radix/shadcn e styled-components;
 - date-fns para datas;
-- json-server como servidor local opcional de dados simulados.
+- Vitest, React Testing Library, MSW e Newman para testes de caixa branca e preta.
 
 ## Execução local
 
@@ -28,27 +28,63 @@ Pré-requisito declarado em `.nvmrc`: Node.js `18.17.1`.
 
 ```bash
 npm install
-npm run dev
+npm run dev -- --host 0.0.0.0
 ```
 
 A aplicação exige `VITE_API_URL` no arquivo `.env.local`. O valor é validado por `src/env.ts` na inicialização.
 
-Para iniciar separadamente o `json-server` com `data.json`:
+O servidor Vite usa a porta `3000`; o `json-server`, a porta `3333`. Os contratos do mock não cobrem todos os endpoints atualmente chamados pela aplicação.
+
+### Ambiente integrado com a API
+
+O ambiente reproduzível validado para a agenda manual usa o backend irmão e Docker Compose:
 
 ```bash
-npm run dev:server
+cd ../../api-agendamento-smart-api/agendamento-smart-api
+docker compose up -d --build
+docker compose ps
 ```
 
-O servidor Vite usa a porta `3000`; o `json-server`, a porta `3333`. Os contratos do mock não cobrem todos os endpoints atualmente chamados pela aplicação.
+Aguarde a mensagem `Started AgendaSmartApplication` em:
+
+```bash
+docker compose logs -f api
+```
+
+Depois, neste repositório, confirme `.env.local` com `VITE_API_URL="http://localhost:8082"` e execute o Vite. URLs locais:
+
+- front-end: `http://localhost:3000`;
+- API: `http://localhost:8082`;
+- MySQL: `localhost:3306`.
+
+Se uma tentativa anterior de subida deixar o contêiner da API fora da rede do banco, preserve o volume e recrie somente a API:
+
+```bash
+cd ../../api-agendamento-smart-api/agendamento-smart-api
+docker compose stop api
+docker compose up -d --force-recreate api
+```
+
+As coleções da feature usam slots determinísticos e alteram a massa. Para repetir a suíte completa, use exclusivamente um banco local/CI descartável e restaure a seed `V006`. O comando abaixo apaga **somente o volume Docker desse projeto**, portanto não deve ser usado em ambiente com dados que precisem ser preservados:
+
+```bash
+cd ../../api-agendamento-smart-api/agendamento-smart-api
+docker compose down -v
+docker compose up -d --build
+```
+
+O roteiro completo, credenciais e ordem dos testes estão em [Como executar os testes](specs/001-criar-agendamento-manual/como-executar-testes.md).
 
 ## Verificação
 
 ```bash
 npm run build
-npx eslint src vite.config.ts
+npm run lint
+npm run test:coverage
+npm run test:postman:smoke
+npm run test:postman
+npm run test:postman:race
 ```
-
-O comando `npm run lint` examina o repositório inteiro e, se `dist/` já existir, também analisa o bundle gerado. Essa limitação está registrada na documentação de arquitetura.
 
 ## Estrutura principal
 
@@ -56,12 +92,12 @@ O comando `npm run lint` examina o repositório inteiro e, se `dist/` já existi
 | ----------------- | ----------------------------------------------------------- |
 | `src/Router.tsx`  | Rotas públicas e internas                                   |
 | `src/_layout/`    | Cascas visuais das rotas                                    |
-| `src/page/`       | Páginas e fluxos de tela                                    |
-| `src/components/` | Componentes compartilhados e de agenda                      |
+| `src/page/`       | Páginas legadas ainda não migradas para features             |
+| `src/features/`   | Domínios; `appointments` inclui API, modelo, tela e testes   |
+| `src/components/` | Componentes compartilhados e componentes visuais legados    |
 | `src/api/`        | Funções HTTP, autenticação local e redirecionamento inicial |
-| `src/context/`    | Estado compartilhado de pacientes e datas                   |
+| `src/context/`    | Estado compartilhado legado de pacientes                    |
 | `src/lib/`        | Instâncias e utilitários de infraestrutura                  |
-| `data.json`       | Massa de dados do servidor simulado                         |
 
 ## Manutenção da documentação
 

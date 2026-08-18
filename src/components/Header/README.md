@@ -13,8 +13,8 @@ Exibir identidade provisória da clínica, navegação desktop, conta e acionado
 
 ## Dependências internas e externas
 
-- internas: UI de botão/dropdown/separador e `account-menu`;
-- externas: React Router, Lucide e styled-components;
+- internas: UI de dropdown e `account-menu`;
+- externas: React Router, Lucide e Tailwind CSS;
 - módulos relacionados: `AppLayout`, `MenuMobile`, autenticação/perfil.
 
 ## Ponto de entrada e fluxo de entrada
@@ -23,8 +23,7 @@ Exibir identidade provisória da clínica, navegação desktop, conta e acionado
 
 ## Arquivos críticos
 
-- `index.tsx`: composição e caminhos de navegação;
-- `styles.tsx`: posicionamento fixo e breakpoint de `980px`.
+- `index.tsx`: composição, caminhos de navegação, estilos Tailwind e breakpoint de `980px`.
 
 ## Regras próprias do módulo
 
@@ -37,7 +36,5 @@ Exibir identidade provisória da clínica, navegação desktop, conta e acionado
 
 ## Observações técnicas e débitos
 
-- O caminho de pacientes é `"/paciente  "`, com espaços finais, e não coincide com a rota.
 - Pacote, duração e valores não possuem rotas ou ações.
-- Identidade e nome da clínica estão parcialmente fixos; o perfil só alimenta o menu de conta.
-- Vários styled-components exportados não são usados.
+- A identidade “Equilíbrio” ainda é fixa; os dados da conta são alimentados pelo perfil.

@@ -6,7 +6,7 @@ import { Toaster } from 'sonner'
 import { BrowserRouter } from 'react-router-dom'
 import './globals.css';
 // import { GlobalStyle } from './styles/global'
-import { SchedulingProvider } from './context/SchedulingContext'
+import { PatientProvider } from './context/PatientContext'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
 // import { GlobalContextProvider } from './context/useGlobalContext'
 import { QueryClientProvider } from '@tanstack/react-query'
@@ -19,7 +19,7 @@ export function App() {
     <ThemeProvider theme={defaultTheme} >
         {/* // <ThemeProvider defaultTheme="dark" storageKey="agendamentos"> */}
         <CookiesProvider>
-        <SchedulingProvider>
+        <PatientProvider>
         <BrowserRouter>
           <HelmetProvider>
             <Helmet titleTemplate="%s | Fisioterapia e Pilates" />
@@ -31,7 +31,7 @@ export function App() {
              {/* </GlobalContextProvider> */}
           </HelmetProvider>
         </BrowserRouter>
-      </SchedulingProvider>
+      </PatientProvider>
       </CookiesProvider>
       {/* <GlobalStyle /> */}
       {/* </ThemeProvider> */}

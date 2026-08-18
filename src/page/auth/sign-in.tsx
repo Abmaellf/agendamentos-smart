@@ -10,6 +10,8 @@ import { useMutation } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
 // import { setAuthorizationToken } from '@/api/auth'
 import { Loader2Icon } from 'lucide-react'
+// 1. Importe o useRef e o useEffect do React
+import { useEffect, useRef } from 'react'
 // import { setAuthorizationToken } from '@/api/auth'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const  signinSchema = z.object({
@@ -23,11 +25,21 @@ export function SignIn() {
 
   const navigate = useNavigate();
 
+    // 2. Crie a referência para o elemento de input de e-mail
+  const emailInputRef = useRef<HTMLInputElement | null>(null);
+
   const { register, handleSubmit, formState: {isSubmitting}  } = useForm<SigninSchema>();
   
   const { mutateAsync: authenticate} = useMutation({
     mutationFn: signIn,
   })
+
+   // 3. Crie o efeito que roda assim que o componente é desenhado na tela
+  useEffect(() => {
+    // Coloca o cursor de foco direto no campo de e-mail
+    emailInputRef.current?.focus();
+  }, []) // O array vazio garante que isso só rode uma vez (no carregamento)
+
  async function handleLogin(data: SigninSchema) {
   
     try {
@@ -37,7 +49,7 @@ export function SignIn() {
           console.log(response.data.token,"auth/signin")
           console.log(response.data.user,"auth/signin")
         // }
-        navigate('/agendamento')
+        navigate('/appointments')
         toast.success('Conectado com sucesso', {     })
     } catch {
       toast.error('Credenciais inválidas')
@@ -65,7 +77,10 @@ export function SignIn() {
           <form onSubmit={handleSubmit(handleLogin)} className="flex flex-col gap-4">
             <div className="space-y-2">
               <Label htmlFor="email"> Seu e-mail</Label>
-              <input id="email" type="email" {...register('login')} />
+              <input id="email" type="email" {...register('login')} ref={(e) => {
+                  register('login').ref(e); // Mantém o react-hook-form funcionando
+                  emailInputRef.current = e; // Salva a referência na nossa variável
+                }} />
             </div>
 
             <div className="space-y-2">

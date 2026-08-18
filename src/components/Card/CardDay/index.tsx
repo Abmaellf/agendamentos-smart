@@ -1,9 +1,8 @@
-import { CardPatient } from '../CardPatient'
-import { CardDayContainer } from './styles'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale/pt-BR'
-// import { SchedulingContext } from '../../../context/SchedulingContext'
-// import { useContextSelector } from 'use-context-selector'
+
+import { CardPatient } from '../CardPatient'
+import { CardDayContainer } from './styles'
 
 interface CardDayProps {
   date: string
@@ -11,64 +10,46 @@ interface CardDayProps {
   dayWeek: number
 }
 
-// criar uma lista do tipo cardPatient e percorrer com os pacientes
-
 export function CardDay(cardDay: CardDayProps) {
-  const  schedulings = 
-    [
+  const appointments = [
     {
-      id: '889',  
-      namePatient: 'Abmael',  
+      id: '889',
+      namePatient: 'Abmael',
       pathology: ['Fisioterapia', 'Pilates'],
-      dateSchenduling: new Date,
+      date: new Date(),
       hours: '10:00',
       status: 'Ativo',
-      image: 'local'
+      image: 'local',
     },
     {
-      id: '890',  
-      namePatient: 'Ana',  
+      id: '890',
+      namePatient: 'Ana',
       pathology: ['Fisioterapia', 'Pilates'],
-      dateSchenduling: new Date,
+      date: new Date(),
       hours: '10:00',
       status: 'Ativo',
-      image: 'local'
-    }
+      image: 'local',
+    },
   ]
-  
 
-  //  const  schedulings  = useContextSelector(
-	// 		SchedulingContext, 
-	// 		(context) => {
-	// 		 return context.schedulings
-	//  });
   const isDayConvert = cardDay.isToday ? 'true' : 'false'
+
   return (
     <CardDayContainer variant={isDayConvert}>
-      {schedulings.map((schenduling) => {
-        const listSchendulingDay = format(
-          schenduling.dateSchenduling,
-          'dd/MM/yyyy',
-          {
-            locale: ptBR,
-          },
-        )
-        if (listSchendulingDay) {
-          if (listSchendulingDay === cardDay.date) {
-            // console.log(listSchendulingDay, 'listSchendulingDay')
+      {appointments.map((appointment) => {
+        const appointmentDay = format(appointment.date, 'dd/MM/yyyy', {
+          locale: ptBR,
+        })
 
-            return (
-              <CardPatient
-                key={schenduling.id}
-                schenduling={schenduling}
-                isToDay={cardDay.isToday}
-                // listSchendulingDay= {listSchendulingDay}
-              />
-            )
-          }
-        } else {
-          return
-        }
+        if (appointmentDay !== cardDay.date) return null
+
+        return (
+          <CardPatient
+            key={appointment.id}
+            appointment={appointment}
+            isToDay={cardDay.isToday}
+          />
+        )
       })}
     </CardDayContainer>
   )

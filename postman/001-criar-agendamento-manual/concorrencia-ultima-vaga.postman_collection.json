@@ -1,0 +1,148 @@
+{
+  "info": {
+    "_postman_id": "68a3aed5-1dad-4b33-9931-001000000004",
+    "name": "001 - Concorrência e idempotência do agendamento",
+    "description": "BB-14 e BB-18. Requer raceSlot com 2 de 3 vagas ocupadas e idempotencySlot livre.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login ADMIN",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"{{adminLogin}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('ADMIN autenticado', () => pm.response.to.have.status(200));",
+              "pm.environment.set('adminToken', pm.response.json().token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "BB-14 - Disputar última vaga em paralelo",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            { "key": "token", "value": "{{adminToken}}", "type": "string" }
+          ]
+        },
+        "method": "GET",
+        "url": "{{baseUrl}}/api/scheduling?unitId={{unitId}}&from={{raceSlot}}&to=2035-08-27T14:30:00.000Z"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Pré-condição da corrida acessível', () => pm.response.to.have.status(200));",
+              "const token = pm.environment.get('adminToken');",
+              "const baseUrl = pm.environment.get('baseUrl');",
+              "const common = { unitId: pm.environment.get('unitId'), serviceId: pm.environment.get('capacityThreeServiceId'), professionalId: null, startsAt: pm.environment.get('raceSlot'), durationMinutes: 60, price: '150.00' };",
+              "const results = [];",
+              "const send = (patientId) => pm.sendRequest({ url: `${baseUrl}/api/scheduling`, method: 'POST', header: [{ key: 'Authorization', value: `Bearer ${token}` }, { key: 'Content-Type', value: 'application/json' }], body: { mode: 'raw', raw: JSON.stringify({ ...common, patientId }) } }, (error, response) => {",
+              "  pm.test(`BB-14 chamada concorrente respondeu`, () => pm.expect(error).to.eql(null));",
+              "  results.push(response.code);",
+              "  if (results.length === 2) { pm.environment.set('raceStatuses', JSON.stringify(results)); pm.test('BB-14 exatamente uma criação vence', () => { pm.expect(results.filter(x => x === 201)).to.have.length(1); pm.expect(results.filter(x => x === 409)).to.have.length(1); }); }",
+              "});",
+              "send(pm.environment.get('patientCId'));",
+              "send(pm.environment.get('patientDId'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "BB-14 - Ocupação final não excede capacidade",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            { "key": "token", "value": "{{adminToken}}", "type": "string" }
+          ]
+        },
+        "method": "GET",
+        "url": "{{baseUrl}}/api/scheduling?unitId={{unitId}}&from={{raceSlot}}&to=2035-08-27T14:30:00.000Z"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('BB-14 consulta final responde', () => pm.response.to.have.status(200));",
+              "pm.test('BB-14 ocupação final é exatamente três', () => { const items = pm.response.json().content.filter(x => x.service.id === pm.environment.get('capacityThreeServiceId') && x.startsAt === pm.environment.get('raceSlot')); pm.expect(items).to.have.length(3); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "BB-18 - Confirmação duplicada idempotente em paralelo",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            { "key": "token", "value": "{{adminToken}}", "type": "string" }
+          ]
+        },
+        "method": "GET",
+        "url": "{{baseUrl}}/api/scheduling?unitId={{unitId}}&from={{idempotencySlot}}&to=2035-09-02T14:30:00.000Z"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Pré-condição de idempotência acessível', () => pm.response.to.have.status(200));",
+              "const token = pm.environment.get('adminToken');",
+              "const baseUrl = pm.environment.get('baseUrl');",
+              "const key = `appointment-${Date.now()}`;",
+              "const payload = { patientId: pm.environment.get('patientDId'), unitId: pm.environment.get('unitId'), serviceId: pm.environment.get('serviceId'), professionalId: null, startsAt: pm.environment.get('idempotencySlot'), durationMinutes: 60, price: '150.00' };",
+              "const results = [];",
+              "const send = () => pm.sendRequest({ url: `${baseUrl}/api/scheduling`, method: 'POST', header: [{ key: 'Authorization', value: `Bearer ${token}` }, { key: 'Content-Type', value: 'application/json' }, { key: 'Idempotency-Key', value: key }], body: { mode: 'raw', raw: JSON.stringify(payload) } }, (error, response) => {",
+              "  pm.test('BB-18 chamada duplicada respondeu', () => pm.expect(error).to.eql(null));",
+              "  results.push({ status: response.code, id: response.json().id });",
+              "  if (results.length === 2) { pm.environment.set('idempotentAppointmentId', results[0].id); pm.test('BB-18 ambas representam o mesmo único resultado', () => { pm.expect(results.every(x => [200, 201].includes(x.status))).to.eql(true); pm.expect(results[0].id).to.eql(results[1].id); }); }",
+              "});",
+              "send(); send();"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "BB-18 - Existe uma única criação efetiva",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            { "key": "token", "value": "{{adminToken}}", "type": "string" }
+          ]
+        },
+        "method": "GET",
+        "url": "{{baseUrl}}/api/scheduling?unitId={{unitId}}&from={{idempotencySlot}}&to=2035-09-02T14:30:00.000Z"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('BB-18 exatamente um registro foi persistido', () => { pm.response.to.have.status(200); const id = pm.environment.get('idempotentAppointmentId'); const matches = pm.response.json().content.filter(x => x.id === id); pm.expect(matches).to.have.length(1); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

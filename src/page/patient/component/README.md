@@ -12,7 +12,7 @@ Concentrar componentes usados apenas pela página de pacientes.
 
 ## Dependências internas e externas
 
-- internas: `components/ui` e `SchedulingContext`;
+- internas: `components/ui` e `PatientContext`;
 - externas: React Hook Form, Zod, resolvers, use-context-selector e Lucide;
 - módulo relacionado: `page/patient/index.tsx`.
 

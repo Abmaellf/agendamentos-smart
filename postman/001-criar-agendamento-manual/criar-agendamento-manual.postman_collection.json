@@ -1,0 +1,986 @@
+{
+  "info": {
+    "_postman_id": "68a3aed5-1dad-4b33-9931-001000000003",
+    "name": "001 - Criar agendamento manual",
+    "description": "Testes de caixa preta BB-01 a BB-24. Requer seed descartável descrita no README.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [{ "key": "schedulingPath", "value": "/api/scheduling" }],
+  "item": [
+    {
+      "name": "00 - Autenticação de teste",
+      "item": [
+        {
+          "name": "Login ADMIN",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{adminLogin}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('ADMIN autenticado', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.token).to.be.a('string').and.not.empty;",
+                  "pm.environment.set('adminToken', body.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Garantir usuário USER de teste",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/list"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Lista usuários da clínica', () => pm.response.to.have.status(200));",
+                  "const users = pm.response.json();",
+                  "const login = pm.environment.get('basicLogin');",
+                  "const exists = users.some(user => user.login === login);",
+                  "pm.collectionVariables.set('basicUserExists', String(exists));",
+                  "if (exists) { pm.test('USER de teste já existe', () => pm.expect(true).to.eql(true)); pm.execution.setNextRequest('Login USER (papel BASIC da spec)'); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Criar usuário USER de teste quando ausente",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{basicLogin}}\",\n  \"password\": \"{{basicPassword}}\",\n  \"role\": \"USER\"\n}"
+            },
+            "url": "{{baseUrl}}/user/register/{{clinicId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Cria USER ausente pelo endpoint informado', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('basicUserExists', 'true');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login USER (papel BASIC da spec)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{basicLogin}}\",\n  \"password\": \"{{basicPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('USER autenticado', () => pm.response.to.have.status(200));",
+                  "pm.environment.set('basicToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 - Criação básica e contrato",
+      "item": [
+        {
+          "name": "BB-01 - Recusar criação sem autenticação",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{freeSlot}}\",\n  \"durationMinutes\": {{defaultDuration}},\n  \"price\": \"{{defaultPrice}}\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.cookies.jar().clear(pm.environment.get('baseUrl'), (error) => { if (error) { throw error; } });"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-01 retorna 403 no Spring Security atual', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-02 - ADMIN cria sem profissional",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{freeSlot}}\",\n  \"durationMinutes\": {{defaultDuration}},\n  \"price\": \"{{defaultPrice}}\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-02 retorna 201 e JSON', () => { pm.response.to.have.status(201); pm.response.to.be.json; });",
+                  "const body = pm.response.json();",
+                  "pm.test('BB-02 contrato canônico', () => {",
+                  "  pm.expect(body.id).to.be.a('string').and.not.empty;",
+                  "  pm.expect(body.status).to.eql('AGENDADO');",
+                  "  pm.expect(body.unitId).to.eql(pm.environment.get('unitId'));",
+                  "  pm.expect(body.professional).to.eql(null);",
+                  "  pm.expect(body.durationMinutes).to.eql(Number(pm.environment.get('defaultDuration')));",
+                  "  pm.expect(body.price).to.eql(pm.environment.get('defaultPrice'));",
+                  "  pm.expect(body.createdBy).to.be.a('string').and.not.empty;",
+                  "  pm.expect(body.createdAt).to.be.a('string').and.not.empty;",
+                  "});",
+                  "pm.environment.set('createdAppointmentId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-03 - BASIC cria com padrões",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{basicToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientBId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{basicFreeSlot}}\",\n  \"durationMinutes\": {{defaultDuration}},\n  \"price\": \"{{defaultPrice}}\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-03 BASIC cria AGENDADO', () => { pm.response.to.have.status(201); const b = pm.response.json(); pm.expect(b.status).to.eql('AGENDADO'); pm.expect(b.durationMinutes).to.eql(60); pm.expect(b.price).to.eql('150.00'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-04 - Campos obrigatórios",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const fields = ['patientId', 'unitId', 'serviceId', 'startsAt', 'durationMinutes'];",
+                  "const index = Number(pm.collectionVariables.get('missingFieldIndex') || 0);",
+                  "const payload = { patientId: pm.environment.get('patientCId'), unitId: pm.environment.get('unitId'), serviceId: pm.environment.get('serviceId'), professionalId: null, startsAt: pm.environment.get('invalidSlot'), durationMinutes: 60, price: '150.00' };",
+                  "delete payload[fields[index]];",
+                  "pm.variables.set('missingFieldName', fields[index]);",
+                  "pm.variables.set('missingFieldPayload', JSON.stringify(payload));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(`BB-04 recusa ausência de ${pm.variables.get('missingFieldName')}`, () => pm.expect(pm.response.code).to.be.oneOf([400, 422]));",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.fieldErrors[pm.variables.get('missingFieldName')]).to.exist;",
+                  "const next = Number(pm.collectionVariables.get('missingFieldIndex') || 0) + 1;",
+                  "if (next < 5) { pm.collectionVariables.set('missingFieldIndex', next); pm.execution.setNextRequest('BB-04 - Campos obrigatórios'); } else { pm.collectionVariables.unset('missingFieldIndex'); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{{missingFieldPayload}}" },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          }
+        },
+        {
+          "name": "BB-05 - Ignorar campos derivados forjados",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientDId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"2035-09-05T12:30:00.000Z\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\",\n  \"tenantId\": \"{{foreignTenantId}}\",\n  \"status\": \"CONCLUIDO\",\n  \"createdBy\": \"forged-user\",\n  \"createdAt\": \"2000-01-01T00:00:00.000Z\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-05 servidor controla campos derivados', () => { pm.response.to.have.status(201); const b = pm.response.json(); pm.expect(b.tenantId).to.eql(pm.environment.get('tenantId')); pm.expect(b.status).to.eql('AGENDADO'); pm.expect(b.createdBy).not.eql('forged-user'); pm.expect(b.createdAt).not.eql('2000-01-01T00:00:00.000Z'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Tenant, conflitos e capacidade",
+      "item": [
+        {
+          "name": "BB-06 - Referências de outro tenant",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const cases = [ ['patientId', pm.environment.get('foreignPatientId')], ['unitId', pm.environment.get('foreignUnitId')], ['serviceId', pm.environment.get('foreignServiceId')], ['professionalId', pm.environment.get('foreignProfessionalId')] ];",
+                  "const index = Number(pm.collectionVariables.get('foreignRefIndex') || 0);",
+                  "const payload = { patientId: pm.environment.get('patientDId'), unitId: pm.environment.get('unitId'), serviceId: pm.environment.get('serviceId'), professionalId: null, startsAt: '2035-09-06T12:30:00.000Z', durationMinutes: 60, price: '150.00' };",
+                  "payload[cases[index][0]] = cases[index][1];",
+                  "pm.variables.set('foreignRefName', cases[index][0]);",
+                  "pm.variables.set('foreignRefPayload', JSON.stringify(payload));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(`BB-06 oculta referência externa ${pm.variables.get('foreignRefName')}`, () => pm.expect(pm.response.code).to.be.oneOf([404, 422]));",
+                  "const body = pm.response.json(); pm.expect(body.code).to.eql('TENANT_RESOURCE_NOT_FOUND'); pm.expect(JSON.stringify(body)).not.to.include(pm.environment.get('foreignTenantId'));",
+                  "const next = Number(pm.collectionVariables.get('foreignRefIndex') || 0) + 1;",
+                  "if (next < 4) { pm.collectionVariables.set('foreignRefIndex', next); pm.execution.setNextRequest('BB-06 - Referências de outro tenant'); } else { pm.collectionVariables.unset('foreignRefIndex'); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{{foreignRefPayload}}" },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          }
+        },
+        {
+          "name": "BB-07/BB-08 - Conflito de paciente prevalece",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{basicToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{capacityThreeServiceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{patientConflictSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-07/08 retorna conflito do paciente mesmo com capacidade', () => { pm.response.to.have.status(409); pm.expect(pm.response.json().code).to.eql('PATIENT_SCHEDULE_CONFLICT'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-09 - Conflito de profissional",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientBId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": \"{{professionalId}}\",\n  \"startsAt\": \"{{professionalConflictSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-09 retorna conflito do profissional', () => { pm.response.to.have.status(409); pm.expect(pm.response.json().code).to.eql('PROFESSIONAL_SCHEDULE_CONFLICT'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-10 - Sem profissional ignora conflito profissional",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{basicToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientCId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{professionalConflictSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-10 permite criação sem profissional', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-11 - Intervalos adjacentes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": \"{{professionalId}}\",\n  \"startsAt\": \"{{adjacentSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-11 permite início exatamente no término anterior', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-12 - Capacidade 1 esgotada",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientDId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{capacityOneServiceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{capacityOneSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-12 mantém capacidade em um', () => { pm.response.to.have.status(409); pm.expect(pm.response.json().code).to.eql('SERVICE_CAPACITY_EXCEEDED'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-13 - Preencher capacidade 3",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ids = [pm.environment.get('patientId'), pm.environment.get('patientBId'), pm.environment.get('patientCId')];",
+                  "const index = Number(pm.collectionVariables.get('capacityFillIndex') || 0); pm.variables.set('capacityPatientId', ids[index]);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-13 aceita ocupação até o limite', () => pm.response.to.have.status(201));",
+                  "const next = Number(pm.collectionVariables.get('capacityFillIndex') || 0) + 1;",
+                  "if (next < 3) { pm.collectionVariables.set('capacityFillIndex', next); pm.execution.setNextRequest('BB-13 - Preencher capacidade 3'); } else { pm.collectionVariables.unset('capacityFillIndex'); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{capacityPatientId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{capacityThreeServiceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{capacityThreeSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          }
+        },
+        {
+          "name": "BB-13 - Recusar quarta vaga",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientDId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{capacityThreeServiceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{capacityThreeSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-13 recusa acima do limite', () => { pm.response.to.have.status(409); pm.expect(pm.response.json().code).to.eql('SERVICE_CAPACITY_EXCEEDED'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Permissões, snapshots e validações",
+      "item": [
+        {
+          "name": "BB-15 - ADMIN sobrescreve duração",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{overrideDurationSlot}}\", \"durationMinutes\": 75, \"price\": \"150.00\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-15 preserva duração administrativa', () => { pm.response.to.have.status(201); pm.expect(pm.response.json().durationMinutes).to.eql(75); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-15 - ADMIN sobrescreve preço",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientBId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{overridePriceSlot}}\", \"durationMinutes\": 60, \"price\": \"175.50\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-15 preserva preço administrativo', () => { pm.response.to.have.status(201); pm.expect(pm.response.json().price).to.eql('175.50'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-15 - ADMIN sobrescreve ambos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientCId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{overrideBothSlot}}\", \"durationMinutes\": 90, \"price\": \"200.00\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-15 preserva ambos', () => { pm.response.to.have.status(201); const b = pm.response.json(); pm.expect(b.durationMinutes).to.eql(90); pm.expect(b.price).to.eql('200.00'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-16 - BASIC não sobrescreve padrões",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{basicToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientDId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{basicOverrideSlot}}\", \"durationMinutes\": 90, \"price\": \"200.00\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-16 BASIC recebe recusa sem criação', () => { pm.expect(pm.response.code).to.be.oneOf([403, 422]); pm.expect(pm.response.json().code).to.eql('APPOINTMENT_OVERRIDE_FORBIDDEN'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-17.1 - Criar snapshot",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{mutableServiceId}}\", \"professionalId\": null, \"startsAt\": \"{{snapshotSlot}}\", \"durationMinutes\": 60, \"price\": \"150.00\"\n}"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-17 cria registro original', () => pm.response.to.have.status(201)); pm.environment.set('snapshotAppointmentId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-17.2 - Alterar padrão do serviço",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"durationMinutes\": 30, \"price\": \"99.00\" }"
+            },
+            "url": "{{baseUrl}}/api/services/{{mutableServiceId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-17 padrão do serviço alterado', () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-17.3 - Snapshot permanece histórico",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}{{schedulingPath}}/{{snapshotAppointmentId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-17 mantém snapshots originais', () => { pm.response.to.have.status(200); const b = pm.response.json(); pm.expect(b.durationMinutes).to.eql(60); pm.expect(b.price).to.eql('150.00'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-19 - ADMIN não cria no passado",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"patientId\": \"{{patientBId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{pastSlot}}\", \"durationMinutes\": 60, \"price\": \"150.00\" }"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-19 bloqueia ADMIN no passado', () => { pm.expect(pm.response.code).to.be.oneOf([400, 422]); pm.expect(pm.response.json().code).to.eql('APPOINTMENT_IN_THE_PAST'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-19 - BASIC não cria no passado",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{basicToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"patientId\": \"{{patientCId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{pastSlot}}\", \"durationMinutes\": 60, \"price\": \"150.00\" }"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-19 bloqueia BASIC no passado', () => { pm.expect(pm.response.code).to.be.oneOf([400, 422]); pm.expect(pm.response.json().code).to.eql('APPOINTMENT_IN_THE_PAST'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-20 - Fuso e limite do dia",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"patientId\": \"{{patientDId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{timeZoneBoundarySlot}}\", \"durationMinutes\": 60, \"price\": \"150.00\" }"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-20 preserva instante e fuso da unidade', () => { pm.response.to.have.status(201); const b = pm.response.json(); pm.expect(b.startsAt).to.eql(pm.environment.get('timeZoneBoundarySlot')); pm.expect(b.timeZone).to.eql(pm.environment.get('timeZone')); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-21 - Profissional indisponível no dia",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"patientId\": \"{{patientBId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": \"{{unavailableProfessionalId}}\", \"startsAt\": \"{{unavailableProfessionalSlot}}\", \"durationMinutes\": 60, \"price\": \"150.00\" }"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-21 bloqueia dia indisponível', () => { pm.expect(pm.response.code).to.be.oneOf([409, 422]); pm.expect(pm.response.json().code).to.eql('PROFESSIONAL_UNAVAILABLE_DAY'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-22 - Token sem papel operacional válido",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{forbiddenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"patientId\": \"{{patientDId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"2035-09-07T12:30:00.000Z\", \"durationMinutes\": 60, \"price\": \"150.00\" }"
+            },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-22 retorna 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-23 - Valores e formatos inválidos",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const invalid = [ { durationMinutes: 0, price: '150.00', startsAt: pm.environment.get('invalidSlot') }, { durationMinutes: 60, price: '-1.00', startsAt: pm.environment.get('invalidSlot') }, { durationMinutes: 60, price: '150.00', startsAt: 'data-invalida' } ];",
+                  "const index = Number(pm.collectionVariables.get('invalidValueIndex') || 0);",
+                  "const payload = Object.assign({ patientId: pm.environment.get('patientDId'), unitId: pm.environment.get('unitId'), serviceId: pm.environment.get('serviceId'), professionalId: null }, invalid[index]); pm.variables.set('invalidPayload', JSON.stringify(payload));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-23 recusa valor/formato inválido', () => pm.expect(pm.response.code).to.be.oneOf([400, 422]));",
+                  "const next = Number(pm.collectionVariables.get('invalidValueIndex') || 0) + 1; if (next < 3) { pm.collectionVariables.set('invalidValueIndex', next); pm.execution.setNextRequest('BB-23 - Valores e formatos inválidos'); } else { pm.collectionVariables.unset('invalidValueIndex'); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{{invalidPayload}}" },
+            "url": "{{baseUrl}}{{schedulingPath}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Visibilidade após criação",
+      "item": [
+        {
+          "name": "BB-24 - Novo compromisso aparece uma vez no tenant A",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                { "key": "token", "value": "{{adminToken}}", "type": "string" }
+              ]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}{{schedulingPath}}?unitId={{unitId}}&from=2035-08-20T00:00:00.000Z&to=2035-08-21T00:00:00.000Z"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-24 agenda contém exatamente o registro criado', () => { pm.response.to.have.status(200); const content = pm.response.json().content; const matches = content.filter(x => x.id === pm.environment.get('createdAppointmentId')); pm.expect(matches).to.have.length(1); pm.expect(matches[0].unitId).to.eql(pm.environment.get('unitId')); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BB-24 - Unidade externa não revela compromisso do tenant",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}{{schedulingPath}}?unitId={{foreignUnitId}}&from=2035-08-20T00:00:00.000Z&to=2035-08-21T00:00:00.000Z"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('BB-24 isolamento por unidade/tenant', () => { pm.expect(pm.response.code).to.be.oneOf([200, 404]); if (pm.response.code === 200) { const content = pm.response.json().content; pm.expect(content.some(x => x.id === pm.environment.get('createdAppointmentId'))).to.eql(false); } });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

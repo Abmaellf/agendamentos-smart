@@ -1,7 +1,8 @@
 import { Route, Routes } from 'react-router-dom'
+import { AppointmentsPage } from '@/features/appointments/pages/appointments-page'
+
 import { SignIn } from './page/auth/sign-in'
 import { AuthLayout } from './_layout/auth'
-import { Scheduling } from './page/Scheduling'
 import { Patient } from './page/patient'
 import { Doctor } from './page/doctor'
 import { AppLayout } from './_layout/app'
@@ -12,16 +13,15 @@ import { FirstScreen } from './api/firstScreen/first-screen'
 export function Router() {
   return (
     <Routes>
-       
       <Route path="/" element={<FirstScreen />} />
-      
+
       <Route element={<AuthLayout />}>
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
       </Route>
 
       <Route element={<AppLayout />}>
-        <Route path="/agendamento" element={<Scheduling />} />
+        <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/paciente" element={<Patient />} />
         <Route path="/doctor" element={<Doctor />} />
         <Route path="/configuration" element={<Configuration />} />

@@ -10,13 +10,14 @@ Seleciona `WeekDates` do contexto, calcula rótulos ao receber uma nova data e o
 
 ## Dependências internas e externas
 
-- internas: `context/SchedulingContext` e `styles.ts`;
+- internas: `styles.ts`;
 - externas: React, use-context-selector e styled-components;
-- módulo relacionado: `page/Scheduling`.
+- módulo relacionado: `features/appointments`.
 
 ## Ponto de entrada e fluxo de entrada
 
-`Scheduling` fornece `date` → componente chama `context.WeekDates` → atualiza `listWeek` → renderiza os rótulos.
+O componente recebe `date`, calcula cinco dias úteis localmente e renderiza os
+rótulos. A página atual de agendamentos não o utiliza.
 
 ## Arquivos críticos
 

@@ -22,29 +22,34 @@ O sistema é uma aplicação de página única (SPA) executada no navegador. Rea
 flowchart TD
     Browser[Navegador] --> Main[src/main.tsx]
     Main --> App[src/App.tsx]
-    App --> Providers[Theme, cookies, agenda, router, helmet e React Query]
+    App --> Providers[Theme, cookies, pacientes, router, helmet e React Query]
     Providers --> Router[src/Router.tsx]
     Router --> AuthLayout[AuthLayout]
     Router --> AppLayout[AppLayout]
     AuthLayout --> AuthPages[SignIn e SignUp]
-    AppLayout --> Pages[Agenda, pacientes, profissional e configuração]
+    AppLayout --> Pages[AppointmentsPage, pacientes, profissional e configuração]
+    Pages --> AppointmentsFeature[features/appointments]
     Pages --> Components[Componentes compartilhados]
-    Pages --> SchedulingContext[SchedulingContext]
-    Components --> SchedulingContext
+    Pages --> PatientContext[PatientContext]
+    Components --> PatientContext
     AuthPages --> ApiFunctions[src/api]
     Components --> ApiFunctions
-    SchedulingContext --> Axios[src/lib/axios.ts]
+    AppointmentsFeature --> Axios[src/lib/axios.ts]
+    PatientContext --> Axios
     ApiFunctions --> Axios
     Axios --> ExternalApi[API em VITE_API_URL]
 ```
 
-A organização observada é predominantemente por camadas técnicas (`page`, `components`, `api`, `context`, `lib`), com subpastas por tela ou componente. Não há uma camada de domínio independente, casos de uso formais ou contratos centralizados.
+A organização legada é predominantemente por camadas técnicas (`page`,
+`components`, `api`, `context`, `lib`). Agendamentos já seguem organização por
+domínio em `features/appointments`, com contrato canônico, API, hooks,
+componentes, página e testes no mesmo limite de feature.
 
 ## Inicialização e composição
 
 1. `index.html` fornece o elemento `#root`.
 2. `src/main.tsx` monta `App` sem `StrictMode` ativo.
-3. `src/App.tsx` instala, nesta ordem, o tema do styled-components, cookies, `SchedulingProvider`, `BrowserRouter`, metadados, notificações e `QueryClientProvider`.
+3. `src/App.tsx` instala, nesta ordem, o tema do styled-components, cookies, `PatientProvider`, `BrowserRouter`, metadados, notificações e `QueryClientProvider`.
 4. `src/Router.tsx` declara a rota inicial, as páginas de autenticação e as páginas internas.
 5. A rota `/` espera um segundo, verifica apenas a presença do cookie `jwt` e navega para login ou agenda.
 
@@ -55,7 +60,7 @@ A organização observada é predominantemente por camadas técnicas (`page`, `c
 | `/`              | nenhum       | `FirstScreen`   | Redirecionamento por presença do cookie `jwt`      |
 | `/sign-in`       | `AuthLayout` | `SignIn`        | Login via `POST /auth/login`                       |
 | `/sign-up`       | `AuthLayout` | `SignUp`        | Formulário visual; não registra usuário            |
-| `/agendamento`   | `AppLayout`  | `Scheduling`    | Seleção de semana e cartões com dados fixos        |
+| `/appointments`  | `AppLayout`  | `AppointmentsPage` | Agenda semanal integrada à API e criação manual |
 | `/paciente`      | `AppLayout`  | `Patient`       | Lista e duas implementações de criação de paciente |
 | `/doctor`        | `AppLayout`  | `Doctor`        | Página mínima, sem fluxo funcional                 |
 | `/configuration` | `AppLayout`  | `Configuration` | Página vazia                                       |
@@ -68,13 +73,13 @@ Não existe rota curinga (`404`) nem guarda de rota no `AppLayout`.
 | ------------------------ | ------------------------------------------ | --------------------------------- | ------------------------------- |
 | `src/_layout`            | Estrutura visual pública e interna         | Router, Header, MenuMobile        | `Router.tsx`                    |
 | `src/page/auth`          | Telas de entrada e cadastro visual         | API, React Query, forms, router   | `Router.tsx`                    |
-| `src/page/Scheduling`    | Seleção de data e grade semanal            | date-fns, componentes de agenda   | `Router.tsx`                    |
+| `src/features/appointments` | Domínio, API, cache, criação e grade semanal | React Query, Zod, date-fns | `Router.tsx` |
 | `src/page/patient`       | Lista, filtro e criação de pacientes       | contexto, UI, forms               | `Router.tsx`                    |
 | `src/page/doctor`        | Placeholder de profissional                | React                             | `Router.tsx`                    |
 | `src/page/Configuration` | Placeholder de configuração                | React                             | `Router.tsx`                    |
 | `src/components`         | Navegação, modais, cartões e paginação     | UI, API, contexto                 | layouts e páginas               |
 | `src/components/ui`      | Primitivos visuais reutilizáveis           | Radix, Tailwind, CVA              | páginas e componentes           |
-| `src/context`            | Estado de pacientes e cálculo de semana    | Axios, date-fns, context selector | agenda e pacientes              |
+| `src/context`            | Estado e operações legadas de pacientes | Axios, context selector           | pacientes                       |
 | `src/api`                | Chamadas HTTP e utilitários de token       | Axios e Web Storage               | autenticação, Header, paciente  |
 | `src/lib`                | Axios, QueryClient e merge de classes      | env, Axios, React Query           | API, contexto e UI              |
 | `src/styles`             | Tema legado do styled-components           | styled-components                 | `App` e componentes estilizados |
@@ -84,7 +89,9 @@ Não existe rota curinga (`404`) nem guarda de rota no `AppLayout`.
 
 ### Composição por providers
 
-`App` centraliza providers transversais. O padrão facilita acesso global, mas `SchedulingProvider` envolve inclusive páginas de autenticação, embora elas não usem seu estado.
+`App` centraliza providers transversais. O padrão facilita acesso global, mas
+`PatientProvider` ainda envolve páginas de autenticação, embora elas não usem
+seu estado.
 
 ### Layouts roteados
 
@@ -92,13 +99,16 @@ Não existe rota curinga (`404`) nem guarda de rota no `AppLayout`.
 
 ### Funções de API por operação
 
-Arquivos em `src/api` exportam funções assíncronas pequenas (`signIn`, `getProfile`, `RegisterPatient`, `registerUser`). Todas dependem da instância Axios única. Não há repositórios por domínio, interceptores, normalização de erros ou tipos de erro compartilhados.
+Arquivos legados em `src/api` exportam funções assíncronas por operação. A
+feature `appointments` concentra suas operações em `api/appointments.ts`, com
+entradas e respostas tipadas e mensagens de erro de domínio.
 
 ### Estado remoto misto
 
-- React Query executa login, consulta de perfil e o cadastro em `AddPatientModal`.
-- `SchedulingContext` guarda a lista de pacientes e acessa Axios diretamente.
-- A agenda mantém a data em estado local e usa agendamentos fixos dentro de `CardDay`.
+- React Query executa login, consultas e criação de agendamentos e o cadastro em `AddPatientModal`.
+- `PatientContext` guarda a lista de pacientes e acessa Axios diretamente.
+- A agenda mantém apenas a data de referência em estado local; os agendamentos
+  remotos pertencem ao cache do React Query.
 
 Essa coexistência não define uma fonte única para estado de servidor e provoca duplicação de responsabilidades.
 
@@ -123,13 +133,14 @@ Ambas estão ativas. `index.css` duplica boa parte de `globals.css`, mas não é
 - `api` concentra parte das operações HTTP;
 - `lib` cria dependências de infraestrutura;
 - `env.ts` valida a configuração de runtime;
-- contexto compartilha pacientes e cálculos de datas.
+- contexto compartilha provisoriamente os pacientes do fluxo legado.
 
 ### Fronteiras violadas ou pouco definidas
 
 - `src/api/firstScreen/first-screen.tsx` é um componente de roteamento dentro da camada de API;
-- `SchedulingContext` mistura estado remoto, chamadas HTTP, criação de paciente e regra de calendário;
-- `CardDay` contém massa de agendamentos fixa, misturando apresentação e fonte de dados;
+- `PatientContext` mistura estado remoto, chamadas HTTP e criação de paciente;
+- `CardDay` contém massa antiga de agendamentos fixa, mas não participa da rota
+  `/appointments`;
 - `AddPatientModal` executa API diretamente enquanto outro modal delega a criação ao contexto;
 - tipos de paciente são redefinidos localmente e não representam um contrato único;
 - componentes de navegação contêm textos de produto e caminhos diretamente.
@@ -143,11 +154,11 @@ Não foram identificados ciclos explícitos no grafo estático de imports, mas e
 | React / React DOM      | Renderização e estado              | Base de toda a SPA                                     |
 | React Router           | Rotas, layouts e navegação         | Acesso e composição de telas dependem dele             |
 | Axios                  | Cliente HTTP com `withCredentials` | Todas as integrações reais usam uma única `baseURL`    |
-| TanStack React Query   | Perfil e mutações pontuais         | Cache do perfil; estratégia ainda não padronizada      |
+| TanStack React Query   | Perfil, catálogos e agendamentos      | Fonte do estado remoto da feature `appointments`          |
 | React Hook Form + Zod  | Formulários e validação            | Contratos de entrada locais às telas                   |
 | react-cookie           | Leitura do cookie `jwt`            | Decide somente o redirecionamento da raiz              |
-| use-context-selector   | Contexto de agenda/pacientes       | Acopla consumidores ao contrato de `SchedulingContext` |
-| date-fns               | Semana útil e formatação           | Regras de calendário estão no contexto e na página     |
+| use-context-selector   | Contexto legado de pacientes       | Acopla consumidores ao contrato de `PatientContext`    |
+| date-fns               | Semana útil e formatação           | Cálculos locais da página de agendamentos               |
 | Tailwind + Radix + CVA | Design system novo                 | Sustenta `components/ui`                               |
 | styled-components      | Componentes visuais legados        | Exige `defaultTheme` e tipos próprios                  |
 | Vite                   | Build e ambiente                   | Expõe apenas variáveis `VITE_*` e resolve o alias `@`  |
@@ -163,11 +174,11 @@ Na qualidade estática, o projeto mantém `.eslintrc` legado e `eslint.config.mj
 | `POST /auth/login`        | `src/api/sign-in.ts`          | Autenticação                          |
 | `GET auth/me`             | `src/api/get-profile.ts`      | Perfil e clínica no Header            |
 | `POST /auth/register/:id` | `src/api/register-user.ts`    | Não conectado à interface             |
-| `GET patient/list`        | `SchedulingContext`           | Lista de pacientes                    |
+| `GET patient/list`        | `PatientContext`              | Lista de pacientes                    |
 | `POST /patient/save`      | `src/api/register-patient.ts` | Cadastro pelo modal compartilhado     |
-| `POST patients`           | `SchedulingContext`           | Cadastro pelo diálogo local da página |
-
-Os caminhos possuem singular/plural e convenções distintas. `data.json` expõe os recursos REST simulados `schedulings` e `patients`; portanto, cobre `POST /patients`, mas não `patient/list`, `/patient/save` ou autenticação.
+| `POST patients`           | `PatientContext`              | Cadastro pelo diálogo local da página |
+| `GET /api/scheduling`     | `features/appointments/api`   | Consulta externa de agendamentos      |
+| `POST /api/scheduling`    | `features/appointments/api`   | Criação externa de agendamento       |
 
 ## Regras arquiteturais
 
@@ -188,7 +199,7 @@ Estas regras orientam código futuro; módulos legados listados neste documento 
 3. Rotas internas devem depender de uma guarda de autenticação central, nunca apenas do redirecionamento em `/`.
 4. Componentes de `components/ui` não devem conhecer regras de negócio. Componentes específicos de uma funcionalidade devem permanecer junto da respectiva página/feature ou ser promovidos a compartilhados somente quando houver reuso real.
 5. Não introduzir um terceiro mecanismo de estilo. Novos componentes devem priorizar Tailwind/Radix; alterações em styled-components podem ser mantidas até migração planejada.
-6. Não duplicar entidades. `Patient`, `Scheduling`, perfil e respostas paginadas devem possuir contratos canônicos compartilhados.
+6. Não duplicar entidades. `Patient`, `Appointment`, perfil e respostas paginadas devem possuir contratos canônicos compartilhados.
 7. Toda nova rota deve declarar estado de carregamento, erro, vazio, autorização e fallback de navegação quando aplicável.
 8. Valores sensíveis, tokens, usuários e respostas de perfil não podem ser enviados a `console`.
 9. Dados simulados devem ser isolados como fixtures e nunca embutidos em componentes de produção.
@@ -199,7 +210,7 @@ Estas regras orientam código futuro; módulos legados listados neste documento 
 ### Convenções observadas
 
 - componentes React em PascalCase, com exportações nomeadas na maioria dos casos;
-- páginas agrupadas em `src/page` e conectadas em `Router.tsx`;
+- páginas legadas em `src/page` e novas telas de domínio dentro de `features`;
 - estilos styled-components em arquivos `styles.ts(x)` próximos do componente;
 - primitivas shadcn/Radix em nomes de arquivo minúsculos;
 - schemas Zod próximos ao formulário;
@@ -208,13 +219,13 @@ Estas regras orientam código futuro; módulos legados listados neste documento 
 
 ### Inconsistências a não reproduzir
 
-- pastas alternam PascalCase e minúsculas (`Scheduling`, `Configuration`, `patient`, `doctor`);
+- pastas legadas ainda alternam PascalCase e minúsculas (`Configuration`, `patient`, `doctor`);
 - operações alternam PascalCase e camelCase (`RegisterPatient` versus `registerUser`);
 - imports alternam alias `@` e caminhos relativos longos;
 - há um arquivo com espaço inicial: `src/components/theme/ mode-toggle.tsx`;
 - caminhos da API alternam barra inicial, singular e plural;
 - o link do Header usa `to="/paciente  "`, com espaços finais, e não corresponde à rota declarada;
-- status e nomes de campos possuem grafias distintas (`schenduling`, `dateSchenduling`, `isToDay`).
+- componentes antigos ainda possuem nomes fora do contrato canônico, como `isToDay`.
 
 Para código novo: usar nomes de pasta em kebab-case ou minúsculas de forma uniforme, componentes em PascalCase, funções em camelCase, alias `@` entre módulos e imports relativos apenas dentro da mesma pasta.
 
@@ -222,18 +233,16 @@ Para código novo: usar nomes de pasta em kebab-case ou minúsculas de forma uni
 
 | Prioridade | Risco comprovado                          | Evidência e impacto                                                                                                        |
 | ---------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Crítica    | Rotas internas sem proteção               | `/agendamento`, `/paciente`, `/doctor` e `/configuration` podem ser abertas diretamente; `FirstScreen` protege somente `/` |
+| Crítica    | Rotas internas sem proteção               | `/appointments`, `/paciente`, `/doctor` e `/configuration` podem ser abertas diretamente; `FirstScreen` protege somente `/` |
 | Alta       | Exposição de informações no console       | Login registra token e usuário; perfil e pacientes também são registrados; o tipo de perfil inclui `password`              |
-| Alta       | Agenda não integrada                      | `CardDay` cria dois agendamentos em memória com `new Date`; `data.json` e API não alimentam a tela                         |
 | Alta       | Criação de paciente duplicada             | Dois diálogos coexistem, usam `/patient/save` e `patients`, e atualizam estados diferentes                                 |
-| Alta       | Contrato de criação incorreto             | `SchedulingContext` importa `uuid` de Zod e envia a própria função no objeto; JSON não produz um identificador UUID        |
+| Alta       | Contrato legado de paciente incorreto       | `PatientContext` importa `uuid` de Zod e envia a própria função no objeto; JSON não produz um identificador UUID           |
 | Alta       | Cadastro de usuário apenas visual         | `SignUp` navega para a agenda sem chamar `registerUser` ou enviar os campos                                                |
 | Média      | Navegação quebrada para pacientes         | O Header aponta para `/paciente  ` em vez de `/paciente`                                                                   |
 | Média      | Logout sem comportamento                  | O item “Sair” não possui callback nem remoção de cookie/token                                                              |
-| Média      | Contexto com responsabilidades excessivas | Pacientes, HTTP, mutação e calendário compartilham o mesmo provider global                                                 |
+| Média      | Contexto com responsabilidades excessivas | Pacientes, HTTP e mutação compartilham o mesmo provider global                                                            |
 | Média      | Contratos de backend divergentes          | Endpoints e formatos do mock não são equivalentes; `fetchPatients` exige `response.data.content`                           |
 | Média      | Rotas incompletas                         | Profissional é um título; configuração é vazia; não existe 404                                                             |
-| Média      | Ausência de testes                        | Nenhum arquivo ou script de teste foi identificado                                                                         |
 | Média      | Bundle inicial grande                     | Build gera cerca de 800,71 kB minificados e alerta acima de 500 kB; não há lazy loading de rotas                           |
 | Média      | Lint dependente do estado de `dist`       | `eslint .` inclui o bundle quando `dist/` existe e produz milhares de falsos erros no código gerado                        |
 | Média      | Configuração de lint divergente           | `.eslintrc` e flat config coexistem; regras React e simple-import-sort instaladas não estão ativas no lint atual           |
@@ -251,7 +260,6 @@ Para código novo: usar nomes de pasta em kebab-case ou minúsculas de forma uni
 | `src/context/useGlobalContext.tsx`                                           | Implementação comentada; exports não retornam estado útil   |
 | `src/hooks/useRequest.ts`                                                    | Arquivo integralmente comentado                             |
 | `src/@types/UserTypes.ts`                                                    | Referenciado somente pelo hook comentado                    |
-| `src/components/AddSchedulingModal`                                          | Não renderizado                                             |
 | `src/components/nav-link.tsx`                                                | Não importado; Header usa o `NavLink` do Router diretamente |
 | `src/components/theme`                                                       | Provider e seletor de tema não montados                     |
 | `src/components/ui/pagination.tsx`                                           | Não usado; existe outra paginação compartilhada             |
@@ -268,7 +276,8 @@ Para código novo: usar nomes de pasta em kebab-case ou minúsculas de forma uni
 
 1. Definir o contrato real de autenticação por cookie, implementar guarda de rota e logout, e remover logs sensíveis.
 2. Escolher uma única API de pacientes e uma única implementação de formulário; modelar paginação e invalidar/refazer a consulta após mutação.
-3. Integrar agendamentos à API com tipos canônicos e remover fixtures do componente.
+3. Expandir a feature `appointments` mantendo API, cache, regras e telas no
+   mesmo limite de domínio.
 4. Conectar ou remover o cadastro de usuário, profissional e configuração conforme escopo de produto confirmado.
 5. Padronizar estado remoto em React Query e separar cálculos puros de calendário do contexto.
 6. Corrigir navegação, rota 404, estados de erro/carregamento/vazio e acessibilidade dos fluxos.
@@ -287,7 +296,7 @@ src/
   features/
     auth/              # API, modelos, páginas e componentes de autenticação
     patients/          # API, queries, modelos e telas de pacientes
-    scheduling/        # API, modelos, regras de calendário e telas
+    appointments/      # API, modelos, regras de calendário e telas
   shared/
     api/               # cliente HTTP e tratamento comum de erros
     ui/                # componentes sem regra de negócio

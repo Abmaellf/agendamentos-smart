@@ -1,36 +1,20 @@
 import { ListNumberDate, WeekDatesContainer } from './styles'
-import { useEffect, useState } from 'react'
-import { SchedulingContext } from '../../context/SchedulingContext'
-import { useContextSelector } from 'use-context-selector'
+import { addDays, format, startOfWeek } from 'date-fns'
+import { ptBR } from 'date-fns/locale/pt-BR'
 
 interface CurrentDate {
   date: Date
 }
 export function WeekDates(currentDate: CurrentDate) {
-  const [listWeek, setListWeek] = useState([''])
-
-  // const { WeekDates } = useContext(SchedulingContext)
-
-    const  WeekDates  = useContextSelector(
-			SchedulingContext, 
-			(context) => {
-			 return context.WeekDates
-		    });
-
-  function dateweeks() {
-    const label = WeekDates(currentDate.date).map((day) => day.data)
-    setListWeek(label)
-    return label
-  }
-
-  useEffect(() => {
-    dateweeks()
-  }, [currentDate])
+  const weekStart = startOfWeek(currentDate.date, { weekStartsOn: 1 })
+  const listWeek = Array.from({ length: 5 }, (_, index) =>
+    format(addDays(weekStart, index), 'EEEE dd/MM/yyyy', { locale: ptBR }),
+  )
 
   return (
     <WeekDatesContainer>
-      {listWeek.map((l) => (
-        <ListNumberDate> {l}</ListNumberDate>
+      {listWeek.map((label) => (
+        <ListNumberDate key={label}>{label}</ListNumberDate>
       ))}
     </WeekDatesContainer>
   )
