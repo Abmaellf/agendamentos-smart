@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent, { type UserEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -123,6 +123,42 @@ describe('integração da criação com a agenda semanal', () => {
     expect(apiScenario.appointmentQueries[0]?.get('unitId')).toBe('unit-a')
     expect(apiScenario.appointmentQueries[0]?.get('from')).toBeTruthy()
     expect(apiScenario.appointmentQueries[0]?.get('to')).toBeTruthy()
+  })
+
+  it('atualiza a semana por meio do seletor de data', async () => {
+    renderWithProviders(<AppointmentsPage />)
+
+    const dateInput = await screen.findByLabelText(/selecionar data da agenda/i)
+    fireEvent.change(dateInput, { target: { value: '2026-08-19' } })
+
+    expect(screen.getByText('19 de Agosto de 2026')).toBeVisible()
+    expect(
+      await screen.findByRole('heading', { name: 'Quarta - 19' }),
+    ).toBeVisible()
+  })
+
+  it.each([
+    ['AGENDADO', '#02B160'],
+    ['FALTA', '#DD4B39'],
+    ['REAGENDADO', '#FF9D18'],
+    ['CANCELADO', '#4F4D4A'],
+  ] as const)('aplica a cor do status %s', async (status, color) => {
+    apiScenario.appointments = [
+      {
+        ...createdAppointment,
+        id: `appointment-${status.toLowerCase()}`,
+        startsAt: '2026-08-13T14:00:00.000Z',
+        status,
+      },
+    ]
+
+    renderWithProviders(<AppointmentsPage />)
+
+    expect(
+      await screen.findByTestId(
+        `appointment-appointment-${status.toLowerCase()}`,
+      ),
+    ).toHaveStyle({ backgroundColor: color })
   })
 
   it('WB-18 disponibiliza e abre a criação para sessão operacional autenticada', async () => {

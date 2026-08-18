@@ -39,6 +39,8 @@ import type { AppointmentSession } from '../model/appointment'
 interface CreateAppointmentDialogProps {
   session: AppointmentSession
   defaultDate?: string
+  triggerLabel?: string
+  triggerAriaLabel?: string
 }
 
 interface FormState {
@@ -99,6 +101,8 @@ const controlClassName =
 export function CreateAppointmentDialog({
   session,
   defaultDate,
+  triggerLabel = 'Novo agendamento',
+  triggerAriaLabel,
 }: CreateAppointmentDialogProps) {
   const queryClient = useQueryClient()
   const patientRef = useRef<HTMLSelectElement>(null)
@@ -233,7 +237,9 @@ export function CreateAppointmentDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="button">Novo agendamento</Button>
+        <Button type="button" aria-label={triggerAriaLabel}>
+          {triggerLabel}
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>

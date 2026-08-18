@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { addDays, format, startOfWeek } from 'date-fns'
 import { ptBR } from 'date-fns/locale/pt-BR'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 
@@ -12,13 +13,23 @@ import type { Appointment } from '@/features/appointments/model/appointment'
 
 import {
   AppointmentCard,
+  AppointmentDetails,
+  AppointmentList,
+  AppointmentTime,
   AppointmentsGrid,
   AppointmentsHeader,
   AppointmentsPageContainer,
   CurrentDate,
+  DatePickerControl,
+  DateNavigationButton,
   DayColumn,
   DayTitle,
   EmptyState,
+  FeedbackPanel,
+  HeaderAction,
+  HeaderDate,
+  HeaderDateInput,
+  ScreenReaderDetails,
   SpaceHeader,
   Title,
 } from './appointments-page.styles'
@@ -52,8 +63,31 @@ function currency(value: string) {
   }).format(Number(value))
 }
 
+function capitalize(value: string) {
+  return value.charAt(0).toLocaleUpperCase('pt-BR') + value.slice(1)
+}
+
+function headerDate(date: Date) {
+  const day = format(date, 'dd')
+  const month = capitalize(format(date, 'MMMM', { locale: ptBR }))
+  const year = format(date, 'yyyy')
+  return `${day} de ${month} de ${year}`
+}
+
+function dayLabel(date: Date) {
+  const weekDay = format(date, 'EEEE', { locale: ptBR }).replace('-feira', '')
+  return `${capitalize(weekDay)} - ${format(date, 'd')}`
+}
+
+function initialSelectedDate() {
+  const today = new Date()
+  if (today.getDay() === 6) return addDays(today, 2)
+  if (today.getDay() === 0) return addDays(today, 1)
+  return today
+}
+
 export function AppointmentsPage() {
-  const [selectedDate, setSelectedDate] = useState(() => new Date())
+  const [selectedDate, setSelectedDate] = useState(initialSelectedDate)
   const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 })
   const weekEnd = addDays(weekStart, 7)
 
@@ -63,7 +97,7 @@ export function AppointmentsPage() {
         const date = addDays(weekStart, index)
         return {
           key: format(date, 'yyyy-MM-dd'),
-          label: format(date, "EEEE, dd 'de' MMMM", { locale: ptBR }),
+          label: dayLabel(date),
         }
       }),
     [weekStart],
@@ -99,66 +133,118 @@ export function AppointmentsPage() {
         <Helmet title="Agendamentos" />
         <AppointmentsHeader>
           <Title>Agendamentos</Title>
-          <CurrentDate>
-            <label htmlFor="appointments-date">Selecione a data</label>
-            <input
-              id="appointments-date"
-              type="date"
-              value={format(selectedDate, 'yyyy-MM-dd')}
-              onChange={(event) => {
-                const nextDate = new Date(`${event.target.value}T12:00:00`)
-                if (!Number.isNaN(nextDate.getTime())) setSelectedDate(nextDate)
-              }}
-            />
+          <CurrentDate aria-label="Navegação da agenda semanal">
+            <DateNavigationButton
+              type="button"
+              aria-label="Semana anterior"
+              onClick={() => setSelectedDate((date) => addDays(date, -7))}
+            >
+              <ChevronLeft aria-hidden="true" />
+            </DateNavigationButton>
+            <DatePickerControl>
+              <HeaderDateInput
+                id="appointments-date"
+                type="date"
+                aria-label="Selecionar data da agenda"
+                value={format(selectedDate, 'yyyy-MM-dd')}
+                onClick={(event) => event.currentTarget.showPicker?.()}
+                onChange={(event) => {
+                  const nextDate = new Date(`${event.target.value}T12:00:00`)
+                  if (!Number.isNaN(nextDate.getTime())) {
+                    setSelectedDate(nextDate)
+                  }
+                }}
+              />
+              <HeaderDate dateTime={format(selectedDate, 'yyyy-MM-dd')}>
+                {headerDate(selectedDate)}
+              </HeaderDate>
+            </DatePickerControl>
+            <DateNavigationButton
+              type="button"
+              aria-label="Próxima semana"
+              onClick={() => setSelectedDate((date) => addDays(date, 7))}
+            >
+              <ChevronRight aria-hidden="true" />
+            </DateNavigationButton>
           </CurrentDate>
           {session ? (
-            <CreateAppointmentDialog
-              session={session}
-              defaultDate={format(selectedDate, 'yyyy-MM-dd')}
-            />
+            <HeaderAction>
+              <CreateAppointmentDialog
+                key={format(selectedDate, 'yyyy-MM-dd')}
+                session={session}
+                defaultDate={format(selectedDate, 'yyyy-MM-dd')}
+                triggerLabel="Agendar"
+                triggerAriaLabel="Novo agendamento"
+              />
+            </HeaderAction>
           ) : null}
         </AppointmentsHeader>
 
-        {loading ? <p role="status">Carregando agenda...</p> : null}
+        {loading ? (
+          <FeedbackPanel role="status">Carregando agenda...</FeedbackPanel>
+        ) : null}
 
         {failed ? (
-          <div role="alert">
+          <FeedbackPanel role="alert">
             <p>Não foi possível carregar a agenda.</p>
             <Button type="button" onClick={retry}>
               Tentar novamente
             </Button>
-          </div>
+          </FeedbackPanel>
         ) : null}
 
         {!loading && !failed && appointments.length === 0 ? (
           <EmptyState>Nenhum agendamento nesta semana.</EmptyState>
         ) : null}
 
-        {!loading && !failed && appointments.length > 0 ? (
+        {!loading && !failed ? (
           <AppointmentsGrid>
             {days.map((day) => {
-              const appointmentsOfDay = appointments.filter(
-                (appointment) =>
-                  localDateParts(appointment.startsAt, appointment.timeZone) ===
-                  day.key,
-              )
+              const appointmentsOfDay = appointments
+                .filter(
+                  (appointment) =>
+                    localDateParts(
+                      appointment.startsAt,
+                      appointment.timeZone,
+                    ) === day.key,
+                )
+                .sort((first, second) =>
+                  first.startsAt.localeCompare(second.startsAt),
+                )
+              const isSelected = day.key === format(selectedDate, 'yyyy-MM-dd')
 
               return (
-                <DayColumn key={day.key}>
+                <DayColumn key={day.key} $selected={isSelected}>
                   <DayTitle>{day.label}</DayTitle>
-                  {appointmentsOfDay.map((appointment) => (
-                    <AppointmentCard
-                      key={appointment.id}
-                      data-testid={`appointment-${appointment.id}`}
-                    >
-                      <strong>{appointment.patient.name}</strong>
-                      <span>{localTime(appointment)}</span>
-                      <span>{appointment.service.name}</span>
-                      <span>{appointment.status}</span>
-                      <span>{appointment.durationMinutes} min</span>
-                      <span>{currency(appointment.price)}</span>
-                    </AppointmentCard>
-                  ))}
+                  <AppointmentList>
+                    {appointmentsOfDay.map((appointment) => (
+                      <AppointmentCard
+                        key={appointment.id}
+                        $status={appointment.status}
+                        data-testid={`appointment-${appointment.id}`}
+                      >
+                        <AppointmentTime
+                          dateTime={appointment.startsAt}
+                          aria-label={`Horário: ${localTime(appointment)}`}
+                        >
+                          {localTime(appointment)}
+                        </AppointmentTime>
+                        <AppointmentDetails>
+                          <strong>{appointment.patient.name}</strong>
+                          <span>{appointment.service.name}</span>
+                          <ScreenReaderDetails>
+                            {appointment.status}
+                          </ScreenReaderDetails>
+                          <ScreenReaderDetails>
+                            {appointment.durationMinutes} min
+                          </ScreenReaderDetails>
+                          <ScreenReaderDetails>
+                            {currency(appointment.price)}
+                          </ScreenReaderDetails>
+                        </AppointmentDetails>
+                      </AppointmentCard>
+                    ))}
+                  </AppointmentList>
                 </DayColumn>
               )
             })}

@@ -21,7 +21,13 @@ export interface TestAppointment {
   timeZone: string
   durationMinutes: number
   price: string
-  status: 'AGENDADO'
+  status:
+    | 'AGENDADO'
+    | 'FALTA'
+    | 'REAGENDADO'
+    | 'CANCELADO'
+    | 'ATENDENDO'
+    | 'FINALIZADO'
   createdBy: string
   createdAt: string
 }

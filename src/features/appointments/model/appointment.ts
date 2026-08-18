@@ -51,6 +51,14 @@ export interface CreateAppointmentInput {
   price: string
 }
 
+export type AppointmentStatus =
+  | 'AGENDADO'
+  | 'FALTA'
+  | 'REAGENDADO'
+  | 'CANCELADO'
+  | 'ATENDENDO'
+  | 'FINALIZADO'
+
 export interface Appointment {
   id: string
   tenantId: string
@@ -62,7 +70,7 @@ export interface Appointment {
   timeZone: string
   durationMinutes: number
   price: string
-  status: 'AGENDADO'
+  status: AppointmentStatus
   createdBy: string
   createdAt: string
 }
