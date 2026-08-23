@@ -5,7 +5,7 @@
     "description": "Testes de caixa preta BB-01 a BB-24. Requer seed descartável descrita no README.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
-  "variable": [{ "key": "schedulingPath", "value": "/api/scheduling" }],
+  "variable": [{ "key": "appointmentPath", "value": "/api/appointment" }],
   "item": [
     {
       "name": "00 - Autenticação de teste",
@@ -137,7 +137,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{freeSlot}}\",\n  \"durationMinutes\": {{defaultDuration}},\n  \"price\": \"{{defaultPrice}}\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -173,7 +173,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{freeSlot}}\",\n  \"durationMinutes\": {{defaultDuration}},\n  \"price\": \"{{defaultPrice}}\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -213,7 +213,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientBId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{basicFreeSlot}}\",\n  \"durationMinutes\": {{defaultDuration}},\n  \"price\": \"{{defaultPrice}}\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -265,7 +265,7 @@
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": { "mode": "raw", "raw": "{{missingFieldPayload}}" },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           }
         },
         {
@@ -283,7 +283,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientDId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"2035-09-05T12:30:00.000Z\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\",\n  \"tenantId\": \"{{foreignTenantId}}\",\n  \"status\": \"CONCLUIDO\",\n  \"createdBy\": \"forged-user\",\n  \"createdAt\": \"2000-01-01T00:00:00.000Z\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -339,7 +339,7 @@
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": { "mode": "raw", "raw": "{{foreignRefPayload}}" },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           }
         },
         {
@@ -357,7 +357,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{capacityThreeServiceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{patientConflictSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -385,7 +385,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientBId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": \"{{professionalId}}\",\n  \"startsAt\": \"{{professionalConflictSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -413,7 +413,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientCId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{professionalConflictSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -441,7 +441,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"professionalId\": \"{{professionalId}}\",\n  \"startsAt\": \"{{adjacentSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -469,7 +469,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientDId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{capacityOneServiceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{capacityOneSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -518,7 +518,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{capacityPatientId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{capacityThreeServiceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{capacityThreeSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           }
         },
         {
@@ -536,7 +536,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientDId}}\",\n  \"unitId\": \"{{unitId}}\",\n  \"serviceId\": \"{{capacityThreeServiceId}}\",\n  \"professionalId\": null,\n  \"startsAt\": \"{{capacityThreeSlot}}\",\n  \"durationMinutes\": 60,\n  \"price\": \"150.00\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -569,7 +569,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{overrideDurationSlot}}\", \"durationMinutes\": 75, \"price\": \"150.00\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -597,7 +597,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientBId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{overridePriceSlot}}\", \"durationMinutes\": 60, \"price\": \"175.50\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -625,7 +625,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientCId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{overrideBothSlot}}\", \"durationMinutes\": 90, \"price\": \"200.00\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -653,7 +653,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientDId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{basicOverrideSlot}}\", \"durationMinutes\": 90, \"price\": \"200.00\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -681,7 +681,7 @@
               "mode": "raw",
               "raw": "{\n  \"patientId\": \"{{patientId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{mutableServiceId}}\", \"professionalId\": null, \"startsAt\": \"{{snapshotSlot}}\", \"durationMinutes\": 60, \"price\": \"150.00\"\n}"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -732,7 +732,7 @@
               ]
             },
             "method": "GET",
-            "url": "{{baseUrl}}{{schedulingPath}}/{{snapshotAppointmentId}}"
+            "url": "{{baseUrl}}{{appointmentPath}}/{{snapshotAppointmentId}}"
           },
           "event": [
             {
@@ -760,7 +760,7 @@
               "mode": "raw",
               "raw": "{ \"patientId\": \"{{patientBId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{pastSlot}}\", \"durationMinutes\": 60, \"price\": \"150.00\" }"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -788,7 +788,7 @@
               "mode": "raw",
               "raw": "{ \"patientId\": \"{{patientCId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{pastSlot}}\", \"durationMinutes\": 60, \"price\": \"150.00\" }"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -816,7 +816,7 @@
               "mode": "raw",
               "raw": "{ \"patientId\": \"{{patientDId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"{{timeZoneBoundarySlot}}\", \"durationMinutes\": 60, \"price\": \"150.00\" }"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -844,7 +844,7 @@
               "mode": "raw",
               "raw": "{ \"patientId\": \"{{patientBId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": \"{{unavailableProfessionalId}}\", \"startsAt\": \"{{unavailableProfessionalSlot}}\", \"durationMinutes\": 60, \"price\": \"150.00\" }"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -876,7 +876,7 @@
               "mode": "raw",
               "raw": "{ \"patientId\": \"{{patientDId}}\", \"unitId\": \"{{unitId}}\", \"serviceId\": \"{{serviceId}}\", \"professionalId\": null, \"startsAt\": \"2035-09-07T12:30:00.000Z\", \"durationMinutes\": 60, \"price\": \"150.00\" }"
             },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           },
           "event": [
             {
@@ -922,7 +922,7 @@
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": { "mode": "raw", "raw": "{{invalidPayload}}" },
-            "url": "{{baseUrl}}{{schedulingPath}}"
+            "url": "{{baseUrl}}{{appointmentPath}}"
           }
         }
       ]
@@ -940,7 +940,7 @@
               ]
             },
             "method": "GET",
-            "url": "{{baseUrl}}{{schedulingPath}}?unitId={{unitId}}&from=2035-08-20T00:00:00.000Z&to=2035-08-21T00:00:00.000Z"
+            "url": "{{baseUrl}}{{appointmentPath}}?unitId={{unitId}}&from=2035-08-20T00:00:00.000Z&to=2035-08-21T00:00:00.000Z"
           },
           "event": [
             {
@@ -967,7 +967,7 @@
               ]
             },
             "method": "GET",
-            "url": "{{baseUrl}}{{schedulingPath}}?unitId={{foreignUnitId}}&from=2035-08-20T00:00:00.000Z&to=2035-08-21T00:00:00.000Z"
+            "url": "{{baseUrl}}{{appointmentPath}}?unitId={{foreignUnitId}}&from=2035-08-20T00:00:00.000Z&to=2035-08-21T00:00:00.000Z"
           },
           "event": [
             {

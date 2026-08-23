@@ -13,7 +13,7 @@ export default defineConfig({
     },
   },
   define: {
-    'import.meta.env.VITE_API_URL': JSON.stringify('http://localhost:8082'),
+    'import.meta.env.VITE_API_URL': JSON.stringify('http://localhost:8080'),
   },
   test: {
     environment: 'jsdom',

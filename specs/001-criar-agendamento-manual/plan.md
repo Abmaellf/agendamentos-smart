@@ -19,7 +19,7 @@ As regras de isolamento por tenant, conflito de paciente/profissional, capacidad
 - O contexto legado de pacientes não oferece um domínio funcional de agendamentos.
 - O login não mantém um contexto tipado de sessão; a API usa cookie HTTP-only, mas o papel ainda não está disponível de forma confiável para a interface.
 - O front-end usa `ADMIN`/`BASIC` na documentação, enquanto a API atual usa `ADMIN`/`USER`.
-- A API atual expõe `POST /api/scheduling`, mas seu contrato contém apenas paciente, patologia, data, hora, status e variante. Não há unidade, serviço, profissional, duração, preço, tenant, autoria, capacidade ou consultas por intervalo.
+- A API atual expõe `POST /api/appointment`, mas seu contrato contém apenas paciente, patologia, data, hora, status e variante. Não há unidade, serviço, profissional, duração, preço, tenant, autoria, capacidade ou consultas por intervalo.
 - A API atual não possui recursos de unidade, serviço ou profissional. Assim, a coleção Postman completa ficará vermelha até o contrato correspondente ser implementado no backend.
 
 ## 3. Decisões obrigatórias antes de escrever os testes

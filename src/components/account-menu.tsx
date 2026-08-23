@@ -28,7 +28,7 @@ export default function AccountMenu() {
           className="h-12 gap-2 rounded-full px-2 text-white select-none hover:bg-white/10 hover:text-white focus-visible:ring-white/70"
         >
           <span className="hidden max-w-36 truncate text-sm font-light sm:inline">
-            {profile?.username ?? profile?.clinic.name ?? 'Conta'}
+            {/* {profile?.username ?? profile?.clinic.name ?? 'Conta'} */}
           </span>
           <img
             src={avatar}
@@ -41,7 +41,7 @@ export default function AccountMenu() {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
           <span className="text-muted-foreground text-xs font-normal">
-            {profile?.clinic.name ?? profile?.username ?? 'Minha conta'}
+            {/* {profile?.clinic.name ?? profile?.username ?? 'Minha conta'} */}
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

@@ -1,6 +1,6 @@
 # Como executar os testes — Criar agendamento manual
 
-Este é o roteiro validado para subir o ambiente completo e executar os testes React e Postman da feature. A API deve responder em `http://localhost:8082` e o front-end em `http://localhost:3000`.
+Este é o roteiro validado para subir o ambiente completo e executar os testes React e Postman da feature. A API deve responder em `http://localhost:8080` e o front-end em `http://localhost:3000`.
 
 ## 1. Preparar uma base descartável
 
@@ -29,7 +29,7 @@ Verifique a inicialização e a aplicação das migrations:
 docker compose logs -f api
 ```
 
-O ambiente está pronto quando aparecer `Started AgendaSmartApplication`. Se o contêiner da API tiver sido criado durante uma colisão temporária da porta `8082` e ficar fora da rede, preserve o banco e recrie apenas a API:
+O ambiente está pronto quando aparecer `Started AgendaSmartApplication`. Se o contêiner da API tiver sido criado durante uma colisão temporária da porta `8080` e ficar fora da rede, preserve o banco e recrie apenas a API:
 
 ```bash
 docker compose stop api
@@ -49,7 +49,7 @@ npm run dev -- --host 0.0.0.0
 O arquivo `.env.local` deve conter:
 
 ```dotenv
-VITE_API_URL="http://localhost:8082"
+VITE_API_URL="http://localhost:8080"
 ```
 
 Acesse `http://localhost:3000`.
@@ -92,7 +92,7 @@ npm run test:postman
 npm run test:postman:race
 ```
 
-Os scripts Newman forçam `baseUrl=http://localhost:8082`, independentemente do valor salvo no environment.
+Os scripts Newman forçam `baseUrl=http://localhost:8080`, independentemente do valor salvo no environment.
 
 Resultados de referência da implementação em 15 de agosto de 2026:
 

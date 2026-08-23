@@ -12,7 +12,7 @@ Como a spec ainda contém clarificações, os testes adotam provisoriamente as r
 2. A unidade usa identificador IANA; os fixtures usam `America/Cuiaba`, e o comando envia um instante ISO normalizado.
 3. Selecionar profissional em dia indisponível bloqueia a criação.
 4. Tentativa de sobrescrita por `BASIC` é recusada, sem persistência silenciosa dos padrões.
-5. O comando usa `POST /api/scheduling` e não aceita tenant, estado, autor ou timestamps como fonte confiável do cliente.
+5. O comando usa `POST /api/appointment` e não aceita tenant, estado, autor ou timestamps como fonte confiável do cliente.
 6. BB-18 usa `Idempotency-Key`: duas confirmações simultâneas representam o mesmo resultado e geram um único registro.
 
 ## Caixa branca
@@ -40,7 +40,7 @@ A execução também revelou débitos do código atual que serão tratados somen
 - Skips: `0`.
 - Validação estrutural: todas as coleções e environments foram carregados com sucesso por `postman-collection`.
 - Comandos: `npm run test:postman` e `npm run test:postman:race`.
-- A API foi confirmada em `localhost:8082`: login/setup e smoke do contrato atual estão verdes; as coleções da feature seguem vermelhas porque o contrato novo ainda não foi implementado.
+- A API foi confirmada em `localhost:8080`: login/setup e smoke do contrato atual estão verdes; as coleções da feature seguem vermelhas porque o contrato novo ainda não foi implementado.
 
 Baseline real observado:
 
@@ -48,7 +48,7 @@ Baseline real observado:
 - smoke atual: `5` requests, `10` assertions, `0` falhas;
 - coleção da feature sem `--bail`: `35` requests e `30` assertions falharam após os checks de autenticação; os comandos de agendamento com o payload novo recebem `403` no backend atual;
 - concorrência: o login passou, mas a pré-condição de listagem e as duas criações paralelas receberam `403`; resultado esperado enquanto capacidade/idempotência não existem;
-- o endpoint legado foi confirmado separadamente: `POST /api/scheduling` recebe `pathology`, `dateScheduling`, `hours`, `status` e `variant` e retorna `200`.
+- o endpoint legado foi confirmado separadamente: `POST /api/appointment` recebe `pathology`, `dateappointment`, `hours`, `status` e `variant` e retorna `200`.
 
 O runner de corrida dispara as requisições em paralelo e consulta a ocupação final. A coleção principal também verifica isolamento de tenant, snapshots, intervalos adjacentes, precedência do conflito de paciente, permissões, campos derivados e visibilidade posterior.
 
