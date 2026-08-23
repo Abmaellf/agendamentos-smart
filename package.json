@@ -13,10 +13,10 @@
     "test": "vitest run --config vitest.config.ts",
     "test:watch": "vitest --config vitest.config.ts",
     "test:coverage": "vitest run --coverage --config vitest.config.ts",
-    "test:postman:setup": "newman run postman/001-criar-agendamento-manual/criar-agendamento-manual.postman_collection.json -e postman/001-criar-agendamento-manual/local.postman_environment.json --env-var baseUrl=http://localhost:8082 --folder \"00 - Autenticação de teste\" --bail",
-    "test:postman:smoke": "newman run postman/001-criar-agendamento-manual/backend-atual-smoke.postman_collection.json -e postman/001-criar-agendamento-manual/local.postman_environment.json --env-var baseUrl=http://localhost:8082 --bail",
-    "test:postman": "newman run postman/001-criar-agendamento-manual/criar-agendamento-manual.postman_collection.json -e postman/001-criar-agendamento-manual/local.postman_environment.json --env-var baseUrl=http://localhost:8082 --bail",
-    "test:postman:race": "newman run postman/001-criar-agendamento-manual/concorrencia-ultima-vaga.postman_collection.json -e postman/001-criar-agendamento-manual/local.postman_environment.json --env-var baseUrl=http://localhost:8082 --bail"
+    "test:postman:setup": "newman run postman/001-criar-agendamento-manual/criar-agendamento-manual.postman_collection.json -e postman/001-criar-agendamento-manual/local.postman_environment.json --env-var baseUrl=http://localhost:8080 --folder \"00 - Autenticação de teste\" --bail",
+    "test:postman:smoke": "newman run postman/001-criar-agendamento-manual/backend-atual-smoke.postman_collection.json -e postman/001-criar-agendamento-manual/local.postman_environment.json --env-var baseUrl=http://localhost:8080 --bail",
+    "test:postman": "newman run postman/001-criar-agendamento-manual/criar-agendamento-manual.postman_collection.json -e postman/001-criar-agendamento-manual/local.postman_environment.json --env-var baseUrl=http://localhost:8080 --bail",
+    "test:postman:race": "newman run postman/001-criar-agendamento-manual/concorrencia-ultima-vaga.postman_collection.json -e postman/001-criar-agendamento-manual/local.postman_environment.json --env-var baseUrl=http://localhost:8080 --bail"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

@@ -14,8 +14,8 @@ front-end.
 - `createAppointment`: comando que cria um registro;
 - `getAppointments` e `useAppointments`: operações que retornam uma coleção.
 
-O termo `scheduling` não deve ser usado em nomes internos. A string
-`/api/scheduling` permanece somente no adaptador HTTP, nos mocks e nos
+O termo `appointment` não deve ser usado em nomes internos. A string
+`/api/appointment` permanece somente no adaptador HTTP, nos mocks e nos
 documentos de contrato porque ainda é o endpoint publicado pelo backend.
 
 ## Estrutura

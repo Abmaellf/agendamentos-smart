@@ -53,7 +53,7 @@ export async function getProfessionals(serviceId: string) {
 }
 
 export async function createAppointment(input: CreateAppointmentInput) {
-  const { data } = await api.post<Appointment>('/api/scheduling', input)
+  const { data } = await api.post<Appointment>('/api/appointments', input)
   return data
 }
 
@@ -63,7 +63,7 @@ export async function getAppointments(params: {
   to: string
 }) {
   const { data } = await api.get<ContentResponse<Appointment> | Appointment[]>(
-    '/api/scheduling',
+    '/api/appointments',
     { params },
   )
   return contentOf(data)

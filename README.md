@@ -51,10 +51,10 @@ Aguarde a mensagem `Started AgendaSmartApplication` em:
 docker compose logs -f api
 ```
 
-Depois, neste repositório, confirme `.env.local` com `VITE_API_URL="http://localhost:8082"` e execute o Vite. URLs locais:
+Depois, neste repositório, confirme `.env.local` com `VITE_API_URL="http://localhost:8080"` e execute o Vite. URLs locais:
 
 - front-end: `http://localhost:3000`;
-- API: `http://localhost:8082`;
+- API: `http://localhost:8080`;
 - MySQL: `localhost:3306`.
 
 Se uma tentativa anterior de subida deixar o contêiner da API fora da rede do banco, preserve o volume e recrie somente a API:

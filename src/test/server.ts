@@ -75,7 +75,7 @@ async function catalogResponse(name: CatalogName, content?: unknown[]) {
 }
 
 const handlers = [
-  http.get('http://localhost:8082/auth/me', () =>
+  http.get('http://localhost:8080/auth/me', () =>
     HttpResponse.json({
       id: adminSession.user.id,
       name: adminSession.user.name,
@@ -85,14 +85,14 @@ const handlers = [
       activeUnitId: adminSession.activeUnitId,
     }),
   ),
-  http.get('http://localhost:8082/api/patients', () =>
+  http.get('http://localhost:8080/api/patients', () =>
     catalogResponse('patients'),
   ),
-  http.get('http://localhost:8082/api/units', () => catalogResponse('units')),
-  http.get('http://localhost:8082/api/services', () =>
+  http.get('http://localhost:8080/api/units', () => catalogResponse('units')),
+  http.get('http://localhost:8080/api/services', () =>
     catalogResponse('services'),
   ),
-  http.get('http://localhost:8082/api/professionals', ({ request }) => {
+  http.get('http://localhost:8080/api/professionals', ({ request }) => {
     const serviceId = new URL(request.url).searchParams.get('serviceId') ?? ''
     apiScenario.professionalQueries.push(serviceId)
     const matchingProfessionals = apiScenario.catalogs.professionals.filter(
@@ -104,7 +104,7 @@ const handlers = [
     )
     return catalogResponse('professionals', matchingProfessionals)
   }),
-  http.get('http://localhost:8082/api/scheduling', async ({ request }) => {
+  http.get('http://localhost:8080/api/appointment', async ({ request }) => {
     apiScenario.appointmentQueries.push(new URL(request.url).searchParams)
     if (apiScenario.appointmentDelayMs > 0) {
       await delay(apiScenario.appointmentDelayMs)
@@ -120,7 +120,7 @@ const handlers = [
     }
     return HttpResponse.json({ content: apiScenario.appointments })
   }),
-  http.post('http://localhost:8082/api/scheduling', async ({ request }) => {
+  http.post('http://localhost:8080/api/appointment', async ({ request }) => {
     const payload = (await request.json()) as Record<string, unknown>
     apiScenario.createRequests.push(payload)
 

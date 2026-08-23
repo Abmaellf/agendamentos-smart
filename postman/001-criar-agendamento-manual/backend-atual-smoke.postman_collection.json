@@ -147,7 +147,7 @@
           ]
         },
         "method": "GET",
-        "url": "{{baseUrl}}/api/scheduling/{{seedAppointmentId}}"
+        "url": "{{baseUrl}}/api/appointment/{{seedAppointmentId}}"
       },
       "event": [
         {
@@ -156,7 +156,7 @@
             "exec": [
               "pm.test('Consulta seed responde 200', () => pm.response.to.have.status(200));",
               "const body = pm.response.json();",
-              "pm.test('Contrato legado é identificável', () => { pm.expect(body.id).to.eql(pm.environment.get('seedAppointmentId')); pm.expect(body).to.have.property('pathology'); pm.expect(body).to.have.property('dateScheduling'); pm.expect(body).to.have.property('hours'); pm.expect(body.status).to.eql('AGENDADO'); });"
+              "pm.test('Contrato legado é identificável', () => { pm.expect(body.id).to.eql(pm.environment.get('seedAppointmentId')); pm.expect(body).to.have.property('pathology'); pm.expect(body).to.have.property('dateAppointment'); pm.expect(body).to.have.property('hours'); pm.expect(body.status).to.eql('AGENDADO'); });"
             ]
           }
         }

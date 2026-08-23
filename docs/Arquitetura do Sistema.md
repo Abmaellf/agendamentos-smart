@@ -176,8 +176,8 @@ Na qualidade estática, o projeto mantém `.eslintrc` legado e `eslint.config.mj
 | `GET patient/list`        | `PatientContext`              | Lista de pacientes                    |
 | `POST /patient/save`      | `src/api/register-patient.ts` | Cadastro pelo modal compartilhado     |
 | `POST patients`           | `PatientContext`              | Cadastro pelo diálogo local da página |
-| `GET /api/scheduling`     | `features/appointments/api`   | Consulta externa de agendamentos      |
-| `POST /api/scheduling`    | `features/appointments/api`   | Criação externa de agendamento        |
+| `GET /api/appointment`    | `features/appointments/api`   | Consulta externa de agendamentos      |
+| `POST /api/appointment`   | `features/appointments/api`   | Criação externa de agendamento        |
 
 ## Regras arquiteturais
 

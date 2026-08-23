@@ -1,6 +1,6 @@
 # Testes Postman — criar agendamento manual
 
-Esta pasta contém três coleções de caixa preta apontadas explicitamente para `http://localhost:8082` pelos scripts npm:
+Esta pasta contém três coleções de caixa preta apontadas explicitamente para `http://localhost:8080` pelos scripts npm:
 
 - `backend-atual-smoke`: confirma que a API está disponível, autentica os usuários e documenta o contrato legado que funciona hoje;
 - `criar-agendamento-manual`: descreve o contrato esperado da feature (`BB-01` a `BB-24`);
@@ -10,9 +10,9 @@ Esta pasta contém três coleções de caixa preta apontadas explicitamente para
 
 - autenticação: `POST /auth/login`;
 - cadastro idempotente do usuário operacional: `GET /auth/list` e, se necessário, `POST /user/register/:clinicId`;
-- criação: `POST /api/scheduling`;
-- consulta da agenda: `GET /api/scheduling?unitId&from&to`;
-- consulta unitária: `GET /api/scheduling/:id`;
+- criação: `POST /api/appointment`;
+- consulta da agenda: `GET /api/appointment?unitId&from&to`;
+- consulta unitária: `GET /api/appointment/:id`;
 - alteração do serviço usada para provar snapshot: `PUT /api/services/:id`.
 
 O comando de criação aceita `patientId`, `unitId`, `serviceId`, `professionalId`, `startsAt`, `durationMinutes` e `price`. Tenant, autor, instante de criação e estado são sempre derivados pelo servidor.
@@ -21,7 +21,7 @@ O comando de criação aceita `patientId`, `unitId`, `serviceId`, `professionalI
 
 O environment local já contém:
 
-- `baseUrl`: `http://localhost:8082`;
+- `baseUrl`: `http://localhost:8080`;
 - `clinicId`: `550e8400-e29b-41d4-a716-446655440000`;
 - ADMIN: `admin@agendasmart.com` / `Admin@123`;
 - USER de teste: `usuario1@agendasmart.com` / `usuario1@123`.
