@@ -1,6 +1,8 @@
-import { Link, type LinkProps, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
-export type NavLinkProps = LinkProps
+import type { NavLinkProps } from '@/@types/components'
+
+export type { NavLinkProps } from '@/@types/components'
 
 // Criado com o snipper rfc
 export function NavLink(props: NavLinkProps) {

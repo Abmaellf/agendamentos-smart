@@ -1,6 +1,5 @@
 import { api } from '@/lib/axios'
 
-import { parseSessionProfile } from '../../session/model/session'
 import type {
   Appointment,
   AppointmentSession,
@@ -9,7 +8,9 @@ import type {
   ProfessionalOption,
   ServiceOption,
   UnitOption,
-} from '../model/appointment'
+} from '@/@types/appointment'
+
+import { parseSessionProfile } from '../../session/model/session'
 
 interface ContentResponse<T> {
   content: T[]

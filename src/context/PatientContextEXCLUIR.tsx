@@ -1,34 +1,20 @@
 import { api } from '@/lib/axios'
-import { AxiosResponse } from 'axios'
-import { ReactNode, useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { createContext } from 'use-context-selector'
 import { uuid } from 'zod'
 
-interface Patient {
-  id: string
-  code: string
-  name: string
-  empresa: string
-  createdAt: Date
-  status: string
-}
-interface PatientContextType {
-  patients: Patient[]
-  fetchPatients: () => Promise<AxiosResponse>
-  createPatient: (data: CreatePatientSchema) => Promise<void>
-}
-interface CreatePatientSchema {
-  name: string
-}
+import type {
+  CreatePatientInput,
+  PatientContextItem,
+  PatientContextValue,
+  PatientProviderProps,
+} from '@/@types/patient'
 
-export const PatientContext = createContext({} as PatientContextType)
+export const PatientContext = createContext({} as PatientContextValue)
 
-interface PatientProviderProps {
-  children: ReactNode
-}
 export function PatientProvider({ children }: PatientProviderProps) {
   // const [cookies] = useCookies(["jwt"]);
-  const [patients, setPatients] = useState<Patient[]>([])
+  const [patients, setPatients] = useState<PatientContextItem[]>([])
 
   async function fetchPatients() {
     const response = await api.get('patient/list')
@@ -36,7 +22,7 @@ export function PatientProvider({ children }: PatientProviderProps) {
     return response
   }
 
-  const createPatient = useCallback(async (data: CreatePatientSchema) => {
+  const createPatient = useCallback(async (data: CreatePatientInput) => {
     const { name } = data
 
     const response = await api.post('patients', {

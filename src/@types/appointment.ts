@@ -4,7 +4,6 @@ export interface AppointmentSession {
   user: {
     id: string
     name?: string
-    login?: string
     role: AppointmentRole
   }
   tenantId: string
@@ -56,22 +55,22 @@ export type AppointmentStatus =
   | 'FALTA'
   | 'REAGENDADO'
   | 'CANCELADO'
-  | 'ATENDENDO'
+  | 'EMATENDIMENTO'
   | 'FINALIZADO'
 
 export interface Appointment {
   id: string
   tenantId: string
   unitId: string
-  patient: { id: string; name: string }
-  service: { id: string; name: string }
-  professional: { id: string; name: string } | null
+  patient: PatientOption
+  service: ServiceOption
+  professional: ProfessionalOption | null
   startsAt: string
-  timeZone: string
   durationMinutes: number
   price: string
   status: AppointmentStatus
-  createdBy: string
+  timeZone: string
+  createdByUserId: string
   createdAt: string
 }
 

@@ -1,6 +1,9 @@
 import { z } from 'zod'
 
-import type { AppointmentRole, CreateAppointmentInput } from './appointment'
+import type {
+  AppointmentRole,
+  CreateAppointmentInput,
+} from '@/@types/appointment'
 
 const requiredId = (message: string) => z.string().trim().min(1, message)
 const datePattern = /^\d{4}-\d{2}-\d{2}$/

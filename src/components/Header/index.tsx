@@ -1,6 +1,8 @@
 import { Menu as MenuIcon } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 
+import type { HeaderProps } from '@/@types/components'
+
 import AccountMenu from '../account-menu'
 import {
   DropdownMenu,
@@ -14,10 +16,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
-
-interface HeaderProps {
-  setMenuIsVisible(data: boolean): void
-}
 
 const navigationClassName =
   'border-b border-transparent px-1 py-2 text-base font-light text-white/90 transition-colors hover:border-white/70 hover:text-white'

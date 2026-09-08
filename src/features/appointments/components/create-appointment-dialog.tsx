@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   cloneElement,
   type FormEvent,
-  type ReactElement,
   useEffect,
   useMemo,
   useRef,
@@ -10,6 +9,11 @@ import {
 } from 'react'
 import { toast } from 'sonner'
 
+import type {
+  AppointmentFieldProps,
+  AppointmentFormState,
+  CreateAppointmentDialogProps,
+} from '@/@types/components'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -34,27 +38,8 @@ import {
   appointmentFormSchema,
   toCreateAppointmentInput,
 } from '../model/appointment-form-schema'
-import type { AppointmentSession } from '../model/appointment'
 
-interface CreateAppointmentDialogProps {
-  session: AppointmentSession
-  defaultDate?: string
-  triggerLabel?: string
-  triggerAriaLabel?: string
-}
-
-interface FormState {
-  patientId: string
-  unitId: string
-  serviceId: string
-  professionalId: string
-  date: string
-  time: string
-  durationMinutes: number | string
-  price: string
-}
-
-const emptyForm = (defaultDate = ''): FormState => ({
+const emptyForm = (defaultDate = ''): AppointmentFormState => ({
   patientId: '',
   unitId: '',
   serviceId: '',
@@ -69,11 +54,7 @@ function Field({
   label,
   error,
   children,
-}: {
-  label: string
-  error?: string
-  children: ReactElement<{ id?: string; 'aria-describedby'?: string }>
-}) {
+}: AppointmentFieldProps) {
   const id = children.props.id ?? label.toLowerCase().replace(/\W+/g, '-')
   const errorId = `${id}-error`
 
@@ -108,7 +89,9 @@ export function CreateAppointmentDialog({
   const patientRef = useRef<HTMLSelectElement>(null)
   const submittingRef = useRef(false)
   const [open, setOpen] = useState(false)
-  const [form, setForm] = useState<FormState>(() => emptyForm(defaultDate))
+  const [form, setForm] = useState<AppointmentFormState>(() =>
+    emptyForm(defaultDate),
+  )
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [feedback, setFeedback] = useState('')
   const [durationOverridden, setDurationOverridden] = useState(false)

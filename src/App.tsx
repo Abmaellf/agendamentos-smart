@@ -4,7 +4,7 @@ import { Helmet, HelmetProvider } from 'react-helmet-async'
 import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'sonner'
 
-import { PatientProvider } from './context/PatientContext'
+import { PatientProvider } from './context/PatientContextEXCLUIR'
 import { queryClient } from './lib/react-query'
 import { Router } from './Router'
 
@@ -13,7 +13,7 @@ import './globals.css'
 export function App() {
   return (
     <CookiesProvider>
-      <PatientProvider>
+      {/* <PatientProvider> */}
         <BrowserRouter>
           <HelmetProvider>
             <Helmet titleTemplate="%s | Fisioterapia e Pilates" />
@@ -23,7 +23,7 @@ export function App() {
             </QueryClientProvider>
           </HelmetProvider>
         </BrowserRouter>
-      </PatientProvider>
+      {/* </PatientProvider> */}
     </CookiesProvider>
   )
 }
