@@ -13,7 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 // import { api } from '@/lib/axios'
-import { PatientContext } from '@/context/PatientContextEXCLUIR'
+import { PatientContext } from '@/context/PatientContext'
 // import { useContext } from 'react'
 import { useContextSelector } from 'use-context-selector'
 

@@ -8,10 +8,12 @@ import { queryClient } from './lib/react-query'
 import { Router } from './Router'
 
 import './globals.css'
+import { PatientProvider } from './context/PatientContext'
 
 export function App() {
   return (
     <CookiesProvider>
+      <PatientProvider>
         <BrowserRouter>
           <HelmetProvider>
             <Helmet titleTemplate="%s | Fisioterapia e Pilates" />
@@ -21,6 +23,7 @@ export function App() {
             </QueryClientProvider>
           </HelmetProvider>
         </BrowserRouter>
+        </PatientProvider>
     </CookiesProvider>
   )
 }
