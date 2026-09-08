@@ -5,15 +5,18 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { Search } from 'lucide-react'
 // import { useContext } from 'react'
-import { PatientContext } from '@/context/PatientContext'
+import { PatientContext } from '@/context/PatientContextEXCLUIR'
 // import { useContext } from 'react'
 import { useContextSelector } from 'use-context-selector'
 
-const patientTableFilterSchema = z.object({
+import type { PatientTableFilterFormValues } from '@/@types/components'
+
+const patientTableFilterSchema: z.ZodType<
+  PatientTableFilterFormValues,
+  PatientTableFilterFormValues
+> = z.object({
   name: z.string(),
 })
-
-type PatientTableFilterSchema = z.infer<typeof patientTableFilterSchema>
 
 
 export function PatientTableFilter() {
@@ -24,11 +27,11 @@ export function PatientTableFilter() {
            return context.fetchPatients
       });
 
-  const { register, handleSubmit } = useForm<PatientTableFilterSchema>({
+  const { register, handleSubmit } = useForm<PatientTableFilterFormValues>({
     resolver: zodResolver(patientTableFilterSchema),
   })
 
-  async function handleSearchPatient(data : PatientTableFilterSchema ) {
+  async function handleSearchPatient(data : PatientTableFilterFormValues ) {
     // const { name } = data;
     await fetchPatients();
     console.log(data)

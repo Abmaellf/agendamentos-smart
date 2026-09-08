@@ -25,10 +25,13 @@ appointments/
 ├── api/          # chamadas HTTP tipadas
 ├── components/   # componentes específicos da feature
 ├── hooks/         # queries e cache remoto
-├── model/         # tipos, schemas e mensagens de domínio
+├── model/         # schemas, transformações e mensagens de domínio
 ├── pages/         # composição da rota /appointments
 └── __tests__/     # testes unitários e de integração
 ```
+
+Os contratos TypeScript compartilhados da feature ficam em
+`src/@types/appointment.ts`.
 
 ## Fluxo principal
 

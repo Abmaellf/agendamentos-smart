@@ -1,16 +1,11 @@
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale/pt-BR'
 
+import type { CardDayProps } from '@/@types/components'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
-import { CardPatient } from '../CardPatient'
-
-interface CardDayProps {
-  date: string
-  isToday: boolean
-  dayWeek: number
-}
+import { CardPatient } from '../CardPatient/cardPatient'
 
 export function CardDay(cardDay: CardDayProps) {
   const appointmentDate = new Date()

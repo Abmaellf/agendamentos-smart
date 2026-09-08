@@ -5,7 +5,7 @@ import { HelmetProvider } from 'react-helmet-async'
 import { Toaster } from 'sonner'
 import type { PropsWithChildren, ReactElement } from 'react'
 
-import { PatientProvider } from '@/context/PatientContext'
+import { PatientProvider } from '@/context/PatientContextEXCLUIR'
 
 interface TestRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   route?: string

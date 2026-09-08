@@ -2,7 +2,6 @@ import { Helmet } from 'react-helmet-async'
 import { Button } from '../../components/ui/button'
 import '../../globals.css'
 import { Label } from '@radix-ui/react-label'
-import z from 'zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { signIn } from '@/api/sign-in'
@@ -12,14 +11,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Loader2Icon } from 'lucide-react'
 // 1. Importe o useRef e o useEffect do React
 import { useEffect, useRef } from 'react'
-// import { setAuthorizationToken } from '@/api/auth'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const  signinSchema = z.object({
-  login: z.string(),
-  password: z.string()
-})
 
-type SigninSchema = z.infer<typeof signinSchema >
+import type { SignInFormValues } from '@/@types/components'
 
 export function SignIn() {
 
@@ -28,7 +21,7 @@ export function SignIn() {
     // 2. Crie a referência para o elemento de input de e-mail
   const emailInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { register, handleSubmit, formState: {isSubmitting}  } = useForm<SigninSchema>();
+  const { register, handleSubmit, formState: {isSubmitting}  } = useForm<SignInFormValues>();
   
   const { mutateAsync: authenticate} = useMutation({
     mutationFn: signIn,
@@ -40,7 +33,7 @@ export function SignIn() {
     emailInputRef.current?.focus();
   }, []) // O array vazio garante que isso só rode uma vez (no carregamento)
 
- async function handleLogin(data: SigninSchema) {
+ async function handleLogin(data: SignInFormValues) {
   
     try {
         const response = await authenticate({ login: data.login, password: data.password})

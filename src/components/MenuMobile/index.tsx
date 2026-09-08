@@ -2,12 +2,8 @@ import { useEffect } from 'react'
 import { X } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 
+import type { MenuMobileProps } from '@/@types/components'
 import { cn } from '@/lib/utils'
-
-interface MenuVisibleProps {
-  menuIsVisible: boolean
-  setMenuIsVisible(data: boolean): void
-}
 
 const navigationItems = [
   { label: 'Agendamentos', to: '/appointments' },
@@ -19,7 +15,7 @@ const navigationItems = [
 export function MenuMobile({
   menuIsVisible,
   setMenuIsVisible,
-}: MenuVisibleProps) {
+}: MenuMobileProps) {
   useEffect(() => {
     const previousOverflow = document.body.style.overflowY
 

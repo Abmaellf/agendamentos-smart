@@ -3,8 +3,8 @@ import { format } from 'date-fns'
 import { describe, expect, it } from 'vitest'
 
 import { CardDay } from '../Card/CardDay'
-import { CardPatient } from '../Card/CardPatient'
-import { WeekDates } from '../WeekDate'
+import { CardPatient } from '../Card/CardPatient/cardPatient'
+import { WeekDatesLEGACY } from '../WeekDate'
 
 const appointment = {
   id: 'appointment-a',
@@ -17,7 +17,7 @@ const appointment = {
 
 describe('componentes legados da agenda', () => {
   it('apresenta os cinco dias úteis da semana em português', () => {
-    render(<WeekDates date={new Date('2026-08-13T12:00:00-04:00')} />)
+    render(<WeekDatesLEGACY date={new Date('2026-08-13T12:00:00-04:00')} />)
 
     expect(screen.getAllByRole('listitem')).toHaveLength(5)
     expect(screen.getByText('segunda-feira 10/08/2026')).toBeVisible()

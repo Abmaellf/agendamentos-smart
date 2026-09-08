@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import type { AppointmentApiError } from './appointment'
+import type { AppointmentApiError } from '@/@types/appointment'
 
 const messages: Record<string, string> = {
   PATIENT_SCHEDULE_CONFLICT:
