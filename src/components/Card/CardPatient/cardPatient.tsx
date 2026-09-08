@@ -25,7 +25,7 @@ const statusPresentation = {
     label: 'Cancelado',
     className: 'border-white bg-[#121214] text-white',
   },
-  EMTENDIMENTO: {
+  EMATENDIMENTO: {
     label: 'Concluído',
     className: 'border-white bg-brand text-[#29292e]',
   },
