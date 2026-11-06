@@ -35,10 +35,12 @@ Os contratos TypeScript compartilhados da feature ficam em
 `/appointments` → `AppointmentsPage` → hooks RTK Query → endpoints injetados
 em `baseApi` → `axiosBaseQuery` → API.
 
-A página seleciona o intervalo semanal, apresenta carregamento, erro e estado
-vazio, distribui os registros nos cinco dias úteis e abre
-`CreateAppointmentDialog`. A consulta de agenda só inicia após a sessão. O
-diálogo usa `skip` enquanto fechado e a mutação de criação invalida
+A página consome a data compartilhada pela casca, calcula o intervalo semanal,
+apresenta carregamento, erro e estado vazio e distribui os registros nos cinco
+dias úteis. O `AppTopbar` fornece a navegação temporal e abre o
+`CreateAppointmentDialog`, que mantém a mesma implementação de criação. A
+consulta de agenda só inicia após a sessão. O diálogo usa `skip` enquanto
+fechado e a mutação de criação invalida
 `Appointment/LIST`, fazendo a semana visível ser consultada novamente.
 
 ## Regras do domínio

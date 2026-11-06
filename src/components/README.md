@@ -9,6 +9,7 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 | Componente/pasta      | Função                               | Estado                      |
 | --------------------- | ------------------------------------ | --------------------------- |
 | `AppSidebar`          | Navegação lateral responsiva         | Ativo                       |
+| `AppTopbar`           | Ações globais da casca interna      | Ativo                       |
 | `account-menu.tsx`    | Perfil da clínica/usuário            | Ativo                       |
 | `Card`                | Cartões antigos da agenda            | Legado sem consumidor       |
 | `WeekDate`            | Rótulos antigos dos dias úteis       | Legado sem consumidor       |
@@ -27,13 +28,16 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 
 ## Pontos de entrada e fluxos de entrada
 
-- `AppLayout` entra por `AppSidebar`, com a mesma definição tipada de entradas em ambos os breakpoints;
+- `AppLayout` entra por `AppTopbar` e `AppSidebar`, com a mesma definição tipada de entradas em ambos os breakpoints;
+- `AppTopbar` concentra o hamburger, busca local, navegação temporal, ação de agendamento, notificações apresentacionais e menu de perfil;
 - `AppointmentsPage` usa apenas componentes de `features/appointments`;
 - `Patient` entra por `AddPatientModal` e `Pagination`;
 
 ## Arquivos críticos
 
 - `AppSidebar/index.tsx`: navegação lateral, destinos disponíveis/indisponíveis e card informativo;
+- `AppTopbar/index.tsx`: ações globais da casca, data compartilhada e acionamento responsivo da sidebar;
+- `account-menu.tsx`: avatar, identificação da conta e menu de perfil baseado no perfil remoto existente;
 - `AddPatientModal.tsx`: mutation de paciente;
 - `features/appointments/pages/appointments-page.tsx`: fonte da grade semanal;
 - `ui/`: base visual da maioria dos formulários.
@@ -54,3 +58,5 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
   podem ser removidos em uma limpeza posterior.
 - Componentes órfãos devem ser conectados somente após confirmar contrato ou removidos.
 - Novos componentes específicos devem ficar junto à feature até existir reuso comprovado.
+- A busca do `AppTopbar` é somente entrada local nesta change; não apresenta resultados nem cria endpoint.
+- O controle de notificações é somente apresentacional enquanto não houver fonte remota de notificações; contador só aparece quando fornecido explicitamente.
