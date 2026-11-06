@@ -15,8 +15,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { PlusCircle } from 'lucide-react'
-import { useMutation } from '@tanstack/react-query'
-import { RegisterPatient } from '@/api/register-patient'
+import { useRegisterPatientMutation } from '@/api/register-patient'
 
 import type { CreatePatientFormValues } from '@/@types/components'
  
@@ -38,9 +37,7 @@ const {
     resolver: zodResolver(createPatientSchema),
   })
 
-  const { mutateAsync: addPatient} = useMutation({
-      mutationFn: RegisterPatient,
-    })
+  const [addPatient] = useRegisterPatientMutation()
 
   async function handlePatient(data: CreatePatientFormValues) {
     console.log(data)
@@ -48,7 +45,7 @@ const {
     try{
          await addPatient({
           name: data.name
-        }) 
+        }).unwrap()
         console.log(data)
         await new Promise((resolve) => setTimeout(resolve, 2000))
         reset()

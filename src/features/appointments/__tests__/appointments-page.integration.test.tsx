@@ -74,6 +74,9 @@ describe('integração da criação com a agenda semanal', () => {
     expect(screen.getByText(/60 min/i)).toBeVisible()
     expect(screen.getByText(/R\$\s*150,00/i)).toBeVisible()
     expect(apiScenario.appointments).toHaveLength(1)
+    await waitFor(() =>
+      expect(apiScenario.appointmentQueries).toHaveLength(2),
+    )
   })
 
   it('WB-17 apresenta carregamento da agenda', () => {
@@ -155,7 +158,7 @@ describe('integração da criação com a agenda semanal', () => {
     ['FALTA', 'bg-appointment-missed'],
     ['REAGENDADO', 'bg-appointment-rescheduled'],
     ['CANCELADO', 'bg-appointment-canceled'],
-    ['ATENDENDO', 'bg-appointment-in-progress'],
+    ['EMATENDIMENTO', 'bg-appointment-in-progress'],
     ['FINALIZADO', 'bg-appointment-completed'],
   ] as const)(
     'aplica o token visual do status %s',

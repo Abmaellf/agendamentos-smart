@@ -1,24 +1,32 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, type RenderOptions } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
+import { Provider } from 'react-redux'
 import { Toaster } from 'sonner'
 import type { PropsWithChildren, ReactElement } from 'react'
 
 import { PatientProvider } from '@/context/PatientContext'
+import { baseApi } from '@/lib/base-api'
+import { createAppStore, type AppStore } from '@/lib/store'
+
+const testStores = new Set<AppStore>()
 
 interface TestRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   route?: string
-  queryClient?: QueryClient
+  store?: AppStore
 }
 
-export function createTestQueryClient() {
-  return new QueryClient({
-    defaultOptions: {
-      queries: { retry: false, gcTime: Infinity },
-      mutations: { retry: false },
-    },
+export function resetTestApiCache() {
+  testStores.forEach((store) => {
+    store.dispatch(baseApi.util.resetApiState())
   })
+  testStores.clear()
+}
+
+export function createTestStore() {
+  const store = createAppStore()
+  testStores.add(store)
+  return store
 }
 
 export function renderWithProviders(
@@ -27,7 +35,7 @@ export function renderWithProviders(
 ) {
   const {
     route = '/appointments',
-    queryClient = createTestQueryClient(),
+    store = createTestStore(),
     ...renderOptions
   } = options
 
@@ -36,10 +44,10 @@ export function renderWithProviders(
       <MemoryRouter initialEntries={[route]}>
         <HelmetProvider>
           <PatientProvider>
-            <QueryClientProvider client={queryClient}>
+            <Provider store={store}>
               {children}
               <Toaster richColors />
-            </QueryClientProvider>
+            </Provider>
           </PatientProvider>
         </HelmetProvider>
       </MemoryRouter>
@@ -47,7 +55,7 @@ export function renderWithProviders(
   }
 
   return {
-    queryClient,
+    store,
     ...render(ui, { wrapper: Wrapper, ...renderOptions }),
   }
 }

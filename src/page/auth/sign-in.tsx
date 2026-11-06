@@ -4,8 +4,7 @@ import '../../globals.css'
 import { Label } from '@radix-ui/react-label'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { signIn } from '@/api/sign-in'
-import { useMutation } from '@tanstack/react-query'
+import { useSignInMutation } from '@/api/sign-in'
 import { Link, useNavigate } from 'react-router-dom'
 // import { setAuthorizationToken } from '@/api/auth'
 import { Loader2Icon } from 'lucide-react'
@@ -23,9 +22,7 @@ export function SignIn() {
 
   const { register, handleSubmit, formState: {isSubmitting}  } = useForm<SignInFormValues>();
   
-  const { mutateAsync: authenticate} = useMutation({
-    mutationFn: signIn,
-  })
+  const [authenticate] = useSignInMutation()
 
    // 3. Crie o efeito que roda assim que o componente é desenhado na tela
   useEffect(() => {
@@ -36,11 +33,11 @@ export function SignIn() {
  async function handleLogin(data: SignInFormValues) {
   
     try {
-        const response = await authenticate({ login: data.login, password: data.password})
+        const response = await authenticate({ login: data.login, password: data.password}).unwrap()
         // if(response) {
           // setAuthorizationToken(response.data.token)
-          console.log(response.data.token,"auth/signin")
-          console.log(response.data.user,"auth/signin")
+          console.log(response.token,"auth/signin")
+          console.log(response.user,"auth/signin")
         // }
         navigate('/appointments')
         toast.success('Conectado com sucesso', {     })

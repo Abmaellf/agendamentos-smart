@@ -26,7 +26,7 @@ export interface TestAppointment {
     | 'FALTA'
     | 'REAGENDADO'
     | 'CANCELADO'
-    | 'ATENDENDO'
+    | 'EMATENDIMENTO'
     | 'FINALIZADO'
   createdBy: string
   createdAt: string

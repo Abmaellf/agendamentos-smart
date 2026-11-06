@@ -1,10 +1,10 @@
-import { QueryClientProvider } from '@tanstack/react-query'
 import { CookiesProvider } from 'react-cookie'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
+import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'sonner'
 
-import { queryClient } from './lib/react-query'
+import { store } from './lib/store'
 import { Router } from './Router'
 
 import './globals.css'
@@ -18,9 +18,9 @@ export function App() {
           <HelmetProvider>
             <Helmet titleTemplate="%s | Fisioterapia e Pilates" />
             <Toaster richColors />
-            <QueryClientProvider client={queryClient}>
+            <Provider store={store}>
               <Router />
-            </QueryClientProvider>
+            </Provider>
           </HelmetProvider>
         </BrowserRouter>
         </PatientProvider>

@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import { addDays, format, startOfWeek } from 'date-fns'
 import { ptBR } from 'date-fns/locale/pt-BR'
 import {
@@ -15,9 +14,11 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { getAppointmentSession } from '@/features/appointments/api/appointments'
+import {
+  useGetAppointmentSessionQuery,
+  useGetAppointmentsQuery,
+} from '@/features/appointments/api/appointments'
 import { CreateAppointmentDialog } from '@/features/appointments/components/create-appointment-dialog'
-import { useAppointments } from '@/features/appointments/hooks/use-appointments'
 import { cn } from '@/lib/utils'
 
 const feedbackPanelClassName =
@@ -107,21 +108,18 @@ export function AppointmentsPage() {
     [weekStart],
   )
 
-  const sessionQuery = useQuery({
-    queryKey: ['appointment-session'],
-    queryFn: getAppointmentSession,
-  })
+  const sessionQuery = useGetAppointmentSessionQuery()
   const session = sessionQuery.data
-  const appointmentsQuery = useAppointments(
+  const appointmentsQuery = useGetAppointmentsQuery(
     {
       unitId: session?.activeUnitId ?? '',
       from: weekStart.toISOString(),
       to: weekEnd.toISOString(),
     },
-    Boolean(session),
+    { skip: !session },
   )
 
-  const loading = sessionQuery.isPending || appointmentsQuery.isPending
+  const loading = sessionQuery.isLoading || appointmentsQuery.isLoading
   const failed = sessionQuery.isError || appointmentsQuery.isError
   const appointments = appointmentsQuery.data ?? []
 

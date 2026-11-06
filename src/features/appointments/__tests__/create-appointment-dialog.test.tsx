@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent, { type UserEvent } from '@testing-library/user-event'
 import type { ComponentType } from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import {
   adminSession,
@@ -81,6 +81,19 @@ async function submit(user: UserEvent) {
 }
 
 describe('diálogo de criação manual', () => {
+  it('não consulta catálogos enquanto permanece fechado', async () => {
+    await renderDialog()
+
+    await new Promise((resolve) => window.setTimeout(resolve, 0))
+
+    expect(apiScenario.catalogRequests).toEqual({
+      patients: 0,
+      units: 0,
+      services: 0,
+      professionals: 0,
+    })
+  })
+
   it('WB-05 preenche duração e preço ao selecionar o serviço', async () => {
     const { user } = await renderDialog()
     await openDialog(user)
@@ -196,6 +209,18 @@ describe('diálogo de criação manual', () => {
     )
   })
 
+  it('aceita catálogos devolvidos como coleção direta', async () => {
+    apiScenario.collectionResponse = 'array'
+    const { user } = await renderDialog()
+    await openDialog(user)
+
+    await chooseOption(user, /^paciente/i, /ana paciente/i)
+
+    expect(screen.getByRole('combobox', { name: /^paciente/i })).toHaveValue(
+      'patient-a',
+    )
+  })
+
   it('WB-09 filtra profissionais pelo serviço e mantém a seleção opcional', async () => {
     const { user } = await renderDialog()
     await openDialog(user)
@@ -305,9 +330,8 @@ describe('diálogo de criação manual', () => {
     expect(screen.getByLabelText(/^horário/i)).toHaveValue('08:30')
   })
 
-  it('WB-15 fecha, confirma e invalida agenda/capacidade após sucesso', async () => {
-    const { user, queryClient } = await renderDialog()
-    const invalidation = vi.spyOn(queryClient, 'invalidateQueries')
+  it('WB-15 fecha e confirma após sucesso', async () => {
+    const { user } = await renderDialog()
     await openDialog(user)
     await fillValidForm(user)
 
@@ -320,12 +344,6 @@ describe('diálogo de criação manual', () => {
       expect(
         screen.queryByRole('dialog', { name: /novo agendamento/i }),
       ).not.toBeInTheDocument(),
-    )
-    expect(invalidation).toHaveBeenCalledWith(
-      expect.objectContaining({ queryKey: ['appointments'] }),
-    )
-    expect(invalidation).toHaveBeenCalledWith(
-      expect.objectContaining({ queryKey: ['service-capacity'] }),
     )
   })
 

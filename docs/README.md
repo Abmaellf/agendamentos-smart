@@ -8,6 +8,7 @@ Este diretório concentra os documentos transversais do sistema. Os detalhes loc
 - [Arquitetura do Sistema](Arquitetura%20do%20Sistema.md): estrutura técnica, dependências, regras, riscos e diretrizes.
 - [Objetivo do sistema](Objetivo%20do%20sistema.md): propósito, atores, funcionalidades e fluxos de negócio comprovados pelo código.
 - [Requisitos do MVP](Requisitos%20do%20MVP.md): decisões confirmadas de produto, permissões, cadastros, agenda, modelo multi-tenant e corte das etapas.
+- [Migração de TanStack React Query para RTK Query](Migracao-React-Query-para-RTK-Query.md): plano técnico de migração, com comparações "antes" e "agora". Documento planejado; não descreve código já entregue.
 
 ## Regra de interpretação
 
