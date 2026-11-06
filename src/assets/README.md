@@ -11,12 +11,12 @@ Contém quatro arquivos PNG: `BolaUnTra.png`, `abm_avatar.png`, `avatar.png` e `
 ## Dependências internas e externas
 
 - dependência externa potencial: pipeline de assets do Vite;
-- módulos relacionados potenciais: Header, conta e páginas de autenticação/agenda;
-- nenhum import ativo foi identificado.
+- módulos consumidores: `components/account-menu.tsx` e `components/AppTopbar/index.tsx` por composição;
+- `abm_avatar.png` é o avatar sintético reutilizado no menu de perfil do topbar.
 
 ## Pontos de entrada e fluxos de entrada
 
-Não há ponto de entrada atual. Um asset só entra no bundle se for importado por TypeScript/CSS.
+Não há ponto de entrada próprio. Um asset entra no bundle quando é importado por TypeScript/CSS; nesta change, `abm_avatar.png` entra pelo menu de perfil compartilhado.
 
 ## Arquivos críticos
 
@@ -31,6 +31,6 @@ Nenhum arquivo é crítico ao fluxo atual. `img_pilates.png` e `avatar.png` são
 
 ## Observações técnicas e débitos
 
-- Todos os PNGs estão órfãos no grafo ativo.
-- Confirmar uso de produto antes de removê-los.
+- `abm_avatar.png` possui consumidor ativo no menu de perfil e não deve ser removido nesta change.
+- Os demais PNGs permanecem sem consumidor confirmado pelo fluxo do topbar.
 - Novos assets devem ter nome descritivo, origem/licença conhecida e consumidor documentado.

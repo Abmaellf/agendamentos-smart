@@ -21,23 +21,28 @@ export default function AccountMenu() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="h-12 gap-2 rounded-full px-2 text-white select-none hover:bg-white/10 hover:text-white focus-visible:ring-white/70"
+          aria-label={
+            profile?.username
+              ? `Abrir menu do perfil de ${profile.username}`
+              : 'Abrir menu do perfil'
+          }
+          className="h-12 gap-2 rounded-full px-2 text-[#20382d] select-none hover:bg-[#edf8f2] hover:text-[#143f32] focus-visible:ring-[#78c85e]"
         >
-          <span className="hidden max-w-36 truncate text-sm font-light sm:inline">
-            {profile?.username|| 'Conta'}
+          <span className="hidden max-w-36 truncate text-sm font-medium sm:inline">
+            {profile?.username || 'Conta'}
           </span>
           <img
             src={avatar}
             alt=""
             className="size-10 rounded-full border-2 border-white/90 object-cover"
           />
-          <ChevronDown className="hidden size-4 sm:block" />
+          <ChevronDown aria-hidden="true" className="hidden size-4 sm:block" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
           <span className="text-muted-foreground text-xs font-normal">
-            {profile?.username ||'Minha conta'}
+            {profile?.username || 'Minha conta'}
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

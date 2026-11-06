@@ -3,10 +3,22 @@ import userEvent, { type UserEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createdAppointment } from '@/test/builders/appointment'
+import { AppLayout } from '@/_layout/app'
 import { renderWithProviders } from '@/test/render'
 import { apiScenario } from '@/test/server'
+import { Route, Routes } from 'react-router-dom'
 
 import { AppointmentsPage } from '../pages/appointments-page'
+
+function renderAppointmentsPage() {
+  return renderWithProviders(
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route path="/appointments" element={<AppointmentsPage />} />
+      </Route>
+    </Routes>,
+  )
+}
 
 async function chooseOption(
   user: UserEvent,
@@ -53,7 +65,7 @@ describe('integração da criação com a agenda semanal', () => {
 
   it('WB-16 refaz a consulta e apresenta uma única vez o agendamento criado', async () => {
     const user = userEvent.setup()
-    renderWithProviders(<AppointmentsPage />)
+    renderAppointmentsPage()
     expect(
       await screen.findByText(/nenhum agendamento nesta semana/i),
     ).toBeVisible()
@@ -82,15 +94,15 @@ describe('integração da criação com a agenda semanal', () => {
   it('WB-17 apresenta carregamento da agenda', () => {
     apiScenario.appointmentDelayMs = 1_000
 
-    renderWithProviders(<AppointmentsPage />)
+    renderAppointmentsPage()
 
-    expect(screen.getByRole('status')).toHaveTextContent(/carregando agenda/i)
+    expect(screen.getByText(/carregando agenda/i)).toBeVisible()
   })
 
   it('WB-17 apresenta erro e permite repetir a consulta', async () => {
     apiScenario.appointmentErrorStatus = 500
     const user = userEvent.setup()
-    renderWithProviders(<AppointmentsPage />)
+    renderAppointmentsPage()
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       /não foi possível carregar a agenda/i,
@@ -104,7 +116,7 @@ describe('integração da criação com a agenda semanal', () => {
   })
 
   it('WB-17 apresenta estado vazio sem usar os fixtures antigos de CardDay', async () => {
-    renderWithProviders(<AppointmentsPage />)
+    renderAppointmentsPage()
 
     expect(
       await screen.findByText(/nenhum agendamento nesta semana/i),
@@ -119,7 +131,7 @@ describe('integração da criação com a agenda semanal', () => {
         startsAt: '2026-08-13T14:00:00.000Z',
       },
     ]
-    renderWithProviders(<AppointmentsPage />)
+    renderAppointmentsPage()
 
     expect(await screen.findByText('Ana Paciente')).toBeVisible()
     expect(screen.getByText('10:00')).toBeVisible()
@@ -129,7 +141,7 @@ describe('integração da criação com a agenda semanal', () => {
   })
 
   it('atualiza a semana por meio do seletor de data', async () => {
-    renderWithProviders(<AppointmentsPage />)
+    renderAppointmentsPage()
 
     const dateInput = await screen.findByLabelText(/selecionar data da agenda/i)
     fireEvent.change(dateInput, { target: { value: '2026-08-19' } })
@@ -144,7 +156,14 @@ describe('integração da criação com a agenda semanal', () => {
 
   it('navega entre semanas pelos botões do cabeçalho', async () => {
     const user = userEvent.setup()
-    renderWithProviders(<AppointmentsPage />)
+    renderAppointmentsPage()
+
+    expect(
+      screen.getAllByLabelText(/selecionar data da agenda/i),
+    ).toHaveLength(1)
+    expect(
+      await screen.findAllByRole('button', { name: /novo agendamento/i }),
+    ).toHaveLength(1)
 
     await user.click(screen.getByRole('button', { name: /semana anterior/i }))
     expect(screen.getByText('06 de Agosto de 2026')).toBeVisible()
@@ -172,7 +191,7 @@ describe('integração da criação com a agenda semanal', () => {
         },
       ]
 
-      renderWithProviders(<AppointmentsPage />)
+      renderAppointmentsPage()
 
       const card = await screen.findByTestId(
         `appointment-appointment-${status.toLowerCase()}`,
@@ -184,7 +203,7 @@ describe('integração da criação com a agenda semanal', () => {
 
   it('WB-18 disponibiliza e abre a criação para sessão operacional autenticada', async () => {
     const user = userEvent.setup()
-    renderWithProviders(<AppointmentsPage />)
+    renderAppointmentsPage()
 
     const trigger = await screen.findByRole('button', {
       name: /novo agendamento/i,

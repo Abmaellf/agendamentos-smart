@@ -1,24 +1,21 @@
 import { addDays, format, startOfWeek } from 'date-fns'
 import { ptBR } from 'date-fns/locale/pt-BR'
 import {
-  ChevronLeft,
-  ChevronRight,
   CircleAlert,
   LoaderCircle,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Helmet } from 'react-helmet-async'
 
 import type { Appointment, AppointmentStatus } from '@/@types/appointment'
+import { useAppShellDate } from '@/_layout/app-shell-context'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import {
   useGetAppointmentSessionQuery,
   useGetAppointmentsQuery,
 } from '@/features/appointments/api/appointments'
-import { CreateAppointmentDialog } from '@/features/appointments/components/create-appointment-dialog'
 import { cn } from '@/lib/utils'
 
 const feedbackPanelClassName =
@@ -72,27 +69,13 @@ function capitalize(value: string) {
   return value.charAt(0).toLocaleUpperCase('pt-BR') + value.slice(1)
 }
 
-function headerDate(date: Date) {
-  const day = format(date, 'dd')
-  const month = capitalize(format(date, 'MMMM', { locale: ptBR }))
-  const year = format(date, 'yyyy')
-  return `${day} de ${month} de ${year}`
-}
-
 function dayLabel(date: Date) {
   const weekDay = format(date, 'EEEE', { locale: ptBR }).replace('-feira', '')
   return `${capitalize(weekDay)} - ${format(date, 'd')}`
 }
 
-function initialSelectedDate() {
-  const today = new Date()
-  if (today.getDay() === 6) return addDays(today, 2)
-  if (today.getDay() === 0) return addDays(today, 1)
-  return today
-}
-
 export function AppointmentsPage() {
-  const [selectedDate, setSelectedDate] = useState(initialSelectedDate)
+  const { selectedDate } = useAppShellDate()
   const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 })
   const weekEnd = addDays(weekStart, 7)
 
@@ -130,71 +113,17 @@ export function AppointmentsPage() {
 
   return (
     <>
-      <div aria-hidden="true" className="h-16" />
-      <main className="bg-agenda-surface flex min-h-[calc(100vh-4rem)] flex-col gap-1 bg-[linear-gradient(135deg,var(--agenda-surface-strong)_0%,#303236_100%)] pb-4">
+      <main className="bg-agenda-surface flex min-h-[calc(100vh-5rem)] flex-col gap-1 bg-[linear-gradient(135deg,var(--agenda-surface-strong)_0%,#303236_100%)] pb-4">
         <Helmet title="Agendamentos" />
-        <header className="grid min-h-16 grid-cols-[1fr_auto_1fr] items-center rounded-b-[0.35rem] bg-white bg-[linear-gradient(115deg,#fff_0%,#fbfdfc_100%)] px-[clamp(1rem,5vw,6.25rem)] py-2 text-[#3f3e3c] shadow-[0_2px_5px_rgb(0_0_0_/_20%)] max-[720px]:grid-cols-[1fr_auto] max-[720px]:gap-2 max-[720px]:px-3">
-          <h1 className="col-start-1 row-start-1 text-[clamp(1.15rem,1.8vw,1.5rem)] font-bold">
-            Agendamentos
-          </h1>
-          <nav
-            aria-label="Navegação da agenda semanal"
-            className="border-brand/10 relative col-start-2 flex items-center justify-center gap-[clamp(0.5rem,2vw,1.5rem)] rounded-full border bg-[linear-gradient(135deg,#fff_0%,#f2faf6_100%)] px-[0.35rem] py-[0.1rem] shadow-[inset_0_1px_0_rgb(255_255_255_/_85%)] max-[720px]:col-[1/-1] max-[720px]:row-start-2 max-[720px]:justify-self-center"
-          >
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label="Semana anterior"
-              className="hover:bg-brand/10 hover:text-brand-hover focus-visible:ring-brand/35 size-10 rounded-[0.35rem] text-[#b9b9b9] shadow-none focus-visible:border-transparent [&_svg]:size-8 [&_svg]:stroke-[2.5]"
-              onClick={() => setSelectedDate((date) => addDays(date, -7))}
-            >
-              <ChevronLeft aria-hidden="true" />
-            </Button>
-            <div className="relative grid min-w-64 place-items-center max-[720px]:min-w-0">
-              <Input
-                id="appointments-date"
-                type="date"
-                aria-label="Selecionar data da agenda"
-                className="peer absolute inset-0 z-10 h-full w-full cursor-pointer border-0 p-0 opacity-0 shadow-none focus-visible:border-0 focus-visible:ring-0"
-                value={format(selectedDate, 'yyyy-MM-dd')}
-                onClick={(event) => event.currentTarget.showPicker?.()}
-                onChange={(event) => {
-                  const nextDate = new Date(`${event.target.value}T12:00:00`)
-                  if (!Number.isNaN(nextDate.getTime())) {
-                    setSelectedDate(nextDate)
-                  }
-                }}
-              />
-              <time
-                dateTime={format(selectedDate, 'yyyy-MM-dd')}
-                className="whitespace-nowrap text-center text-[clamp(1rem,1.8vw,1.5rem)] font-bold text-[#3f3e3c] peer-focus-visible:rounded-sm peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand/35 max-[720px]:min-w-0 max-[720px]:text-sm"
-              >
-                {headerDate(selectedDate)}
-              </time>
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label="Próxima semana"
-              className="hover:bg-brand/10 hover:text-brand-hover focus-visible:ring-brand/35 size-10 rounded-[0.35rem] text-[#b9b9b9] shadow-none focus-visible:border-transparent [&_svg]:size-8 [&_svg]:stroke-[2.5]"
-              onClick={() => setSelectedDate((date) => addDays(date, 7))}
-            >
-              <ChevronRight aria-hidden="true" />
-            </Button>
-          </nav>
-          {session ? (
-            <div className="col-start-3 row-start-1 flex justify-end max-[720px]:col-start-2 [&_button]:h-10 [&_button]:w-[clamp(8rem,12vw,11.5rem)] [&_button]:border [&_button]:border-brand/25 [&_button]:bg-white [&_button]:bg-[linear-gradient(135deg,#fff_0%,#edf8f2_100%)] [&_button]:text-[0.9rem] [&_button]:text-brand-hover [&_button]:shadow-[0_4px_12px_rgb(37_50_44_/_10%)] [&_button:hover]:bg-[#f4faf7] [&_button:hover]:bg-[linear-gradient(135deg,#f8fcfa_0%,#e3f4eb_100%)] max-[720px]:[&_button]:w-auto">
-              <CreateAppointmentDialog
-                key={format(selectedDate, 'yyyy-MM-dd')}
-                session={session}
-                defaultDate={format(selectedDate, 'yyyy-MM-dd')}
-                triggerLabel="Agendar"
-                triggerAriaLabel="Novo agendamento"
-              />
-            </div>
-          ) : null}
+        <header className="flex items-center justify-between gap-4 bg-white px-[clamp(1rem,5vw,6.25rem)] py-5 text-[#20382d] shadow-[0_2px_5px_rgb(0_0_0_/_12%)] max-[720px]:px-4">
+          <div>
+            <h1 className="text-[clamp(1.35rem,2vw,1.8rem)] font-bold tracking-tight">
+              Agendamentos
+            </h1>
+            <p className="mt-1 text-sm text-[#71877b]">
+              Visualize e gerencie os atendimentos da semana.
+            </p>
+          </div>
         </header>
 
         {loading ? (

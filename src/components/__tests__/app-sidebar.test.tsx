@@ -12,7 +12,24 @@ function CurrentPath() {
   return <output data-testid="current-path">{location.pathname}</output>
 }
 
-function renderLayout(route: string) {
+function setViewport(isCompact: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches: isCompact && query === '(max-width: 980px)',
+      media: query,
+      onchange: null,
+      addListener: () => undefined,
+      removeListener: () => undefined,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+      dispatchEvent: () => false,
+    }),
+  })
+}
+
+function renderLayout(route: string, isCompact = false) {
+  setViewport(isCompact)
   return renderWithProviders(
     <Routes>
       <Route element={<AppLayout />}>
@@ -87,7 +104,7 @@ describe('AppSidebar', () => {
 
   it('abre o painel compacto, bloqueia a rolagem e fecha por Escape com foco restaurado', async () => {
     const user = userEvent.setup()
-    renderLayout('/appointments')
+    renderLayout('/appointments', true)
 
     const trigger = screen.getByRole('button', { name: /abrir menu lateral/i })
     await user.click(trigger)
@@ -106,7 +123,7 @@ describe('AppSidebar', () => {
 
   it('fecha pelo controle nomeado', async () => {
     const user = userEvent.setup()
-    renderLayout('/appointments')
+    renderLayout('/appointments', true)
 
     await user.click(
       screen.getByRole('button', { name: /abrir menu lateral/i }),
@@ -122,7 +139,7 @@ describe('AppSidebar', () => {
 
   it('comunica destinos indisponíveis sem alterar a rota', async () => {
     const user = userEvent.setup()
-    renderLayout('/appointments')
+    renderLayout('/appointments', true)
 
     await user.click(
       screen.getByRole('button', { name: /abrir menu lateral/i }),
@@ -143,7 +160,7 @@ describe('AppSidebar', () => {
 
   it('fecha o painel depois de navegar e mantém o card informativo não interativo', async () => {
     const user = userEvent.setup()
-    renderLayout('/paciente')
+    renderLayout('/paciente', true)
 
     await user.click(
       screen.getByRole('button', { name: /abrir menu lateral/i }),

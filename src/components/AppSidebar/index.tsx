@@ -4,8 +4,6 @@ import {
   CircleDollarSign,
   CircleHelp,
   Home,
-  PanelLeftClose,
-  PanelLeftOpen,
   Settings,
   Stethoscope,
   UsersRound,
@@ -83,19 +81,12 @@ export interface AppSidebarProps {
   isCollapsed?: boolean
   onClose?: () => void
   onNavigate?: () => void
-  onToggleCollapse?: () => void
 }
 
 const sidebarSurfaceClassName =
   'bg-[#143f32] text-white shadow-[0_18px_42px_rgb(11_43_33_/_22%)]'
 
-function Brand({
-  isCollapsed,
-  onToggleCollapse,
-}: {
-  isCollapsed: boolean
-  onToggleCollapse?: () => void
-}) {
+function Brand({ isCollapsed }: { isCollapsed: boolean }) {
   return (
     <div
       className={cn(
@@ -118,24 +109,6 @@ function Brand({
           </div>
         ) : null}
       </div>
-      {onToggleCollapse ? (
-        <button
-          type="button"
-          aria-label={isCollapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'}
-          onClick={onToggleCollapse}
-          title={isCollapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'}
-          className={cn(
-            'mt-4 flex w-full items-center justify-center rounded-lg p-2 text-white/75 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-[#a8df81] focus-visible:outline-none',
-            !isCollapsed && 'justify-end',
-          )}
-        >
-          {isCollapsed ? (
-            <PanelLeftOpen aria-hidden="true" className="size-5" />
-          ) : (
-            <PanelLeftClose aria-hidden="true" className="size-5" />
-          )}
-        </button>
-      ) : null}
     </div>
   )
 }
@@ -231,7 +204,6 @@ export function AppSidebar({
   isCollapsed = false,
   onClose,
   onNavigate,
-  onToggleCollapse,
 }: AppSidebarProps) {
   if (variant === 'compact' && !isOpen) return null
 
@@ -243,7 +215,7 @@ export function AppSidebar({
         <div aria-hidden="true" className="fixed inset-0 z-40 bg-[#071d16]/45 min-[981px]:hidden" />
       ) : null}
       <aside
-        id={isCompact ? 'app-sidebar-compact' : undefined}
+        id={isCompact ? 'app-sidebar-compact' : 'app-sidebar-desktop'}
         aria-label="Menu lateral"
         role={isCompact ? 'dialog' : undefined}
         aria-modal={isCompact || undefined}
@@ -259,7 +231,6 @@ export function AppSidebar({
       >
         <Brand
           isCollapsed={!isCompact && isCollapsed}
-          onToggleCollapse={!isCompact ? onToggleCollapse : undefined}
         />
         {isCompact ? (
           <button
