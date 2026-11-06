@@ -21,7 +21,8 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 
 ## Dependências internas e externas
 
-- internas: `components/ui`, `context`, `api`, estilos e tipos locais;
+- internas: `components/ui`, `context`, `api`, estilos e tipos compartilhados em
+  `src/@types`;
 - externas: React, Router, React Query, React Hook Form, Zod, Radix, Lucide, date-fns, Tailwind e sonner;
 - módulos relacionados: layouts, agenda e pacientes.
 

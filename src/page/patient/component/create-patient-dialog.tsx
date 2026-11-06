@@ -17,12 +17,15 @@ import { PatientContext } from '@/context/PatientContext'
 // import { useContext } from 'react'
 import { useContextSelector } from 'use-context-selector'
 
-const createPatientSchema = z.object({
+import type { CreatePatientFormValues } from '@/@types/components'
+
+const createPatientSchema: z.ZodType<
+  CreatePatientFormValues,
+  CreatePatientFormValues
+> = z.object({
   name: z.string(),
   // dataNascimento: z.string(),
 })
-
-type CreatePatientSchema = z.infer<typeof createPatientSchema>
 
 export default function CreatePatientDialog() {
 
@@ -33,11 +36,11 @@ export default function CreatePatientDialog() {
 		    });
 	
   
-  const { register, handleSubmit, reset } = useForm<CreatePatientSchema>({
+  const { register, handleSubmit, reset } = useForm<CreatePatientFormValues>({
     resolver: zodResolver(createPatientSchema),
   })
 
-  async function handleCreatePatient(data: CreatePatientSchema ) {
+  async function handleCreatePatient(data: CreatePatientFormValues ) {
     const { name } = data;
 
      await createPatient({

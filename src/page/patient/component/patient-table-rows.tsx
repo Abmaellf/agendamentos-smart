@@ -1,14 +1,9 @@
+import type { PatientTableRowsProps } from '@/@types/components'
 import { Button } from '@/components/ui/button'
 import { TableRow, TableCell } from '@/components/ui/table'
 import { Search, ArrowRight, X } from 'lucide-react'
 
-type Props = {
-    patientObj: {
-          name: string          
-    }
-}
-
-export default function PatientTableRows({patientObj}: Props) {
+export default function PatientTableRows({patientObj}: PatientTableRowsProps) {
 console.log("Row", patientObj)
   return (
     <TableRow>

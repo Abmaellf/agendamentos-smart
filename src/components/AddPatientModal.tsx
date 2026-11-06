@@ -17,12 +17,15 @@ import { toast } from 'sonner'
 import { PlusCircle } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import { RegisterPatient } from '@/api/register-patient'
+
+import type { CreatePatientFormValues } from '@/@types/components'
  
-const createPatientSchema = z.object({
+const createPatientSchema: z.ZodType<
+  CreatePatientFormValues,
+  CreatePatientFormValues
+> = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
 })
-
-type CreatePatientSchema = z.infer<typeof createPatientSchema>
 
 export function AddPatientModal() {
 
@@ -31,7 +34,7 @@ const {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<CreatePatientSchema>({
+  } = useForm<CreatePatientFormValues>({
     resolver: zodResolver(createPatientSchema),
   })
 
@@ -39,7 +42,7 @@ const {
       mutationFn: RegisterPatient,
     })
 
-  async function handlePatient(data: CreatePatientSchema) {
+  async function handlePatient(data: CreatePatientFormValues) {
     console.log(data)
 
     try{

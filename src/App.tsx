@@ -4,11 +4,11 @@ import { Helmet, HelmetProvider } from 'react-helmet-async'
 import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'sonner'
 
-import { PatientProvider } from './context/PatientContext'
 import { queryClient } from './lib/react-query'
 import { Router } from './Router'
 
 import './globals.css'
+import { PatientProvider } from './context/PatientContext'
 
 export function App() {
   return (
@@ -23,7 +23,7 @@ export function App() {
             </QueryClientProvider>
           </HelmetProvider>
         </BrowserRouter>
-      </PatientProvider>
+        </PatientProvider>
     </CookiesProvider>
   )
 }

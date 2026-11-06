@@ -10,6 +10,7 @@ import {
 import { useMemo, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 
+import type { Appointment, AppointmentStatus } from '@/@types/appointment'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -17,10 +18,6 @@ import { Input } from '@/components/ui/input'
 import { getAppointmentSession } from '@/features/appointments/api/appointments'
 import { CreateAppointmentDialog } from '@/features/appointments/components/create-appointment-dialog'
 import { useAppointments } from '@/features/appointments/hooks/use-appointments'
-import type {
-  Appointment,
-  AppointmentStatus,
-} from '@/features/appointments/model/appointment'
 import { cn } from '@/lib/utils'
 
 const feedbackPanelClassName =
@@ -35,7 +32,7 @@ const appointmentStatusClassNames = {
     'bg-appointment-rescheduled bg-[linear-gradient(135deg,var(--appointment-rescheduled)_0%,var(--appointment-rescheduled-strong)_100%)]',
   CANCELADO:
     'bg-appointment-canceled bg-[linear-gradient(135deg,var(--appointment-canceled)_0%,var(--appointment-canceled-strong)_100%)]',
-  ATENDENDO:
+  EMATENDIMENTO:
     'bg-appointment-in-progress bg-[linear-gradient(135deg,var(--appointment-in-progress-highlight)_0%,var(--appointment-in-progress-strong)_100%)]',
   FINALIZADO:
     'bg-appointment-completed bg-[linear-gradient(135deg,var(--appointment-completed)_0%,var(--appointment-completed-strong)_100%)]',
