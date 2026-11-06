@@ -4,6 +4,7 @@ Este diretório concentra os documentos transversais do sistema. Os detalhes loc
 
 ## Documentos oficiais
 
+- [Desenvolvimento SDD com OpenSpec e CodeGraph](SDD-OpenSpec-CodeGraph.md): instalação, fluxo obrigatório, linha de base e comandos.
 - [Arquitetura do Sistema](Arquitetura%20do%20Sistema.md): estrutura técnica, dependências, regras, riscos e diretrizes.
 - [Objetivo do sistema](Objetivo%20do%20sistema.md): propósito, atores, funcionalidades e fluxos de negócio comprovados pelo código.
 - [Requisitos do MVP](Requisitos%20do%20MVP.md): decisões confirmadas de produto, permissões, cadastros, agenda, modelo multi-tenant e corte das etapas.

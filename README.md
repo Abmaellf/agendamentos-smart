@@ -10,6 +10,8 @@ O repositório contém uma SPA React com autenticação, consulta de perfil, age
 - [Objetivo do sistema](docs/Objetivo%20do%20sistema.md)
 - [Requisitos do MVP](docs/Requisitos%20do%20MVP.md)
 - [Índice da documentação](docs/README.md)
+- [Guia SDD com OpenSpec e CodeGraph](docs/SDD-OpenSpec-CodeGraph.md)
+- [Protocolo para agentes](AGENTS.md)
 - [Mapa do código-fonte](src/README.md)
 
 ## Stack verificada
@@ -102,6 +104,12 @@ npm run test:postman:race
 ## Manutenção da documentação
 
 Qualquer alteração de rota, endpoint, dependência, responsabilidade de pasta ou fluxo de negócio deve atualizar o README do módulo afetado e, quando houver impacto transversal, os documentos em `docs/`. Comportamentos planejados devem ser identificados como **Hipótese** ou **não implementado**.
+
+## Desenvolvimento orientado por especificação
+
+Mudanças novas seguem OpenSpec. Antes de alterar comportamento, crie uma change com proposta, delta spec e tarefas em `openspec/changes/`; após a entrega e validação, arquive-a para promover a spec em `openspec/specs/`. Use `codegraph status` e `codegraph explore` para localizar relações e impacto estrutural antes de buscas textuais amplas.
+
+O guia completo, instalação e limites da linha de base estão em [Desenvolvimento SDD com OpenSpec e CodeGraph](docs/SDD-OpenSpec-CodeGraph.md). O diretório histórico `specs/` (GitHub Spec Kit) foi preservado, mas OpenSpec é o fluxo canônico para trabalho novo.
 
 ## Regras confirmadas do produto
 
