@@ -1,7 +1,10 @@
 import { addDays, format, startOfWeek } from 'date-fns'
 import { ptBR } from 'date-fns/locale/pt-BR'
 import {
+  CalendarDays,
+  CalendarRange,
   CircleAlert,
+  List,
   LoaderCircle,
 } from 'lucide-react'
 import { useMemo } from 'react'
@@ -115,14 +118,63 @@ export function AppointmentsPage() {
     <>
       <main className="bg-agenda-surface flex min-h-[calc(100vh-5rem)] flex-col gap-1 bg-[linear-gradient(135deg,var(--agenda-surface-strong)_0%,#303236_100%)] pb-4">
         <Helmet title="Agendamentos" />
-        <header className="flex items-center justify-between gap-4 bg-white px-[clamp(1rem,5vw,6.25rem)] py-5 text-[#20382d] shadow-[0_2px_5px_rgb(0_0_0_/_12%)] max-[720px]:px-4">
-          <div>
-            <h1 className="text-[clamp(1.35rem,2vw,1.8rem)] font-bold tracking-tight">
-              Agendamentos
-            </h1>
-            <p className="mt-1 text-sm text-[#71877b]">
-              Visualize e gerencie os atendimentos da semana.
-            </p>
+        <header
+          data-testid="appointments-header"
+          className="flex flex-wrap items-center justify-between gap-5 bg-white px-[clamp(1rem,5vw,6.25rem)] py-5 text-[#20382d] shadow-[0_2px_5px_rgb(0_0_0_/_12%)] max-[720px]:flex-col max-[720px]:items-start max-[720px]:px-4"
+        >
+          <div className="flex min-w-0 items-center gap-5">
+            <div
+              aria-hidden="true"
+              className="grid size-16 shrink-0 place-items-center rounded-xl bg-brand shadow-[0_8px_18px_rgb(2_177_96_/_22%)]"
+            >
+              <CalendarDays className="size-8 text-white" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-[clamp(1.35rem,2vw,1.8rem)] font-bold tracking-tight">
+                Agendamentos
+              </h1>
+              <p className="mt-1 text-sm text-[#71877b]">
+                Visualize e gerencie os atendimentos da semana.
+              </p>
+            </div>
+          </div>
+
+          <div
+            role="group"
+            aria-label="Visualização da agenda"
+            data-testid="appointments-view-menu"
+            className="ml-auto flex shrink-0 items-center gap-1 rounded-[0.8rem] border border-[#e0e9e4] bg-white p-1 shadow-[0_4px_12px_rgb(32_56_45_/_8%)] max-[720px]:ml-0 max-[720px]:w-full"
+          >
+            <Button
+              type="button"
+              aria-pressed="true"
+              data-state="active"
+              data-view="week"
+              className="h-12 flex-1 rounded-[0.6rem] bg-brand px-5 text-base text-white shadow-[0_5px_12px_rgb(2_177_96_/_22%)] hover:bg-brand-hover focus-visible:ring-brand max-[720px]:px-3"
+            >
+              <CalendarRange aria-hidden="true" className="size-5" />
+              Semana
+            </Button>
+            <Button
+              type="button"
+              aria-pressed="false"
+              aria-disabled="true"
+              data-view="day"
+              className="h-12 flex-1 rounded-[0.6rem] border border-transparent bg-white px-5 text-base text-[#20382d] hover:border-[#dce9e2] hover:bg-brand-muted focus-visible:ring-brand max-[720px]:px-3"
+            >
+              <CalendarDays aria-hidden="true" className="size-5" />
+              Dia
+            </Button>
+            <Button
+              type="button"
+              aria-pressed="false"
+              aria-disabled="true"
+              data-view="list"
+              className="h-12 flex-1 rounded-[0.6rem] border border-transparent bg-white px-5 text-base text-[#20382d] hover:border-[#dce9e2] hover:bg-brand-muted focus-visible:ring-brand max-[720px]:px-3"
+            >
+              <List aria-hidden="true" className="size-5" />
+              Lista
+            </Button>
           </div>
         </header>
 

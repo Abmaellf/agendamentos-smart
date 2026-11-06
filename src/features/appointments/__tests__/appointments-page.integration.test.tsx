@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent, { type UserEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -122,6 +122,70 @@ describe('integração da criação com a agenda semanal', () => {
       await screen.findByText(/nenhum agendamento nesta semana/i),
     ).toBeVisible()
     expect(screen.queryByText('Abmael')).not.toBeInTheDocument()
+  })
+
+  it('apresenta o cabeçalho e o menu central da referência visual', async () => {
+    renderAppointmentsPage()
+
+    expect(await screen.findByRole('heading', { name: 'Agendamentos' })).toBeVisible()
+    expect(
+      screen.getByText('Visualize e gerencie os atendimentos da semana.'),
+    ).toBeVisible()
+
+    const menu = screen.getByRole('group', {
+      name: 'Visualização da agenda',
+    })
+    expect(menu).toBeVisible()
+
+    const week = within(menu).getByRole('button', { name: 'Semana' })
+    expect(week).toHaveAttribute('aria-pressed', 'true')
+    expect(week).toHaveAttribute('data-state', 'active')
+    expect(week).toHaveAttribute('data-view', 'week')
+    expect(within(menu).getByRole('button', { name: 'Dia' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    )
+    expect(
+      within(menu).getByRole('button', { name: 'Lista' }),
+    ).toHaveAttribute('aria-disabled', 'true')
+  })
+
+  it('mantém a agenda semanal sem consulta nova ao interagir com modos futuros', async () => {
+    const user = userEvent.setup()
+    renderAppointmentsPage()
+
+    expect(
+      await screen.findByText(/nenhum agendamento nesta semana/i),
+    ).toBeVisible()
+    const queryCount = apiScenario.appointmentQueries.length
+    const menu = screen.getByRole('group', {
+      name: 'Visualização da agenda',
+    })
+
+    await user.click(within(menu).getByRole('button', { name: 'Dia' }))
+    await user.click(within(menu).getByRole('button', { name: 'Lista' }))
+
+    expect(apiScenario.appointmentQueries).toHaveLength(queryCount)
+    expect(
+      screen.getByText(/nenhum agendamento nesta semana/i),
+    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Dia' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    )
+  })
+
+  it('reorganiza o cabeçalho em viewport estreita', async () => {
+    renderAppointmentsPage()
+
+    await screen.findByRole('heading', { name: 'Agendamentos' })
+
+    expect(screen.getByTestId('appointments-header')).toHaveClass(
+      'max-[720px]:flex-col',
+    )
+    expect(screen.getByTestId('appointments-view-menu')).toHaveClass(
+      'max-[720px]:w-full',
+    )
   })
 
   it('WB-17 apresenta os dados retornados pela API no fuso da unidade', async () => {
