@@ -1,0 +1,34 @@
+schema: spec-driven
+
+context: |
+  Aplicação web React/TypeScript (Vite) para gestão de agendamentos de clínicas.
+  Os artefatos OpenSpec, a documentação e os textos de interface são em pt-BR;
+  identificadores técnicos, comandos e marcadores obrigatórios do OpenSpec são preservados.
+  A API é externa e configurada por VITE_API_URL. O frontend não é fonte de
+  autorização, isolamento de tenant, regras de conflito ou integridade dos dados.
+  O diretório specs/ preexistente usa GitHub Spec Kit e deve ser preservado como
+  histórico; OpenSpec é a fonte canônica para mudanças iniciadas após esta adoção.
+  Não trate código, documentação antiga ou checkbox histórico como evidência de
+  produção sem teste, comando ou validação correspondente.
+
+rules:
+  proposal:
+    - Declare escopo, fora de escopo e impacto nos contratos HTTP, rotas, dados ou permissões quando aplicável.
+    - Reutilize uma capability existente em vez de criar especificações sobrepostas.
+  specs:
+    - Descreva comportamento observável e cenários testáveis; não descreva componentes, bibliotecas ou detalhes de implementação.
+    - Diferencie comportamento confirmado, hipótese e lacuna de evidência quando a change for uma auditoria retrospectiva.
+  tasks:
+    - Inclua a verificação proporcional (testes, build, lint, contrato ou revisão documental) em cada grupo de trabalho.
+    - Não marque uma tarefa concluída sem registrar a evidência ou o bloqueio real.
+
+operations:
+  apply:
+    guidance:
+      - Antes de editar código, encontre uma change ativa, a spec correspondente e uma tarefa compatível.
+      - Use CodeGraph para símbolos, callers, callees e impacto quando .codegraph/ existir; depois leia o código-fonte relevante.
+      - Preserve alterações preexistentes e registre desvios descobertos fora do escopo em uma nova change.
+  archive:
+    guidance:
+      - Arquive somente após validar a change, atualizar as specs principais e confirmar que as tarefas refletem o estado real.
+      - Registre testes não executados, falhas preexistentes e dependências externas em vez de inferir sucesso.
