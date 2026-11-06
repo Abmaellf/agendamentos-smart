@@ -9,6 +9,7 @@ Concentrar a SPA React: bootstrap, providers, rotas, páginas, integração HTTP
 - montar `App` no DOM;
 - compor providers globais;
 - declarar rotas públicas e internas;
+- montar a casca interna com menu lateral responsivo, modo desktop recolhível para ícones e destinos explicitamente indisponíveis;
 - oferecer telas de autenticação, agenda, pacientes e placeholders de profissional/configuração;
 - integrar com a API definida por `VITE_API_URL`.
 
@@ -22,11 +23,11 @@ Concentrar a SPA React: bootstrap, providers, rotas, páginas, integração HTTP
 
 - `main.tsx`: entrada do bundle e montagem de `App`;
 - `App.tsx`: composição de cookies, contexto, store RTK, roteador, metadados e notificações;
-- `Router.tsx`: entrada de navegação para todas as páginas;
+- `Router.tsx`: entrada de navegação para todas as páginas e para a casca interna com `AppSidebar`;
 - `env.ts`: validação antecipada da URL da API;
 - `globals.css`: estilos Tailwind efetivamente carregados.
 
-Fluxo principal: `main.tsx` → `App.tsx` → providers → `Router.tsx` → layout → página → componente/contexto/API.
+Fluxo principal: `main.tsx` → `App.tsx` → providers → `Router.tsx` → `AppLayout`/`AppSidebar` → página → componente/contexto/API.
 
 ## Arquivos críticos
 
@@ -36,6 +37,7 @@ Fluxo principal: `main.tsx` → `App.tsx` → providers → `Router.tsx` → lay
 | `Router.tsx`    | Contrato de rotas        |
 | `env.ts`        | Contrato de configuração |
 | `_layout/`      | Cascas das rotas         |
+| `components/AppSidebar/` | Navegação lateral responsiva das rotas internas |
 | `page/`         | Fluxos de tela           |
 | `api/` e `lib/` | Integração externa       |
 | `context/`      | Estado compartilhado     |
@@ -48,6 +50,7 @@ Fluxo principal: `main.tsx` → `App.tsx` → providers → `Router.tsx` → lay
 - Permissões de `ADMIN` e `BASIC` controlam a interface, mas também precisam ser verificadas pelo adaptador/API.
 - Estado remoto deve passar por endpoints tipados do RTK Query; componentes e páginas não devem acessar Axios nem o arquivo de mock diretamente.
 - Entidades e estados de agendamento devem possuir contratos canônicos, sem strings ou formas redefinidas por tela.
+- A navegação interna usa marca textual e CSS no `AppSidebar`; esta change não adiciona nem importa assets de marca locais.
 
 ## Observações técnicas e débitos
 

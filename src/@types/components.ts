@@ -11,16 +11,6 @@ export interface PaginationProps {
   totalCount: number
 }
 
-export interface MenuVisibilityControls {
-  setMenuIsVisible(isVisible: boolean): void
-}
-
-export type HeaderProps = MenuVisibilityControls
-
-export interface MenuMobileProps extends MenuVisibilityControls {
-  menuIsVisible: boolean
-}
-
 export interface CardDayProps {
   date: string
   isToday: boolean

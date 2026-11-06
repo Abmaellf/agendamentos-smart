@@ -7,11 +7,11 @@ Fornecer estruturas visuais compartilhadas para rotas de autenticação e para a
 ## Responsabilidades e funcionalidades existentes
 
 - `AuthLayout`: divide a tela em apresentação da clínica e conteúdo de login/cadastro;
-- `AppLayout`: monta menu móvel, Header, conteúdo via `Outlet` e um rodapé provisório.
+- `AppLayout`: monta menu lateral persistente em telas amplas, com modo recolhido somente por ícones, e painel lateral acionável em telas compactas, delegando a página ao `Outlet`.
 
 ## Dependências internas e externas
 
-- internas: `components/Header`, `components/MenuMobile` e páginas montadas pelo Router;
+- internas: `components/AppSidebar` e páginas montadas pelo Router;
 - externas: React e `react-router-dom`;
 - módulos relacionados: `src/Router.tsx`, `src/page/auth` e páginas internas.
 
@@ -35,6 +35,5 @@ Fornecer estruturas visuais compartilhadas para rotas de autenticação e para a
 ## Observações técnicas e débitos
 
 - `AppLayout` não valida autenticação; todas as rotas filhas são acessíveis diretamente.
-- O rodapé interno contém texto de placeholder.
-- A abertura do menu móvel é estado local do layout.
+- A abertura do painel lateral compacto é estado local do layout, que também bloqueia a rolagem temporariamente, responde a Escape e restaura o foco ao acionador.
 - O provider de tema Tailwind aparece somente em comentário e não é montado aqui.
