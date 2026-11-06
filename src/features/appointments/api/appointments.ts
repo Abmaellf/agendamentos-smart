@@ -1,5 +1,3 @@
-import { api } from '@/lib/axios'
-
 import type {
   Appointment,
   AppointmentSession,
@@ -9,6 +7,7 @@ import type {
   ServiceOption,
   UnitOption,
 } from '@/@types/appointment'
+import { baseApi } from '@/lib/base-api'
 
 import { parseSessionProfile } from '../../session/model/session'
 
@@ -16,56 +15,72 @@ interface ContentResponse<T> {
   content: T[]
 }
 
-function contentOf<T>(value: ContentResponse<T> | T[]) {
+type CollectionResponse<T> = ContentResponse<T> | T[]
+
+function contentOf<T>(value: CollectionResponse<T>) {
   return Array.isArray(value) ? value : value.content
 }
 
-export async function getAppointmentSession(): Promise<AppointmentSession> {
-  const { data } = await api.get('/auth/me')
-  return parseSessionProfile(data)
-}
+export const appointmentsApi = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    getAppointmentSession: builder.query<AppointmentSession, void>({
+      query: () => ({ url: '/auth/me' }),
+      transformResponse: parseSessionProfile,
+      providesTags: ['Session'],
+    }),
+    getPatients: builder.query<PatientOption[], void>({
+      query: () => ({ url: '/api/patients' }),
+      transformResponse: (response: unknown) =>
+        contentOf(response as CollectionResponse<PatientOption>),
+      providesTags: ['PatientCatalog'],
+    }),
+    getUnits: builder.query<UnitOption[], void>({
+      query: () => ({ url: '/api/units' }),
+      transformResponse: (response: unknown) =>
+        contentOf(response as CollectionResponse<UnitOption>),
+      providesTags: ['UnitCatalog'],
+    }),
+    getServices: builder.query<ServiceOption[], void>({
+      query: () => ({ url: '/api/services' }),
+      transformResponse: (response: unknown) =>
+        contentOf(response as CollectionResponse<ServiceOption>),
+      providesTags: ['ServiceCatalog'],
+    }),
+    getProfessionals: builder.query<ProfessionalOption[], string>({
+      query: (serviceId) => ({
+        url: '/api/professionals',
+        params: { serviceId },
+      }),
+      transformResponse: (response: unknown) =>
+        contentOf(response as CollectionResponse<ProfessionalOption>),
+      providesTags: ['ProfessionalCatalog'],
+    }),
+    createAppointment: builder.mutation<Appointment, CreateAppointmentInput>({
+      query: (data) => ({
+        url: '/api/appointments',
+        method: 'POST',
+        data,
+      }),
+      invalidatesTags: [{ type: 'Appointment', id: 'LIST' }],
+    }),
+    getAppointments: builder.query<
+      Appointment[],
+      { unitId: string; from: string; to: string }
+    >({
+      query: (params) => ({ url: '/api/appointments', params }),
+      transformResponse: (response: unknown) =>
+        contentOf(response as CollectionResponse<Appointment>),
+      providesTags: [{ type: 'Appointment', id: 'LIST' }],
+    }),
+  }),
+})
 
-export async function getPatients() {
-  const { data } = await api.get<
-    ContentResponse<PatientOption> | PatientOption[]
-  >('/api/patients')
-  return contentOf(data)
-}
-
-export async function getUnits() {
-  const { data } = await api.get<ContentResponse<UnitOption> | UnitOption[]>(
-    '/api/units',
-  )
-  return contentOf(data)
-}
-
-export async function getServices() {
-  const { data } = await api.get<
-    ContentResponse<ServiceOption> | ServiceOption[]
-  >('/api/services')
-  return contentOf(data)
-}
-
-export async function getProfessionals(serviceId: string) {
-  const { data } = await api.get<
-    ContentResponse<ProfessionalOption> | ProfessionalOption[]
-  >('/api/professionals', { params: { serviceId } })
-  return contentOf(data)
-}
-
-export async function createAppointment(input: CreateAppointmentInput) {
-  const { data } = await api.post<Appointment>('/api/appointments', input)
-  return data
-}
-
-export async function getAppointments(params: {
-  unitId: string
-  from: string
-  to: string
-}) {
-  const { data } = await api.get<ContentResponse<Appointment> | Appointment[]>(
-    '/api/appointments',
-    { params },
-  )
-  return contentOf(data)
-}
+export const {
+  useCreateAppointmentMutation,
+  useGetAppointmentSessionQuery,
+  useGetAppointmentsQuery,
+  useGetPatientsQuery,
+  useGetProfessionalsQuery,
+  useGetServicesQuery,
+  useGetUnitsQuery,
+} = appointmentsApi

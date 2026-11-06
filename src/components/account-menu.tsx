@@ -1,8 +1,7 @@
 import { Building, ChevronDown, LogOut } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
 
 import avatar from '@/assets/abm_avatar.png'
-import { getProfile } from '@/api/get-profile'
+import { useGetProfileQuery } from '@/api/get-profile'
 
 import { Button } from './ui/button'
 import {
@@ -15,10 +14,7 @@ import {
 } from './ui/dropdown-menu'
 
 export default function AccountMenu() {
-  const { data: profile } = useQuery({
-    queryKey: ['profile'],
-    queryFn: getProfile,
-  })
+  const { data: profile } = useGetProfileQuery()
 
   return (
     <DropdownMenu>

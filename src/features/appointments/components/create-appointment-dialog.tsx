@@ -1,4 +1,3 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   cloneElement,
   type FormEvent,
@@ -27,11 +26,11 @@ import {
 } from '@/components/ui/dialog'
 
 import {
-  createAppointment,
-  getPatients,
-  getProfessionals,
-  getServices,
-  getUnits,
+  useCreateAppointmentMutation,
+  useGetPatientsQuery,
+  useGetProfessionalsQuery,
+  useGetServicesQuery,
+  useGetUnitsQuery,
 } from '../api/appointments'
 import { appointmentErrorMessage } from '../model/appointment-errors'
 import {
@@ -85,7 +84,6 @@ export function CreateAppointmentDialog({
   triggerLabel = 'Novo agendamento',
   triggerAriaLabel,
 }: CreateAppointmentDialogProps) {
-  const queryClient = useQueryClient()
   const patientRef = useRef<HTMLSelectElement>(null)
   const submittingRef = useRef(false)
   const [open, setOpen] = useState(false)
@@ -97,31 +95,16 @@ export function CreateAppointmentDialog({
   const [durationOverridden, setDurationOverridden] = useState(false)
   const [priceOverridden, setPriceOverridden] = useState(false)
 
-  const patientsQuery = useQuery({
-    queryKey: ['appointment-catalog', 'patients'],
-    queryFn: getPatients,
-    enabled: open,
+  const patientsQuery = useGetPatientsQuery(undefined, { skip: !open })
+  const unitsQuery = useGetUnitsQuery(undefined, { skip: !open })
+  const servicesQuery = useGetServicesQuery(undefined, { skip: !open })
+  const professionalsQuery = useGetProfessionalsQuery(form.serviceId, {
+    skip: !open || !form.serviceId,
   })
-  const unitsQuery = useQuery({
-    queryKey: ['appointment-catalog', 'units'],
-    queryFn: getUnits,
-    enabled: open,
-  })
-  const servicesQuery = useQuery({
-    queryKey: ['appointment-catalog', 'services'],
-    queryFn: getServices,
-    enabled: open,
-  })
-  const professionalsQuery = useQuery({
-    queryKey: ['appointment-catalog', 'professionals', form.serviceId],
-    queryFn: () => getProfessionals(form.serviceId),
-    enabled: open && Boolean(form.serviceId),
-  })
-
-  const mutation = useMutation({ mutationFn: createAppointment })
+  const [createAppointment, mutation] = useCreateAppointmentMutation()
 
   const requiredQueries = [patientsQuery, unitsQuery, servicesQuery]
-  const isCatalogLoading = requiredQueries.some((query) => query.isPending)
+  const isCatalogLoading = requiredQueries.some((query) => query.isLoading)
   const catalogError = requiredQueries.find((query) => query.isError)
   const hasEmptyCatalog = requiredQueries.some(
     (query) => query.isSuccess && query.data.length === 0,
@@ -193,11 +176,7 @@ export function CreateAppointmentDialog({
         role: session.user.role,
         timeZone,
       })
-      await mutation.mutateAsync(input)
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['appointments'] }),
-        queryClient.invalidateQueries({ queryKey: ['service-capacity'] }),
-      ])
+      await createAppointment(input).unwrap()
       toast.success('Agendamento criado com sucesso.')
       setOpen(false)
       setForm(emptyForm(defaultDate))
@@ -215,7 +194,7 @@ export function CreateAppointmentDialog({
     isCatalogLoading ||
     Boolean(catalogError) ||
     hasEmptyCatalog ||
-    mutation.isPending
+    mutation.isLoading
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -322,7 +301,7 @@ export function CreateAppointmentDialog({
               <select
                 className={controlClassName}
                 value={form.professionalId}
-                disabled={!form.serviceId || professionalsQuery.isPending}
+                disabled={!form.serviceId || professionalsQuery.isLoading}
                 onChange={(event) =>
                   setForm((current) => ({
                     ...current,
@@ -423,7 +402,7 @@ export function CreateAppointmentDialog({
               </Button>
             </DialogClose>
             <Button type="submit" disabled={createDisabled}>
-              {mutation.isPending ? 'Criando...' : 'Criar agendamento'}
+              {mutation.isLoading ? 'Criando...' : 'Criar agendamento'}
             </Button>
           </DialogFooter>
         </form>

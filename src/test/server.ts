@@ -27,6 +27,8 @@ interface ApiScenario {
   createRequests: Record<string, unknown>[]
   professionalQueries: string[]
   appointmentQueries: URLSearchParams[]
+  catalogRequests: Record<CatalogName, number>
+  collectionResponse: 'content' | 'array'
 }
 
 function initialScenario(): ApiScenario {
@@ -49,6 +51,13 @@ function initialScenario(): ApiScenario {
     createRequests: [],
     professionalQueries: [],
     appointmentQueries: [],
+    catalogRequests: {
+      patients: 0,
+      units: 0,
+      services: 0,
+      professionals: 0,
+    },
+    collectionResponse: 'content',
   }
 }
 
@@ -59,6 +68,7 @@ export function resetApiScenario() {
 }
 
 async function catalogResponse(name: CatalogName, content?: unknown[]) {
+  apiScenario.catalogRequests[name] += 1
   if (apiScenario.catalogDelayMs > 0) {
     await delay(apiScenario.catalogDelayMs)
   }
@@ -71,7 +81,10 @@ async function catalogResponse(name: CatalogName, content?: unknown[]) {
     )
   }
 
-  return HttpResponse.json({ content: content ?? apiScenario.catalogs[name] })
+  const collection = content ?? apiScenario.catalogs[name]
+  return HttpResponse.json(
+    apiScenario.collectionResponse === 'array' ? collection : { content: collection },
+  )
 }
 
 const handlers = [
@@ -104,7 +117,7 @@ const handlers = [
     )
     return catalogResponse('professionals', matchingProfessionals)
   }),
-  http.get('http://localhost:8080/api/appointment', async ({ request }) => {
+  http.get('http://localhost:8080/api/appointments', async ({ request }) => {
     apiScenario.appointmentQueries.push(new URL(request.url).searchParams)
     if (apiScenario.appointmentDelayMs > 0) {
       await delay(apiScenario.appointmentDelayMs)
@@ -118,9 +131,13 @@ const handlers = [
         { status: apiScenario.appointmentErrorStatus },
       )
     }
-    return HttpResponse.json({ content: apiScenario.appointments })
+    return HttpResponse.json(
+      apiScenario.collectionResponse === 'array'
+        ? apiScenario.appointments
+        : { content: apiScenario.appointments },
+    )
   }),
-  http.post('http://localhost:8080/api/appointment', async ({ request }) => {
+  http.post('http://localhost:8080/api/appointments', async ({ request }) => {
     const payload = (await request.json()) as Record<string, unknown>
     apiScenario.createRequests.push(payload)
 

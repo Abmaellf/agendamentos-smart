@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 import type { AppointmentApiError } from '@/@types/appointment'
 
 const messages: Record<string, string> = {
@@ -17,10 +15,16 @@ const messages: Record<string, string> = {
 }
 
 export function appointmentErrorMessage(error: unknown) {
-  if (axios.isAxiosError<AppointmentApiError>(error)) {
-    const code = error.response?.data?.code
-    if (code && messages[code]) return messages[code]
-  }
+  const data =
+    typeof error === 'object' && error !== null && 'data' in error
+      ? error.data
+      : undefined
+  const code =
+    typeof data === 'object' && data !== null && 'code' in data
+      ? (data as AppointmentApiError).code
+      : undefined
+
+  if (code && messages[code]) return messages[code]
 
   return 'Não foi possível criar o agendamento. Tente novamente.'
 }

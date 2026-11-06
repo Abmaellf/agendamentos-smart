@@ -11,12 +11,10 @@ front-end.
 - `Appointment`: singular para uma entidade ou registro individual;
 - `appointments`: plural para a feature, coleções, queries e caminhos de rota;
 - `AppointmentsPage`: página que apresenta uma coleção de agendamentos;
-- `createAppointment`: comando que cria um registro;
-- `getAppointments` e `useAppointments`: operações que retornam uma coleção.
+- `createAppointment`: mutação que cria um registro;
+- `useGetAppointmentsQuery`: consulta RTK Query que retorna uma coleção.
 
-O termo `appointment` não deve ser usado em nomes internos. A string
-`/api/appointment` permanece somente no adaptador HTTP, nos mocks e nos
-documentos de contrato porque ainda é o endpoint publicado pelo backend.
+O caminho externo de agenda é `/api/appointments` para consulta e criação.
 
 ## Estrutura
 
@@ -24,7 +22,6 @@ documentos de contrato porque ainda é o endpoint publicado pelo backend.
 appointments/
 ├── api/          # chamadas HTTP tipadas
 ├── components/   # componentes específicos da feature
-├── hooks/         # queries e cache remoto
 ├── model/         # schemas, transformações e mensagens de domínio
 ├── pages/         # composição da rota /appointments
 └── __tests__/     # testes unitários e de integração
@@ -35,13 +32,14 @@ Os contratos TypeScript compartilhados da feature ficam em
 
 ## Fluxo principal
 
-`/appointments` → `AppointmentsPage` → `useAppointments` →
-`getAppointments` → API.
+`/appointments` → `AppointmentsPage` → hooks RTK Query → endpoints injetados
+em `baseApi` → `axiosBaseQuery` → API.
 
 A página seleciona o intervalo semanal, apresenta carregamento, erro e estado
 vazio, distribui os registros nos cinco dias úteis e abre
-`CreateAppointmentDialog`. Após a criação, o cache `appointments` é invalidado e
-a semana visível é consultada novamente.
+`CreateAppointmentDialog`. A consulta de agenda só inicia após a sessão. O
+diálogo usa `skip` enquanto fechado e a mutação de criação invalida
+`Appointment/LIST`, fazendo a semana visível ser consultada novamente.
 
 ## Regras do domínio
 

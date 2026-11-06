@@ -6,7 +6,7 @@
 | --------------------- | ------------------------------------------------------------------------------------------------ |
 | Repositório analisado | `agendamentos-smart`                                                                             |
 | Commit-base           | `62ac47e` (`feat: add getProfile`)                                                               |
-| Data da análise       | 6 de agosto de 2026                                                                              |
+| Data da análise       | 6 de novembro de 2026                                                                            |
 | Escopo                | Aplicação web, configurações, dependências, dados simulados e grafo estático de imports/chamadas |
 | Validações executadas | `npm run build` e `npx eslint src vite.config.ts`                                                |
 
@@ -22,7 +22,7 @@ O sistema é uma aplicação de página única (SPA) executada no navegador. Rea
 flowchart TD
     Browser[Navegador] --> Main[src/main.tsx]
     Main --> App[src/App.tsx]
-    App --> Providers[Theme, cookies, pacientes, router, helmet e React Query]
+    App --> Providers[Cookies, pacientes, store RTK, router, helmet e notificações]
     Providers --> Router[src/Router.tsx]
     Router --> AuthLayout[AuthLayout]
     Router --> AppLayout[AppLayout]
@@ -49,7 +49,7 @@ componentes, página e testes no mesmo limite de feature.
 
 1. `index.html` fornece o elemento `#root`.
 2. `src/main.tsx` monta `App` sem `StrictMode` ativo.
-3. `src/App.tsx` carrega os estilos globais e instala, nesta ordem, cookies, `PatientProvider`, `BrowserRouter`, metadados, notificações e `QueryClientProvider`.
+3. `src/App.tsx` carrega os estilos globais e instala, nesta ordem, cookies, `PatientProvider`, `BrowserRouter`, metadados, notificações e o `Provider` da store RTK.
 4. `src/Router.tsx` declara a rota inicial, as páginas de autenticação e as páginas internas.
 5. A rota `/` espera um segundo, verifica apenas a presença do cookie `jwt` e navega para login ou agenda.
 
@@ -72,8 +72,8 @@ Não existe rota curinga (`404`) nem guarda de rota no `AppLayout`.
 | Módulo                      | Responsabilidade atual                       | Dependências relevantes         | Consumidores                   |
 | --------------------------- | -------------------------------------------- | ------------------------------- | ------------------------------ |
 | `src/_layout`               | Estrutura visual pública e interna           | Router, Header, MenuMobile      | `Router.tsx`                   |
-| `src/page/auth`             | Telas de entrada e cadastro visual           | API, React Query, forms, router | `Router.tsx`                   |
-| `src/features/appointments` | Domínio, API, cache, criação e grade semanal | React Query, Zod, date-fns      | `Router.tsx`                   |
+| `src/page/auth`             | Telas de entrada e cadastro visual           | RTK Query, forms, router        | `Router.tsx`                   |
+| `src/features/appointments` | Domínio, API, cache, criação e grade semanal | RTK Query, Zod, date-fns        | `Router.tsx`                   |
 | `src/page/patient`          | Lista, filtro e criação de pacientes         | contexto, UI, forms             | `Router.tsx`                   |
 | `src/page/doctor`           | Placeholder de profissional                  | React                           | `Router.tsx`                   |
 | `src/page/Configuration`    | Placeholder de configuração                  | React                           | `Router.tsx`                   |
@@ -81,7 +81,7 @@ Não existe rota curinga (`404`) nem guarda de rota no `AppLayout`.
 | `src/components/ui`         | Primitivos visuais reutilizáveis             | Radix, Tailwind, CVA            | páginas e componentes          |
 | `src/context`               | Estado e operações legadas de pacientes      | Axios, context selector         | pacientes                      |
 | `src/api`                   | Chamadas HTTP e utilitários de token         | Axios e Web Storage             | autenticação, Header, paciente |
-| `src/lib`                   | Axios, QueryClient e merge de classes        | env, Axios, React Query         | API, contexto e UI             |
+| `src/lib`                   | Axios, base API/store RTK e merge de classes | env, Axios, RTK Query           | API, contexto e UI             |
 | `src/globals.css`           | Tailwind e design tokens globais             | Tailwind                        | `App` e componentes visuais    |
 | `src/assets`                | Imagens locais atualmente sem consumidores   | bundler Vite                    | nenhum import ativo            |
 
@@ -105,10 +105,10 @@ entradas e respostas tipadas e mensagens de erro de domínio.
 
 ### Estado remoto misto
 
-- React Query executa login, consultas e criação de agendamentos e o cadastro em `AddPatientModal`.
+- RTK Query executa login, perfil, consultas, criação de agendamentos e o cadastro em `AddPatientModal`.
 - `PatientContext` guarda a lista de pacientes e acessa Axios diretamente.
 - A agenda mantém apenas a data de referência em estado local; os agendamentos
-  remotos pertencem ao cache do React Query.
+  remotos pertencem ao cache da `baseApi`.
 
 Essa coexistência não define uma fonte única para estado de servidor e provoca duplicação de responsabilidades.
 
@@ -141,7 +141,7 @@ Login e cadastros de paciente combinam React Hook Form e Zod. O cadastro visual 
 - `PatientContext` mistura estado remoto, chamadas HTTP e criação de paciente;
 - `CardDay` contém massa antiga de agendamentos fixa, mas não participa da rota
   `/appointments`;
-- `AddPatientModal` executa API diretamente enquanto outro modal delega a criação ao contexto;
+- `AddPatientModal` usa mutação RTK Query enquanto outro modal delega a criação ao contexto;
 - tipos de paciente são redefinidos localmente e não representam um contrato único;
 - componentes de navegação contêm textos de produto e caminhos diretamente.
 
@@ -154,7 +154,7 @@ Não foram identificados ciclos explícitos no grafo estático de imports, mas e
 | React / React DOM      | Renderização e estado              | Base de toda a SPA                                    |
 | React Router           | Rotas, layouts e navegação         | Acesso e composição de telas dependem dele            |
 | Axios                  | Cliente HTTP com `withCredentials` | Todas as integrações reais usam uma única `baseURL`   |
-| TanStack React Query   | Perfil, catálogos e agendamentos   | Fonte do estado remoto da feature `appointments`      |
+| Redux Toolkit + React Redux | Perfil, catálogos e agendamentos | Store e fonte do estado remoto dos consumidores RTK   |
 | React Hook Form + Zod  | Formulários e validação            | Contratos de entrada locais às telas                  |
 | react-cookie           | Leitura do cookie `jwt`            | Decide somente o redirecionamento da raiz             |
 | use-context-selector   | Contexto legado de pacientes       | Acopla consumidores ao contrato de `PatientContext`   |
@@ -162,7 +162,7 @@ Não foram identificados ciclos explícitos no grafo estático de imports, mas e
 | Tailwind + Radix + CVA | Design system                      | Sustenta `components/ui`, páginas e componentes       |
 | Vite                   | Build e ambiente                   | Expõe apenas variáveis `VITE_*` e resolve o alias `@` |
 
-Dependências declaradas sem import ativo identificado: `@headlessui/react`, `@heroicons/react`, `phosphor-react` (apenas comentário) e `scheduler`. `react-datepicker` fornece apenas um CSS importado; o seletor visível usa `react-day-picker`. Pacotes Redux aparecem instalados como extrínsecos em `node_modules`, mas não constam em `package.json` nem são usados pelo código.
+Dependências declaradas sem import ativo identificado: `@headlessui/react`, `@heroicons/react`, `phosphor-react` (apenas comentário) e `scheduler`. `react-datepicker` fornece apenas um CSS importado; o seletor visível usa `react-day-picker`.
 
 Na qualidade estática, o projeto mantém `.eslintrc` legado e `eslint.config.mjs` simultaneamente. A execução atual do ESLint 9 usa a configuração flat, que habilita somente as recomendações JavaScript/TypeScript; os plugins instalados de React e ordenação de imports não são adicionados nessa configuração.
 
@@ -176,8 +176,8 @@ Na qualidade estática, o projeto mantém `.eslintrc` legado e `eslint.config.mj
 | `GET patient/list`        | `PatientContext`              | Lista de pacientes                    |
 | `POST /patient/save`      | `src/api/register-patient.ts` | Cadastro pelo modal compartilhado     |
 | `POST patients`           | `PatientContext`              | Cadastro pelo diálogo local da página |
-| `GET /api/appointment`    | `features/appointments/api`   | Consulta externa de agendamentos      |
-| `POST /api/appointment`   | `features/appointments/api`   | Criação externa de agendamento        |
+| `GET /api/appointments`   | `features/appointments/api`   | Consulta externa de agendamentos      |
+| `POST /api/appointments`  | `features/appointments/api`   | Criação externa de agendamento        |
 
 ## Regras arquiteturais
 
@@ -193,7 +193,7 @@ Na qualidade estática, o projeto mantém `.eslintrc` legado e `eslint.config.mj
 
 Estas regras orientam código futuro; módulos legados listados neste documento ainda não obedecem a todas elas.
 
-1. Uma funcionalidade deve ter uma única fonte para estado remoto. Prefira React Query para requisições e cache; use contexto apenas para estado realmente compartilhado que não seja derivável do servidor.
+1. Uma funcionalidade deve ter uma única fonte para estado remoto. Prefira RTK Query para requisições e cache; use contexto apenas para estado realmente compartilhado que não seja derivável do servidor.
 2. Operações HTTP devem ficar em módulos de API por domínio, com tipos de entrada e saída explícitos. Páginas e componentes visuais não devem importar Axios diretamente.
 3. Rotas internas devem depender de uma guarda de autenticação central, nunca apenas do redirecionamento em `/`.
 4. Componentes de `components/ui` não devem conhecer regras de negócio. Componentes específicos de uma funcionalidade devem permanecer junto da respectiva página/feature ou ser promovidos a compartilhados somente quando houver reuso real.
@@ -277,7 +277,7 @@ Para código novo: usar nomes de pasta em kebab-case ou minúsculas de forma uni
 3. Expandir a feature `appointments` mantendo API, cache, regras e telas no
    mesmo limite de domínio.
 4. Conectar ou remover o cadastro de usuário, profissional e configuração conforme escopo de produto confirmado.
-5. Padronizar estado remoto em React Query e separar cálculos puros de calendário do contexto.
+5. Consolidar os fluxos remotos legados restantes no RTK Query e separar cálculos puros de calendário do contexto.
 6. Corrigir navegação, rota 404, estados de erro/carregamento/vazio e acessibilidade dos fluxos.
 7. Introduzir testes de contratos de API, regras de data, componentes críticos e proteção de rotas.
 8. Consolidar o ESLint em uma configuração única, excluir `dist` explicitamente e ativar regras React/Hooks compatíveis.

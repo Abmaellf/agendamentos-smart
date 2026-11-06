@@ -7,24 +7,27 @@ Criar instâncias e utilitários técnicos reutilizados por API, contexto e comp
 ## Responsabilidades e funcionalidades existentes
 
 - `axios.ts`: instância HTTP com `baseURL` e cookies;
-- `react-query.ts`: `QueryClient` global;
+- `axios-base-query.ts`: adaptador tipado do Axios para consultas e mutações remotas;
+- `base-api.ts`: API-base RTK com tags compartilhadas;
+- `store.ts`: store, reducer e middleware da API;
 - `utils.ts`: combinação segura de classes Tailwind com `clsx` e `tailwind-merge`.
 
 ## Dependências internas e externas
 
 - internas: `env.ts`;
-- externas: Axios, TanStack React Query, clsx e tailwind-merge;
+- externas: Axios, Redux Toolkit, React Redux, clsx e tailwind-merge;
 - módulos relacionados: `api`, `context`, `components/ui` e `App.tsx`.
 
 ## Pontos de entrada e fluxos de entrada
 
 - operações HTTP importam `api`;
-- `App` fornece `queryClient` ao React Query;
+- `App` fornece `store` pelo `Provider` do React Redux;
+- APIs por domínio injetam endpoints na `baseApi` e reutilizam `axiosBaseQuery`;
 - componentes UI chamam `cn` para compor `className`.
 
 ## Arquivos críticos
 
-Todos os três arquivos são ativos. `axios.ts` é o limite central entre frontend e backend.
+`axios.ts`, `axios-base-query.ts`, `base-api.ts`, `store.ts` e `utils.ts` são ativos. `axios.ts` é o limite central entre frontend e backend.
 
 ## Regras próprias do módulo
 
@@ -37,5 +40,5 @@ Todos os três arquivos são ativos. `axios.ts` é o limite central entre fronte
 ## Observações técnicas e débitos
 
 - Não há interceptores para autenticação, correlação ou normalização de erros.
-- O `QueryClient` usa configurações padrão e não possui política documentada de retry/stale time.
+- Falhas não tratadas pelo Axios são serializadas como `{ status, data }` para o RTK Query; políticas globais de retry ainda não foram definidas.
 - Novos utilitários devem ser puros e independentes de regras de negócio.
