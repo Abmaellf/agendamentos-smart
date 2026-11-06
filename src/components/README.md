@@ -8,8 +8,7 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 
 | Componente/pasta      | Função                               | Estado                      |
 | --------------------- | ------------------------------------ | --------------------------- |
-| `Header`              | Navegação desktop e menu da conta    | Ativo                       |
-| `MenuMobile`          | Sobreposição de navegação responsiva | Ativo, links apenas visuais |
+| `AppSidebar`          | Navegação lateral responsiva         | Ativo                       |
 | `account-menu.tsx`    | Perfil da clínica/usuário            | Ativo                       |
 | `Card`                | Cartões antigos da agenda            | Legado sem consumidor       |
 | `WeekDate`            | Rótulos antigos dos dias úteis       | Legado sem consumidor       |
@@ -23,19 +22,18 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 
 - internas: `components/ui`, `context`, `api`, estilos e tipos compartilhados em
   `src/@types`;
-- externas: React, Router, React Query, React Hook Form, Zod, Radix, Lucide, date-fns, Tailwind e sonner;
+- externas: React, Router, RTK Query, React Hook Form, Zod, Radix, Lucide, date-fns, Tailwind e sonner;
 - módulos relacionados: layouts, agenda e pacientes.
 
 ## Pontos de entrada e fluxos de entrada
 
-- `AppLayout` entra por `Header` e `MenuMobile`;
+- `AppLayout` entra por `AppSidebar`, com a mesma definição tipada de entradas em ambos os breakpoints;
 - `AppointmentsPage` usa apenas componentes de `features/appointments`;
 - `Patient` entra por `AddPatientModal` e `Pagination`;
-- `Header` entra por `AccountMenu`, que consulta o perfil.
 
 ## Arquivos críticos
 
-- `Header/index.tsx` e `account-menu.tsx`: navegação e consulta transversal de perfil;
+- `AppSidebar/index.tsx`: navegação lateral, destinos disponíveis/indisponíveis e card informativo;
 - `AddPatientModal.tsx`: mutation de paciente;
 - `features/appointments/pages/appointments-page.tsx`: fonte da grade semanal;
 - `ui/`: base visual da maioria dos formulários.
@@ -54,6 +52,5 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 - Há componentes compartilhados que possuem regra de negócio e chamadas de API.
 - `Card` e `WeekDate` permanecem como componentes legados sem consumidores e
   podem ser removidos em uma limpeza posterior.
-- O link de pacientes no Header contém espaços finais no caminho.
 - Componentes órfãos devem ser conectados somente após confirmar contrato ou removidos.
 - Novos componentes específicos devem ficar junto à feature até existir reuso comprovado.

@@ -16,12 +16,12 @@ Concentrar os componentes associados diretamente a rotas e coordenar os fluxos d
 ## Dependências internas e externas
 
 - internas: componentes, contexto e API;
-- externas: React Router, React Query, forms, Zod, date-fns, Helmet e bibliotecas visuais;
+- externas: React Router, RTK Query, forms, Zod, date-fns, Helmet e bibliotecas visuais;
 - módulos relacionados: `Router.tsx` e `_layout`.
 
 ## Pontos de entrada e fluxos de entrada
 
-Todas as páginas entram pelo `Router`. Páginas públicas usam `AuthLayout`; páginas internas usam `AppLayout` e, consequentemente, Header/perfil.
+Todas as páginas entram pelo `Router`. Páginas públicas usam `AuthLayout`; páginas internas usam `AppLayout` e a navegação lateral responsiva.
 
 ## Arquivos críticos
 
