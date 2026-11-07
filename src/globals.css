@@ -46,6 +46,10 @@
   --color-brand-muted: var(--brand-muted);
   --color-agenda-surface: var(--agenda-surface);
   --color-agenda-surface-strong: var(--agenda-surface-strong);
+  --color-appointment-yellow: var(--appointment-yellow);
+  --color-appointment-green: var(--appointment-green);
+  --color-appointment-graphite: var(--appointment-graphite);
+  --color-appointment-red: var(--appointment-red);
   --color-appointment-scheduled: var(--appointment-scheduled);
   --color-appointment-scheduled-strong: var(--appointment-scheduled-strong);
   --color-appointment-missed: var(--appointment-missed);
@@ -103,19 +107,23 @@
   --brand-muted: #edf8f2;
   --agenda-surface: #29292e;
   --agenda-surface-strong: #242528;
-  --appointment-scheduled: #02b160;
-  --appointment-scheduled-strong: #019b55;
-  --appointment-missed: #dd4b39;
-  --appointment-missed-strong: #c83e31;
-  --appointment-rescheduled: #ff9d18;
-  --appointment-rescheduled-strong: #e9890f;
-  --appointment-canceled: #4f4d4a;
-  --appointment-canceled-strong: #393735;
-  --appointment-in-progress: #6f7374;
-  --appointment-in-progress-highlight: #7c8182;
-  --appointment-in-progress-strong: #626667;
-  --appointment-completed: #6f7374;
-  --appointment-completed-strong: #55595a;
+  --appointment-yellow: #ffcf2e;
+  --appointment-green: #069b6d;
+  --appointment-graphite: #2f3032;
+  --appointment-red: #f51f3d;
+  --appointment-scheduled: var(--appointment-green);
+  --appointment-scheduled-strong: var(--appointment-green);
+  --appointment-missed: var(--appointment-red);
+  --appointment-missed-strong: var(--appointment-red);
+  --appointment-rescheduled: var(--appointment-yellow);
+  --appointment-rescheduled-strong: var(--appointment-yellow);
+  --appointment-canceled: var(--appointment-graphite);
+  --appointment-canceled-strong: var(--appointment-graphite);
+  --appointment-in-progress: var(--appointment-green);
+  --appointment-in-progress-highlight: var(--appointment-green);
+  --appointment-in-progress-strong: var(--appointment-green);
+  --appointment-completed: var(--appointment-green);
+  --appointment-completed-strong: var(--appointment-green);
 }
 
 .dark {
