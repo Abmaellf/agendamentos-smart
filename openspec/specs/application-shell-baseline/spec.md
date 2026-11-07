@@ -154,6 +154,11 @@ O topbar MUST apresentar um controle de notificações e um controle de perfil c
 - **WHEN** uma pessoa ativar o controle de avatar ou perfil
 - **THEN** a aplicação MUST abrir o menu de conta existente com a identificação disponível do perfil e sem exigir uma nova rota de perfil
 
+#### Scenario: Abrir os detalhes do perfil
+
+- **WHEN** uma pessoa ativar a opção “Perfil” no menu de conta
+- **THEN** a aplicação MUST abrir o modal de detalhes do perfil sobre a rota atual, mantendo o menu e o topbar fora do fluxo de navegação
+
 #### Scenario: Identificar notificações
 
 - **WHEN** o topbar for renderizado

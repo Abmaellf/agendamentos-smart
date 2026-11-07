@@ -33,6 +33,85 @@ describe('consumidores RTK Query', () => {
     expect(await screen.findByText('Ana Conta')).toBeVisible()
   })
 
+  it('abre os dados seguros do perfil e oferece o download da foto', async () => {
+    server.use(
+      http.get('http://localhost:8080/auth/me', () =>
+        HttpResponse.json({
+          id: 'user-a',
+          login: 'ana@clinica.test',
+          password: 'nao-exibir',
+          role: 'ADMIN',
+          clinic: {
+            id: 'clinic-a',
+            code: 1,
+            name: 'Clínica A',
+            createdAt: '2026-01-01T00:00:00.000Z',
+          },
+          username: 'Ana Conta',
+        }),
+      ),
+    )
+
+    const user = userEvent.setup()
+    renderWithProviders(<AccountMenu />)
+
+    const trigger = await screen.findByRole('button', {
+      name: /abrir menu do perfil de ana conta/i,
+    })
+    await user.click(trigger)
+    await user.click(screen.getByRole('menuitem', { name: /perfil/i }))
+
+    expect(
+      await screen.findByRole('dialog', { name: /detalhes do perfil/i }),
+    ).toBeVisible()
+    expect(screen.getByText('ana@clinica.test')).toBeVisible()
+    expect(screen.getByText('ADMIN')).toBeVisible()
+    expect(screen.getByText('Clínica A')).toBeVisible()
+    expect(screen.queryByText('nao-exibir')).not.toBeInTheDocument()
+
+    expect(screen.getByRole('link', { name: /baixar foto/i })).toHaveAttribute(
+      'download',
+      'foto-de-perfil.png',
+    )
+  })
+
+  it('fecha o modal por Escape e devolve o foco ao perfil', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<AccountMenu />)
+
+    const trigger = await screen.findByRole('button', {
+      name: /abrir menu do perfil/i,
+    })
+    await user.click(trigger)
+    await user.click(screen.getByRole('menuitem', { name: /perfil/i }))
+    await screen.findByRole('dialog', { name: /detalhes do perfil/i })
+
+    await user.keyboard('{Escape}')
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(trigger).toHaveFocus()
+  })
+
+  it('comunica quando os dados do perfil não estão disponíveis', async () => {
+    server.use(
+      http.get('http://localhost:8080/auth/me', () => HttpResponse.error()),
+    )
+
+    const user = userEvent.setup()
+    renderWithProviders(<AccountMenu avatarSrc="" />)
+
+    const trigger = await screen.findByRole('button', {
+      name: /abrir menu do perfil/i,
+    })
+    await user.click(trigger)
+    await user.click(screen.getByRole('menuitem', { name: /perfil/i }))
+
+    expect(
+      await screen.findByText(/dados do perfil não estão disponíveis/i),
+    ).toBeVisible()
+    expect(screen.queryByRole('link', { name: /baixar foto/i })).not.toBeInTheDocument()
+  })
+
   it('envia o cadastro de paciente sem alterar o payload', async () => {
     let body: unknown
     server.use(
