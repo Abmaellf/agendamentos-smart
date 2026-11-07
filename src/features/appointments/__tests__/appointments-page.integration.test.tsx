@@ -188,6 +188,109 @@ describe('integração da criação com a agenda semanal', () => {
     )
   })
 
+  it('renderiza a matriz semanal com régua horária, cabeçalhos e o dia atual', async () => {
+    apiScenario.appointments = [
+      {
+        ...createdAppointment,
+        startsAt: '2026-08-13T14:00:00.000Z',
+      },
+    ]
+    renderAppointmentsPage()
+
+    const weeklyGrid = await screen.findByTestId('weekly-appointments')
+    const headers = within(weeklyGrid).getAllByRole('columnheader')
+
+    expect(
+      headers.map((header) => header.textContent?.replace(/\s+/g, ' ').trim()),
+    ).toEqual([
+      'Segunda10 de Agosto',
+      'Terça11 de Agosto',
+      'Quarta12 de Agosto',
+      'Quinta13 de AgostoHoje',
+      'Sexta14 de Agosto',
+    ])
+    expect(
+      within(weeklyGrid).getByTestId('appointments-day-header-2026-08-13'),
+    ).toHaveAttribute('data-selected', 'true')
+    expect(
+      within(weeklyGrid).getByTestId('weekly-appointments-time-ruler'),
+    ).toHaveTextContent('07:00')
+    expect(
+      within(weeklyGrid).getByTestId('weekly-appointments-time-ruler'),
+    ).toHaveTextContent('18:00')
+    expect(within(weeklyGrid).getAllByRole('region')).toHaveLength(5)
+    expect(within(weeklyGrid).getAllByLabelText('Calendário')).toHaveLength(5)
+  })
+
+  it('posiciona cards por duração e distribui sobreposições lateralmente', async () => {
+    apiScenario.appointments = [
+      {
+        ...createdAppointment,
+        id: 'appointment-first',
+        patient: { ...createdAppointment.patient, name: 'Primeiro paciente' },
+        startsAt: '2026-08-13T14:00:00.000Z',
+        durationMinutes: 60,
+      },
+      {
+        ...createdAppointment,
+        id: 'appointment-second',
+        patient: { ...createdAppointment.patient, name: 'Segundo paciente' },
+        startsAt: '2026-08-13T14:30:00.000Z',
+        durationMinutes: 60,
+      },
+      {
+        ...createdAppointment,
+        id: 'appointment-after-hours',
+        patient: {
+          ...createdAppointment.patient,
+          name: 'Paciente fora da janela',
+        },
+        startsAt: '2026-08-13T21:30:00.000Z',
+        durationMinutes: 120,
+      },
+    ]
+    renderAppointmentsPage()
+
+    const first = await screen.findByTestId('appointment-appointment-first')
+    const second = screen.getByTestId('appointment-appointment-second')
+    const afterHours = screen.getByTestId(
+      'appointment-appointment-after-hours',
+    )
+
+    expect(first).toHaveAttribute('data-top-minutes', '180')
+    expect(first).toHaveAttribute('data-height-minutes', '60')
+    expect(first).toHaveAttribute('data-lane', '0')
+    expect(second).toHaveAttribute('data-lane', '1')
+    expect(first).toHaveAttribute('data-lane-count', '2')
+    expect(second).toHaveAttribute('data-lane-count', '2')
+    expect(afterHours).toHaveAttribute('data-top-minutes', '630')
+    expect(afterHours).toHaveAttribute('data-height-minutes', '120')
+  })
+
+  it('exibe a legenda completa e mantém a matriz rolável em telas estreitas', async () => {
+    renderAppointmentsPage()
+
+    const weeklyGrid = await screen.findByTestId('weekly-appointments')
+    const legend = within(weeklyGrid).getByTestId('appointments-legend')
+
+    expect(legend).toHaveTextContent('Aguardando atendimento')
+    expect(legend).toHaveTextContent('Paciente agendado')
+    expect(legend).toHaveTextContent('Atendida')
+    expect(legend).toHaveTextContent('Atendimento realizado')
+    expect(legend).toHaveTextContent('Cancelado')
+    expect(legend).toHaveTextContent('Agendamento cancelado')
+    expect(legend).toHaveTextContent('Falta')
+    expect(legend).toHaveTextContent('Paciente não compareceu')
+    expect(legend.querySelectorAll('li')).toHaveLength(4)
+    expect(
+      within(weeklyGrid).getByTestId('weekly-appointments-scroll'),
+    ).toHaveClass('overflow-x-auto')
+    expect(
+      within(weeklyGrid).getByTestId('weekly-appointments-scroll')
+        .firstElementChild,
+    ).toHaveClass('min-w-[70rem]')
+  })
+
   it('WB-17 apresenta os dados retornados pela API no fuso da unidade', async () => {
     apiScenario.appointments = [
       {
@@ -198,7 +301,11 @@ describe('integração da criação com a agenda semanal', () => {
     renderAppointmentsPage()
 
     expect(await screen.findByText('Ana Paciente')).toBeVisible()
-    expect(screen.getByText('10:00')).toBeVisible()
+    expect(
+      within(screen.getByTestId('weekly-appointments-time-ruler')).getByText(
+        '10:00',
+      ),
+    ).toBeVisible()
     expect(apiScenario.appointmentQueries[0]?.get('unitId')).toBe('unit-a')
     expect(apiScenario.appointmentQueries[0]?.get('from')).toBeTruthy()
     expect(apiScenario.appointmentQueries[0]?.get('to')).toBeTruthy()
@@ -237,15 +344,15 @@ describe('integração da criação com a agenda semanal', () => {
   })
 
   it.each([
-    ['AGENDADO', 'bg-appointment-scheduled'],
-    ['FALTA', 'bg-appointment-missed'],
-    ['REAGENDADO', 'bg-appointment-rescheduled'],
-    ['CANCELADO', 'bg-appointment-canceled'],
-    ['EMATENDIMENTO', 'bg-appointment-in-progress'],
-    ['FINALIZADO', 'bg-appointment-completed'],
+    ['AGENDADO', 'bg-appointment-yellow', 'text-black'],
+    ['FALTA', 'bg-appointment-red', 'text-white'],
+    ['REAGENDADO', 'bg-appointment-yellow', 'text-black'],
+    ['CANCELADO', 'bg-appointment-graphite', 'text-white'],
+    ['EMATENDIMENTO', 'bg-appointment-green', 'text-white'],
+    ['FINALIZADO', 'bg-appointment-green', 'text-white'],
   ] as const)(
-    'aplica o token visual do status %s',
-    async (status, colorToken) => {
+    'aplica o token visual e o contraste do status %s',
+    async (status, colorToken, textToken) => {
       apiScenario.appointments = [
         {
           ...createdAppointment,
@@ -261,9 +368,30 @@ describe('integração da criação com a agenda semanal', () => {
         `appointment-appointment-${status.toLowerCase()}`,
       )
       expect(card).toHaveAttribute('data-status', status)
-      expect(card).toHaveClass(colorToken)
+      expect(card).toHaveClass(colorToken, textToken)
     },
   )
+
+  it('preserva o conteúdo completo em nomes e serviços longos', async () => {
+    const patientName = 'Paciente com nome completo para coluna estreita'
+    const serviceName = 'Atendimento individual de reabilitação funcional'
+    apiScenario.appointments = [
+      {
+        ...createdAppointment,
+        patient: { ...createdAppointment.patient, name: patientName },
+        service: { ...createdAppointment.service, name: serviceName },
+        startsAt: '2026-08-13T14:00:00.000Z',
+      },
+    ]
+
+    renderAppointmentsPage()
+
+    const card = await screen.findByTestId('appointment-appointment-created')
+    expect(within(card).getByText(patientName)).toHaveClass('break-words')
+    expect(within(card).getByText(serviceName)).toHaveClass('break-words')
+    expect(within(card).getByText('AGENDADO')).toHaveClass('sr-only')
+    expect(card).toHaveAttribute('aria-label', expect.stringContaining('10:00'))
+  })
 
   it('WB-18 disponibiliza e abre a criação para sessão operacional autenticada', async () => {
     const user = userEvent.setup()
