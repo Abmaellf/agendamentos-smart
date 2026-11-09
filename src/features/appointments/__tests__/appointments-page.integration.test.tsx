@@ -2,7 +2,10 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent, { type UserEvent } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createdAppointment } from '@/test/builders/appointment'
+import {
+  backendAppointmentFixtures,
+  createdAppointment,
+} from '@/test/builders/appointment'
 import { AppLayout } from '@/_layout/app'
 import { renderWithProviders } from '@/test/render'
 import { apiScenario } from '@/test/server'
@@ -309,6 +312,23 @@ describe('integração da criação com a agenda semanal', () => {
     expect(apiScenario.appointmentQueries[0]?.get('unitId')).toBe('unit-a')
     expect(apiScenario.appointmentQueries[0]?.get('from')).toBeTruthy()
     expect(apiScenario.appointmentQueries[0]?.get('to')).toBeTruthy()
+  })
+
+  it('interpreta o envelope real e renderiza os três agendamentos da resposta', async () => {
+    vi.setSystemTime(new Date('2026-11-09T12:00:00-04:00'))
+    apiScenario.appointments = [...backendAppointmentFixtures]
+
+    renderAppointmentsPage()
+
+    expect(await screen.findAllByText('Ana Oliveira')).toHaveLength(2)
+    expect(screen.getByText('Carla Mendes')).toBeVisible()
+    expect(screen.getAllByText('Turma de reabilitação')).toHaveLength(2)
+    expect(screen.getByText('Pilates')).toBeVisible()
+    expect(screen.getAllByText('R$ 150,00')).toHaveLength(3)
+    expect(
+      screen.getByTestId('appointment-50000000-0000-4000-8000-000000000001'),
+    ).toHaveAttribute('data-status', 'AGENDADO')
+    expect(apiScenario.appointmentQueries[0]?.get('unitId')).toBe('unit-a')
   })
 
   it('atualiza a semana por meio do seletor de data', async () => {

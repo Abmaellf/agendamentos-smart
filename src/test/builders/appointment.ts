@@ -20,7 +20,7 @@ export interface TestAppointment {
   startsAt: string
   timeZone: string
   durationMinutes: number
-  price: string
+  price: number
   status:
     | 'AGENDADO'
     | 'FALTA'
@@ -30,6 +30,12 @@ export interface TestAppointment {
     | 'FINALIZADO'
   createdBy: string
   createdAt: string
+  patientId: string
+  pathology: string[]
+  appointmentDate: string
+  hours: string
+  variant: string
+  updatedAt: string
 }
 
 export const adminSession: TestSession = {
@@ -115,8 +121,101 @@ export const createdAppointment: TestAppointment = {
   startsAt: '2026-08-20T12:30:00.000Z',
   timeZone: 'America/Cuiaba',
   durationMinutes: 60,
-  price: '150.00',
+  price: 150,
   status: 'AGENDADO',
   createdBy: 'user-admin',
   createdAt: '2026-08-13T15:00:00.000Z',
+  patientId: 'patient-a',
+  pathology: [],
+  appointmentDate: '2026-08-20T08:30:00',
+  hours: '08:30:00',
+  variant: 'primary',
+  updatedAt: '2026-08-13T15:00:00.000Z',
 }
+
+export const backendAppointmentFixtures: TestAppointment[] = [
+  {
+    id: '50000000-0000-4000-8000-000000000001',
+    tenantId: '70000000-0000-4000-8000-000000000001',
+    unitId: '60000000-0000-4000-8000-000000000001',
+    patient: {
+      id: '20000000-0000-4000-8000-000000000001',
+      name: 'Ana Oliveira',
+    },
+    service: {
+      id: '40000000-0000-4000-8000-000000000003',
+      name: 'Turma de reabilitação',
+    },
+    professional: null,
+    startsAt: '2026-11-09T12:30:00.000Z',
+    timeZone: 'America/Cuiaba',
+    durationMinutes: 60,
+    price: 150,
+    status: 'AGENDADO',
+    createdBy: '10000000-0000-4000-8000-000000000001',
+    createdAt: '2026-11-08T16:14:23.683549Z',
+    patientId: '20000000-0000-4000-8000-000000000001',
+    pathology: [],
+    appointmentDate: '2026-11-09T04:30:00',
+    hours: '04:30:00',
+    variant: 'primary',
+    updatedAt: '2026-11-08T16:14:23.683549Z',
+  },
+  {
+    id: '50000000-0000-4000-8000-000000000003',
+    tenantId: '70000000-0000-4000-8000-000000000001',
+    unitId: '60000000-0000-4000-8000-000000000001',
+    patient: {
+      id: '20000000-0000-4000-8000-000000000003',
+      name: 'Carla Mendes',
+    },
+    service: {
+      id: '40000000-0000-4000-8000-000000000001',
+      name: 'Pilates',
+    },
+    professional: {
+      id: '30000000-0000-4000-8000-000000000002',
+      name: 'Diego Profissional',
+    },
+    startsAt: '2026-11-11T14:00:00.000Z',
+    timeZone: 'America/Cuiaba',
+    durationMinutes: 60,
+    price: 150,
+    status: 'AGENDADO',
+    createdBy: '10000000-0000-4000-8000-000000000001',
+    createdAt: '2026-11-08T16:14:23.683549Z',
+    patientId: '20000000-0000-4000-8000-000000000003',
+    pathology: [],
+    appointmentDate: '2026-11-11T06:00:00',
+    hours: '06:00:00',
+    variant: 'primary',
+    updatedAt: '2026-11-08T16:14:23.683549Z',
+  },
+  {
+    id: '50000000-0000-4000-8000-000000000005',
+    tenantId: '70000000-0000-4000-8000-000000000001',
+    unitId: '60000000-0000-4000-8000-000000000001',
+    patient: {
+      id: '20000000-0000-4000-8000-000000000001',
+      name: 'Ana Oliveira',
+    },
+    service: {
+      id: '40000000-0000-4000-8000-000000000003',
+      name: 'Turma de reabilitação',
+    },
+    professional: null,
+    startsAt: '2026-11-13T20:00:00.000Z',
+    timeZone: 'America/Cuiaba',
+    durationMinutes: 60,
+    price: 150,
+    status: 'AGENDADO',
+    createdBy: '10000000-0000-4000-8000-000000000001',
+    createdAt: '2026-11-08T16:14:23.683549Z',
+    patientId: '20000000-0000-4000-8000-000000000001',
+    pathology: [],
+    appointmentDate: '2026-11-13T12:00:00',
+    hours: '12:00:00',
+    variant: 'primary',
+    updatedAt: '2026-11-08T16:14:23.683549Z',
+  },
+]

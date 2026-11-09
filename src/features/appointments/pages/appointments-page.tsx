@@ -76,7 +76,7 @@ const legendItems = [
   },
 ] as const
 
-function currency(value: string) {
+function currency(value: number) {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
