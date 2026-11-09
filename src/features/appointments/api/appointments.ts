@@ -17,6 +17,8 @@ interface ContentResponse<T> {
 
 type CollectionResponse<T> = ContentResponse<T> | T[]
 
+type AppointmentsResponse = ContentResponse<Appointment>
+
 function contentOf<T>(value: CollectionResponse<T>) {
   return Array.isArray(value) ? value : value.content
 }
@@ -69,7 +71,7 @@ export const appointmentsApi = baseApi.injectEndpoints({
     >({
       query: (params) => ({ url: '/api/appointments', params }),
       transformResponse: (response: unknown) =>
-        contentOf(response as CollectionResponse<Appointment>),
+        (response as AppointmentsResponse).content,
       providesTags: [{ type: 'Appointment', id: 'LIST' }],
     }),
   }),

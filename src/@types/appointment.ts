@@ -40,6 +40,21 @@ export interface ProfessionalOption {
   availableWeekDays: number[]
 }
 
+export interface AppointmentPatient {
+  id: string
+  name: string
+}
+
+export interface AppointmentService {
+  id: string
+  name: string
+}
+
+export interface AppointmentProfessional {
+  id: string
+  name: string
+}
+
 export interface CreateAppointmentInput {
   patientId: string
   unitId: string
@@ -62,16 +77,22 @@ export interface Appointment {
   id: string
   tenantId: string
   unitId: string
-  patient: PatientOption
-  service: ServiceOption
-  professional: ProfessionalOption | null
+  patient: AppointmentPatient
+  service: AppointmentService
+  professional: AppointmentProfessional | null
   startsAt: string
   durationMinutes: number
-  price: string
+  price: number
   status: AppointmentStatus
   timeZone: string
-  createdByUserId: string
+  createdBy: string
   createdAt: string
+  patientId: string
+  pathology: string[]
+  appointmentDate: string
+  hours: string
+  variant: string
+  updatedAt: string
 }
 
 export interface AppointmentApiError {
