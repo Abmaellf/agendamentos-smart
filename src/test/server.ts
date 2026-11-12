@@ -96,9 +96,11 @@ const handlers = [
       role: adminSession.user.role,
       tenantId: adminSession.tenantId,
       activeUnitId: adminSession.activeUnitId,
+      clinicName: 'Equilíbrio',
+      unitName: 'Matriz',
     }),
   ),
-  http.get('http://localhost:8080/api/patients', () =>
+  http.get('http://localhost:8080/patient/list', () =>
     catalogResponse('patients'),
   ),
   http.get('http://localhost:8080/api/units', () => catalogResponse('units')),

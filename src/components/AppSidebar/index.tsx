@@ -14,6 +14,7 @@ import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
 import { cn } from '@/lib/utils'
+import { useGetProfileQuery } from '@/api/get-profile'
 
 type AvailableNavigationItem = {
   label: string
@@ -87,6 +88,9 @@ const sidebarSurfaceClassName =
   'bg-[#143f32] text-white shadow-[0_18px_42px_rgb(11_43_33_/_22%)]'
 
 function Brand({ isCollapsed }: { isCollapsed: boolean }) {
+  const { data: profile } = useGetProfileQuery()
+  const clinicName = profile?.clinicName ?? profile?.clinic?.name
+  const unitName = profile?.unitName ?? profile?.activeUnitName
   return (
     <div
       className={cn(
@@ -97,15 +101,15 @@ function Brand({ isCollapsed }: { isCollapsed: boolean }) {
       <div className={cn('flex items-center gap-3', isCollapsed && 'justify-center')}>
         <span
           aria-hidden="true"
-          title="Equilíbrio — Fisioterapia & Pilates"
+          title={clinicName && unitName ? `${clinicName} — ${unitName}` : undefined}
           className="grid size-10 place-items-center rounded-xl bg-[#78c85e] text-lg font-bold text-[#143f32] shadow-sm"
         >
           E
         </span>
         {!isCollapsed ? (
           <div>
-            <p className="text-base font-semibold tracking-tight">Equilíbrio</p>
-            <p className="text-xs text-white/65">Fisioterapia &amp; Pilates</p>
+            <p className="text-base font-semibold tracking-tight">{clinicName ?? 'Clínica indisponível'}</p>
+            <p className="text-xs text-white/65">{unitName ?? 'Unidade indisponível'}</p>
           </div>
         ) : null}
       </div>

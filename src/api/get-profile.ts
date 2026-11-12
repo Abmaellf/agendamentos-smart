@@ -4,7 +4,6 @@ import { baseApi } from '@/lib/base-api'
 export interface GetProfileResponse {
     id: string
     login: string
-    password: string
     role: string
     clinic:{
         id: string
@@ -13,6 +12,9 @@ export interface GetProfileResponse {
         createdAt: string 
     },
     username: string
+    clinicName?: string
+    unitName?: string
+    activeUnitName?: string
 }
 
 export const profileApi = baseApi.injectEndpoints({
@@ -28,6 +30,5 @@ export const { useGetProfileQuery } = profileApi
 
 export async function getProfile() {
   const response = await api.get<GetProfileResponse>('auth/me')
-  console.log(response)
   return response.data
 }
