@@ -1,9 +1,9 @@
 import type { AppointmentApiError } from '@/@types/appointment'
 
 const messages: Record<string, string> = {
-  PATIENT_SCHEDULE_CONFLICT:
+  PATIENT_APPOINTMENT_CONFLICT:
     'O paciente já possui outro agendamento nesse horário.',
-  PROFESSIONAL_SCHEDULE_CONFLICT:
+  PROFESSIONAL_APPOINTMENT_CONFLICT:
     'O profissional já possui outro agendamento nesse horário.',
   SERVICE_CAPACITY_EXCEEDED:
     'A capacidade do serviço está esgotada nesse horário.',
@@ -23,8 +23,13 @@ export function appointmentErrorMessage(error: unknown) {
     typeof data === 'object' && data !== null && 'code' in data
       ? (data as AppointmentApiError).code
       : undefined
+  const apiMessage =
+    typeof data === 'object' && data !== null && 'message' in data
+      ? (data as AppointmentApiError).message
+      : undefined
 
   if (code && messages[code]) return messages[code]
+  if (apiMessage) return apiMessage
 
   return 'Não foi possível criar o agendamento. Tente novamente.'
 }

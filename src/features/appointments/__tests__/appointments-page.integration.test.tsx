@@ -38,9 +38,12 @@ async function chooseOption(
   await user.click(await screen.findByRole('option', { name: optionName }))
 }
 
-async function fillAndSubmitAppointment(user: UserEvent) {
+async function fillAndSubmitAppointment(
+  user: UserEvent,
+  patientName: RegExp = /ana paciente/i,
+) {
   await user.click(screen.getByRole('button', { name: /novo agendamento/i }))
-  await chooseOption(user, /^paciente/i, /ana paciente/i)
+  await chooseOption(user, /^paciente/i, patientName)
   await chooseOption(user, /^unidade/i, /unidade centro/i)
   await chooseOption(user, /^serviço/i, /pilates/i)
 
@@ -92,6 +95,38 @@ describe('integração da criação com a agenda semanal', () => {
     await waitFor(() =>
       expect(apiScenario.appointmentQueries).toHaveLength(2),
     )
+  })
+
+  it('permite criar para outro paciente em um horário já ocupado quando a API aceita a vaga', async () => {
+    const user = userEvent.setup()
+    apiScenario.appointments = [
+      {
+        ...createdAppointment,
+        id: 'appointment-existing-group',
+        startsAt: '2026-08-14T12:30:00.000Z',
+      },
+    ]
+    apiScenario.createdAppointment = {
+      ...createdAppointment,
+      id: 'appointment-new-group',
+      patient: { id: 'patient-b', name: 'Bia Paciente' },
+      patientId: 'patient-b',
+      startsAt: '2026-08-14T12:30:00.000Z',
+    }
+    renderAppointmentsPage()
+
+    await screen.findByTestId('appointment-appointment-existing-group')
+    await fillAndSubmitAppointment(user, /bia paciente/i)
+
+    await waitFor(() =>
+      expect(apiScenario.createRequests).toHaveLength(1),
+    )
+    expect(apiScenario.createRequests[0]).toMatchObject({ patientId: 'patient-b' })
+    expect(
+      await screen.findByTestId('appointment-appointment-new-group'),
+    ).toHaveAttribute('data-lane-count', '2')
+    expect(screen.getByText('Ana Paciente')).toBeVisible()
+    expect(screen.getByText('Bia Paciente')).toBeVisible()
   })
 
   it('WB-17 apresenta carregamento da agenda', () => {
@@ -268,6 +303,32 @@ describe('integração da criação com a agenda semanal', () => {
     expect(second).toHaveAttribute('data-lane-count', '2')
     expect(afterHours).toHaveAttribute('data-top-minutes', '630')
     expect(afterHours).toHaveAttribute('data-height-minutes', '120')
+  })
+
+  it('apresenta todos os pacientes de uma turma simultânea em cartões identificáveis', async () => {
+    apiScenario.appointments = Array.from({ length: 5 }, (_, index) => ({
+      ...createdAppointment,
+      id: `appointment-group-${index + 1}`,
+      patient: {
+        id: `patient-group-${index + 1}`,
+        name: `Paciente da turma ${index + 1}`,
+      },
+      startsAt: '2026-08-13T14:00:00.000Z',
+      durationMinutes: 60,
+    }))
+    renderAppointmentsPage()
+
+    for (let index = 0; index < 5; index += 1) {
+      const patientName = `Paciente da turma ${index + 1}`
+      const card = await screen.findByTestId(`appointment-appointment-group-${index + 1}`)
+
+      expect(card).toHaveAttribute('data-lane', String(index))
+      expect(card).toHaveAttribute('data-lane-count', '5')
+      expect(card).toHaveAttribute('data-density', 'compact')
+      expect(card).toHaveAttribute('title', expect.stringContaining(patientName))
+      expect(within(card).getByText(patientName)).toBeVisible()
+      expect(within(card).getByText('Pilates')).toBeVisible()
+    }
   })
 
   it('exibe a legenda completa e mantém a matriz rolável em telas estreitas', async () => {

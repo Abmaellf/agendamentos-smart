@@ -295,8 +295,8 @@ describe('diálogo de criação manual', () => {
   })
 
   it.each([
-    ['PATIENT_SCHEDULE_CONFLICT', /paciente.*outro agendamento/i],
-    ['PROFESSIONAL_SCHEDULE_CONFLICT', /profissional.*outro agendamento/i],
+    ['PATIENT_APPOINTMENT_CONFLICT', /paciente.*outro agendamento/i],
+    ['PROFESSIONAL_APPOINTMENT_CONFLICT', /profissional.*outro agendamento/i],
     ['SERVICE_CAPACITY_EXCEEDED', /capacidade.*esgotada/i],
     ['APPOINTMENT_OVERRIDE_FORBIDDEN', /somente administradores/i],
     ['TENANT_RESOURCE_NOT_FOUND', /cadastro não encontrado/i],
@@ -313,6 +313,19 @@ describe('diálogo de criação manual', () => {
     expect(
       screen.getByRole('dialog', { name: /novo agendamento/i }),
     ).toBeVisible()
+  })
+
+  it('WB-13 exibe a mensagem da API quando o código ainda não possui tradução', async () => {
+    apiScenario.createErrorCode = 'NEW_DOMAIN_RULE'
+    const { user } = await renderDialog()
+    await openDialog(user)
+    await fillValidForm(user)
+
+    await submit(user)
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Criação recusada pelo domínio',
+    )
   })
 
   it('WB-14 preserva o formulário após erro de rede desconhecido', async () => {

@@ -105,6 +105,27 @@ function maxConcurrent(intervals: PositionedInterval[]) {
   return Math.max(maximum, 1)
 }
 
+function overlapGroups(intervals: PositionedInterval[]) {
+  const groups: PositionedInterval[][] = []
+  let group: PositionedInterval[] = []
+  let latestEndMinute = -Infinity
+
+  for (const interval of intervals) {
+    if (group.length > 0 && interval.startMinutes >= latestEndMinute) {
+      groups.push(group)
+      group = []
+      latestEndMinute = -Infinity
+    }
+
+    group.push(interval)
+    latestEndMinute = Math.max(latestEndMinute, interval.endMinutes)
+  }
+
+  if (group.length > 0) groups.push(group)
+
+  return groups
+}
+
 function placeAppointments(appointments: Appointment[]) {
   const intervals = appointments
     .map((appointment) => {
@@ -137,8 +158,10 @@ function placeAppointments(appointments: Appointment[]) {
     return { ...interval, lane }
   })
 
-  const laneCount = maxConcurrent(withLanes)
-  return withLanes.map((interval) => ({ ...interval, laneCount }))
+  return overlapGroups(withLanes).flatMap((group) => {
+    const laneCount = maxConcurrent(group)
+    return group.map((interval) => ({ ...interval, laneCount }))
+  })
 }
 
 export function buildWeeklyAppointmentGrid(

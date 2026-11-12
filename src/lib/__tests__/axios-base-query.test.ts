@@ -33,7 +33,7 @@ describe('axiosBaseQuery', () => {
 
   it('serializa resposta HTTP e falha de rede no formato do RTK Query', async () => {
     vi.mocked(api.request).mockRejectedValueOnce({
-      response: { status: 409, data: { code: 'PATIENT_SCHEDULE_CONFLICT' } },
+      response: { status: 409, data: { code: 'PATIENT_APPOINTMENT_CONFLICT' } },
     })
     vi.mocked(api.request).mockRejectedValueOnce(new Error('Network Error'))
 
@@ -42,7 +42,7 @@ describe('axiosBaseQuery', () => {
     ).resolves.toEqual({
       error: {
         status: 409,
-        data: { code: 'PATIENT_SCHEDULE_CONFLICT' },
+        data: { code: 'PATIENT_APPOINTMENT_CONFLICT' },
       },
     })
     await expect(
