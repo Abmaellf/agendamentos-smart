@@ -31,7 +31,7 @@ export const appointmentsApi = baseApi.injectEndpoints({
       providesTags: ['Session'],
     }),
     getPatients: builder.query<PatientOption[], void>({
-      query: () => ({ url: '/api/patients' }),
+      query: () => ({ url: '/patient/list' }),
       transformResponse: (response: unknown) =>
         contentOf(response as CollectionResponse<PatientOption>),
       providesTags: ['PatientCatalog'],

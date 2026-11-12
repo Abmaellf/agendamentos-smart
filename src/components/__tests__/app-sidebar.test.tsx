@@ -42,11 +42,9 @@ function renderLayout(route: string, isCompact = false) {
 
 describe('AppSidebar', () => {
   it('apresenta os destinos disponíveis e marca a rota ativa', () => {
-    render(
-      <MemoryRouter initialEntries={['/appointments']}>
-        <AppSidebar variant="desktop" />
-      </MemoryRouter>,
-    )
+    renderWithProviders(<AppSidebar variant="desktop" />, {
+      route: '/appointments',
+    })
 
     expect(screen.getByRole('link', { name: 'Início' })).toHaveAttribute(
       'href',
@@ -90,7 +88,7 @@ describe('AppSidebar', () => {
       'title',
       'Agenda',
     )
-    expect(screen.queryByText('Fisioterapia & Pilates')).not.toBeInTheDocument()
+    expect(screen.queryByText('Matriz')).not.toBeInTheDocument()
 
     await user.click(
       screen.getByRole('button', { name: /expandir menu lateral/i }),
@@ -99,7 +97,7 @@ describe('AppSidebar', () => {
     expect(
       screen.getByRole('button', { name: /recolher menu lateral/i }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Fisioterapia & Pilates')).toBeInTheDocument()
+    expect(screen.getByText('Matriz')).toBeInTheDocument()
   })
 
   it('abre o painel compacto, bloqueia a rolagem e fecha por Escape com foco restaurado', async () => {

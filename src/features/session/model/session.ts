@@ -6,6 +6,8 @@ const sessionProfileSchema = z.object({
   role: z.enum(['ADMIN', 'BASIC']),
   tenantId: z.string().min(1),
   activeUnitId: z.string().min(1),
+  clinicName: z.string().min(1).optional(),
+  unitName: z.string().min(1).optional(),
 })
 
 export interface SessionProfile {
@@ -17,6 +19,8 @@ export interface SessionProfile {
   }
   tenantId: string
   activeUnitId: string
+  clinicName?: string
+  unitName?: string
 }
 
 export function parseSessionProfile(value: unknown): SessionProfile {
@@ -35,5 +39,7 @@ export function parseSessionProfile(value: unknown): SessionProfile {
     },
     tenantId: parsed.tenantId,
     activeUnitId: parsed.activeUnitId,
+    ...(parsed.clinicName ? { clinicName: parsed.clinicName } : {}),
+    ...(parsed.unitName ? { unitName: parsed.unitName } : {}),
   }
 }

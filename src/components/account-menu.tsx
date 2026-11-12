@@ -127,7 +127,11 @@ export default function AccountMenu({ avatarSrc = avatar }: AccountMenuProps) {
                 </div>
                 <div>
                   <dt className="text-muted-foreground">Clínica</dt>
-                  <dd className="font-medium">{profile.clinic?.name || 'Não informado'}</dd>
+                  <dd className="font-medium">{profile.clinicName || profile.clinic?.name || 'Não informado'}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">Unidade</dt>
+                  <dd className="font-medium">{profile.unitName || profile.activeUnitName || 'Não informado'}</dd>
                 </div>
               </dl>
             </div>
