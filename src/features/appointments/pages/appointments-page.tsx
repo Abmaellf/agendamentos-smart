@@ -360,9 +360,16 @@ export function AppointmentsPage() {
                                 data-height-minutes={positioned.heightMinutes}
                                 data-lane={positioned.lane}
                                 data-lane-count={positioned.laneCount}
+                                data-density={
+                                  positioned.laneCount > 2 ? 'compact' : 'regular'
+                                }
                                 aria-label={`${positioned.appointment.patient.name}, ${positioned.appointment.service.name}, ${positioned.localTime}, ${statusLabel}`}
+                                title={`${positioned.appointment.patient.name} — ${positioned.appointment.service.name} — ${statusLabel}`}
                                 className={cn(
-                                  'absolute z-[1] flex min-w-0 flex-col justify-center gap-0.5 overflow-auto rounded-[0.35rem] border border-white/80 px-2 py-1.5 text-sm leading-tight shadow-[0_4px_10px_rgb(32_32_36_/_16%)] transition-[transform,box-shadow,filter] duration-[160ms] hover:z-[2] hover:-translate-y-0.5 hover:saturate-[1.04] hover:shadow-[0_8px_16px_rgb(32_32_36_/_22%)]',
+                                  'absolute z-[1] flex min-w-0 flex-col justify-center gap-0.5 overflow-auto rounded-[0.35rem] border border-white/80 leading-tight shadow-[0_4px_10px_rgb(32_32_36_/_16%)] transition-[transform,box-shadow,filter] duration-[160ms] hover:z-[2] hover:-translate-y-0.5 hover:saturate-[1.04] hover:shadow-[0_8px_16px_rgb(32_32_36_/_22%)]',
+                                  positioned.laneCount > 2
+                                    ? 'px-1 py-1 text-xs'
+                                    : 'px-2 py-1.5 text-sm',
                                   appointmentStatusClassNames[
                                     positioned.appointment.status
                                   ],

@@ -47,7 +47,7 @@ describe('modelo da grade horária semanal', () => {
     expect(appointmentLocalTime(appointment)).toBe('23:30')
   })
 
-  it('distribui dois, três e múltiplos agendamentos simultâneos em faixas estáveis', () => {
+  it('distribui dois, três e cinco agendamentos simultâneos em faixas estáveis', () => {
     const appointments = [
       makeAppointment({
         id: 'appointment-a',
@@ -66,7 +66,17 @@ describe('modelo da grade horária semanal', () => {
       }),
       makeAppointment({
         id: 'appointment-d',
-        startsAt: '2026-08-13T15:45:00.000Z',
+        startsAt: '2026-08-13T14:45:00.000Z',
+        durationMinutes: 15,
+      }),
+      makeAppointment({
+        id: 'appointment-e',
+        startsAt: '2026-08-13T14:45:00.000Z',
+        durationMinutes: 30,
+      }),
+      makeAppointment({
+        id: 'appointment-adjacent',
+        startsAt: '2026-08-13T15:30:00.000Z',
         durationMinutes: 30,
       }),
     ]
@@ -80,8 +90,13 @@ describe('modelo da grade horária semanal', () => {
       ['appointment-a', 0],
       ['appointment-b', 1],
       ['appointment-c', 2],
-      ['appointment-d', 0],
+      ['appointment-e', 3],
+      ['appointment-d', 4],
+      ['appointment-adjacent', 0],
     ])
-    expect(day?.appointments.every((item) => item.laneCount === 3)).toBe(true)
+    expect(day?.appointments.slice(0, 5).every((item) => item.laneCount === 5)).toBe(
+      true,
+    )
+    expect(day?.appointments[5]).toMatchObject({ lane: 0, laneCount: 1 })
   })
 })

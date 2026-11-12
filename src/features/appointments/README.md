@@ -53,6 +53,15 @@ fechado e a mutação de criação invalida
   apresentados pelo formulário.
 - Data e horário são normalizados conforme o fuso IANA da unidade.
 
+### Atendimentos em grupo
+
+Cada registro representa um único paciente. Portanto, para formar uma turma, a
+interface envia uma criação independente para cada paciente, inclusive quando o
+intervalo já contém outro agendamento. A API é a única autoridade para aceitar
+uma vaga, bloquear sobreposição do próprio paciente ou profissional e recusar
+capacidade esgotada. Quando aceitos, os registros simultâneos aparecem lado a
+lado na grade semanal, com cartão e estado próprios por paciente.
+
 Estados além de `AGENDADO`, recorrência, remarcação e cancelamento fazem parte
 da especificação do MVP, mas ainda não estão implementados integralmente neste
 módulo.
