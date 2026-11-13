@@ -43,6 +43,11 @@ dias úteis. O `AppTopbar` fornece a navegação temporal e abre o
 dos controles de catálogo. Paciente, unidade, serviço e profissional podem ser
 localizados por trecho do nome no dropdown; essa filtragem ocorre localmente
 sobre o catálogo já carregado e não cria contrato de busca remota.
+A unidade do usuário `BASIC` é inicializada a partir de `activeUnitId`, fica
+visível porém sem edição e só pode ser enviada quando estiver presente no
+catálogo autorizado pela API. `ADMIN` mantém a seleção editável entre as
+unidades retornadas. Essa regra visual não substitui o escopo e a autorização
+aplicados pelo backend.
 A consulta de agenda só inicia após a sessão. O diálogo usa `skip` enquanto
 fechado e a mutação de criação invalida
 `Appointment/LIST`, fazendo a semana visível ser consultada novamente.

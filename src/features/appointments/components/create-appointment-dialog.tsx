@@ -32,9 +32,9 @@ import {
   toCreateAppointmentInput,
 } from '../model/appointment-form-schema'
 
-const emptyForm = (defaultDate = ''): AppointmentFormState => ({
+const emptyForm = (defaultDate = '', unitId = ''): AppointmentFormState => ({
   patientId: '',
-  unitId: '',
+  unitId,
   serviceId: '',
   professionalId: '',
   date: defaultDate,
@@ -77,6 +77,11 @@ export function CreateAppointmentDialog({
   const hasEmptyCatalog = requiredQueries.some(
     (query) => query.isSuccess && query.data.length === 0,
   )
+  const unitIsReadOnly = session.user.role === 'BASIC'
+  const basicUnitUnavailable =
+    unitIsReadOnly &&
+    unitsQuery.isSuccess &&
+    !unitsQuery.data.some((unit) => unit.id === session.activeUnitId)
 
   const selectedUnit = useMemo(
     () => unitsQuery.data?.find((unit) => unit.id === form.unitId),
@@ -123,6 +128,24 @@ export function CreateAppointmentDialog({
       submittingRef.current = false
     }
   }, [open])
+
+  useEffect(() => {
+    if (!open || !unitIsReadOnly || !unitsQuery.isSuccess) return
+
+    const hasActiveUnit = unitsQuery.data.some(
+      (unit) => unit.id === session.activeUnitId,
+    )
+    setForm((current) => ({
+      ...current,
+      unitId: hasActiveUnit ? session.activeUnitId : '',
+    }))
+  }, [
+    open,
+    session.activeUnitId,
+    unitIsReadOnly,
+    unitsQuery.data,
+    unitsQuery.isSuccess,
+  ])
 
   function changeService(serviceId: string) {
     const service = servicesQuery.data?.find((item) => item.id === serviceId)
@@ -182,7 +205,9 @@ export function CreateAppointmentDialog({
       await createAppointment(input).unwrap()
       toast.success('Agendamento criado com sucesso.')
       setOpen(false)
-      setForm(emptyForm(defaultDate))
+      setForm(
+        emptyForm(defaultDate, unitIsReadOnly ? session.activeUnitId : ''),
+      )
       setDurationOverridden(false)
       setPriceOverridden(false)
     } catch (error) {
@@ -197,6 +222,7 @@ export function CreateAppointmentDialog({
     isCatalogLoading ||
     Boolean(catalogError) ||
     hasEmptyCatalog ||
+    basicUnitUnavailable ||
     mutation.isLoading
 
   return (
@@ -233,6 +259,12 @@ export function CreateAppointmentDialog({
             </div>
           ) : null}
 
+          {!catalogError && basicUnitUnavailable ? (
+            <div role="alert" className="rounded-md bg-red-50 p-3 text-red-800">
+              A unidade da sua sessão não está disponível para este atendimento.
+            </div>
+          ) : null}
+
           {!catalogError && feedback ? (
             <p
               role="alert"
@@ -265,9 +297,11 @@ export function CreateAppointmentDialog({
                 searchPlaceholder="Buscar unidade"
                 className={controlClassName}
                 value={form.unitId}
-                onValueChange={(unitId) =>
+                disabled={unitIsReadOnly || basicUnitUnavailable}
+                onValueChange={(unitId) => {
+                  if (unitIsReadOnly) return
                   setForm((current) => ({ ...current, unitId }))
-                }
+                }}
               />
             </FormField>
 
@@ -303,7 +337,7 @@ export function CreateAppointmentDialog({
                 type="date"
                 className={controlClassName}
                 value={form.date}
-                onChange={(event) =>Openspec Apply Change.
+                onChange={(event) =>
                   setForm((current) => ({
                     ...current,
                     date: event.target.value,
