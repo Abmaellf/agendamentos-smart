@@ -29,7 +29,7 @@ permanece em `src/lib`; contratos de domínio compartilhados permanecem em
 | --- | --- | --- | --- |
 | `appointments` | Implementado parcialmente | `src/features/appointments` | Referência estrutural; sem migração funcional |
 | `patients` | Em migração | `src/features/patients` | Migrar página, componentes, contexto, API, testes e documentação |
-| `session` | Contrato parcial | `src/features/session` | Preservar modelo existente e auditar tipos compartilhados |
+| `session` | Contrato parcial | `src/features/session` | Preservar modelo existente; `activeUnitId` inicializa controles BASIC sem substituir a autorização da API |
 | `professionals` | Planejado | `src/features/professionals` | Não criar fluxo nesta change |
 | `services` | Planejado | `src/features/services` | Não criar fluxo nesta change |
 | `reports` | Planejado | `src/features/reports` | Não criar fluxo nesta change |

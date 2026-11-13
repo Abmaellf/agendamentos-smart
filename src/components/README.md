@@ -43,7 +43,9 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
   de erro; não contém schemas, chamadas HTTP ou regras de domínio;
 - `searchable-select.tsx`: combobox apresentacional com filtro local por nome,
   lupa no dropdown e estados acessíveis; recebe opções e seleção por
-  propriedades e não consulta API;
+  propriedades e não consulta API. O controle pode ser desabilitado pela
+  feature quando o papel não puder editar o escopo, sem assumir autorização no
+  navegador;
 - `features/appointments/pages/appointments-page.tsx`: fonte da grade semanal;
 - `ui/`: base visual da maioria dos formulários.
 

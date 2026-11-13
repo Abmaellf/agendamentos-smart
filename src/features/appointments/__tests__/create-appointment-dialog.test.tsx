@@ -70,7 +70,10 @@ async function typeInto(user: UserEvent, label: RegExp, value: string) {
 
 async function fillValidForm(user: UserEvent) {
   await chooseOption(user, /^paciente/i, /ana paciente/i)
-  await chooseOption(user, /^unidade/i, /unidade centro/i)
+  const unit = screen.getByRole('combobox', { name: /^unidade/i })
+  if (!unit.hasAttribute('disabled')) {
+    await chooseOption(user, /^unidade/i, /unidade centro/i)
+  }
   await chooseOption(user, /^serviço/i, /pilates/i)
   await typeInto(user, /^data/i, '2026-08-20')
   await typeInto(user, /^horário/i, '08:30')
@@ -135,6 +138,49 @@ describe('diálogo de criação manual', () => {
 
     expect(screen.getByLabelText(/duração/i)).toBeEnabled()
     expect(screen.getByLabelText(/preço/i)).toBeEnabled()
+  })
+
+  it('pré-seleciona e bloqueia a unidade da sessão BASIC', async () => {
+    const { user } = await renderDialog(basicSession)
+    await openDialog(user)
+
+    const unit = await screen.findByRole('combobox', { name: /^unidade/i })
+    expect(unit).toHaveTextContent('Unidade Centro')
+    expect(unit).toBeDisabled()
+  })
+
+  it('mantém a seleção de unidade editável para ADMIN', async () => {
+    apiScenario.catalogs.units = [
+      ...apiScenario.catalogs.units,
+      {
+        id: 'unit-b',
+        name: 'Unidade Parque do Lago',
+        tenantId: 'tenant-a',
+        timeZone: 'America/Cuiaba',
+      },
+    ]
+    const { user } = await renderDialog(adminSession)
+    await openDialog(user)
+
+    const unit = await screen.findByRole('combobox', { name: /^unidade/i })
+    expect(unit).toBeEnabled()
+    await chooseOption(user, /^unidade/i, /parque do lago/i)
+    expect(unit).toHaveTextContent('Unidade Parque do Lago')
+  })
+
+  it('bloqueia o BASIC quando sua unidade não está no catálogo', async () => {
+    const { user } = await renderDialog({
+      ...basicSession,
+      activeUnitId: 'unit-missing',
+    })
+    await openDialog(user)
+
+    expect(
+      await screen.findByText(/unidade da sua sessão não está disponível/i),
+    ).toBeVisible()
+    expect(
+      screen.getByRole('button', { name: /criar agendamento/i }),
+    ).toBeDisabled()
   })
 
   it('WB-07 impede o BASIC de editar ou enviar valores fora do padrão', async () => {
