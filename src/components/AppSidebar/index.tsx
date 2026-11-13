@@ -62,7 +62,8 @@ export const sidebarNavigationItems: SidebarNavigationItem[] = [
   {
     label: 'Serviços',
     icon: CircleHelp,
-    availability: 'unavailable',
+    to: '/services/packages',
+    availability: 'available',
   },
   {
     label: 'Relatórios',
