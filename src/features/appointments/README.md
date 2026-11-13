@@ -38,8 +38,9 @@ em `baseApi` → `axiosBaseQuery` → API.
 A página consome a data compartilhada pela casca, calcula o intervalo semanal,
 apresenta carregamento, erro e estado vazio e distribui os registros nos cinco
 dias úteis. O `AppTopbar` fornece a navegação temporal e abre o
-`CreateAppointmentDialog`, que mantém a mesma implementação de criação. A
-consulta de agenda só inicia após a sessão. O diálogo usa `skip` enquanto
+`CreateAppointmentDialog`, que mantém a mesma implementação de criação e usa
+o `FormField` compartilhado apenas para a apresentação acessível dos controles.
+A consulta de agenda só inicia após a sessão. O diálogo usa `skip` enquanto
 fechado e a mutação de criação invalida
 `Appointment/LIST`, fazendo a semana visível ser consultada novamente.
 

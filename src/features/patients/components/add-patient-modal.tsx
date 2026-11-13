@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
+import { FormField } from '@/components/form-field'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -76,20 +76,18 @@ export function AddPatientModal() {
           </DialogHeader>
 
           <form onSubmit={handleSubmit(handlePatient)} className="space-y-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Paciente
-              </Label>
+            <FormField
+              label="Paciente"
+              error={errors.name?.message}
+              className="grid grid-cols-4 items-center gap-4"
+              labelClassName="text-right"
+            >
               <input
                 type="text"
-                id="name"
                 className=" focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] col-span-3 file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                 {...register('name')}
               />
-            </div>
-            {errors.name && (
-              <p className="text-sm text-red-500">{errors.name.message}</p>
-            )}
+            </FormField>
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="outline">
