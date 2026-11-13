@@ -6,7 +6,6 @@ import type {
   CreateAppointmentDialogProps,
 } from '@/@types/appointment'
 import { FormField } from '@/components/form-field'
-import { SearchableSelect } from '@/components/searchable-select'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -52,7 +51,7 @@ export function CreateAppointmentDialog({
   triggerLabel = 'Novo agendamento',
   triggerAriaLabel,
 }: CreateAppointmentDialogProps) {
-  const patientRef = useRef<HTMLButtonElement>(null)
+  const patientRef = useRef<HTMLSelectElement>(null)
   const submittingRef = useRef(false)
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<AppointmentFormState>(() =>
@@ -81,41 +80,6 @@ export function CreateAppointmentDialog({
   const selectedUnit = useMemo(
     () => unitsQuery.data?.find((unit) => unit.id === form.unitId),
     [form.unitId, unitsQuery.data],
-  )
-
-  const patientOptions = useMemo(
-    () =>
-      patientsQuery.data?.map((patient) => ({
-        id: patient.id,
-        label: patient.name,
-      })) ?? [],
-    [patientsQuery.data],
-  )
-  const unitOptions = useMemo(
-    () =>
-      unitsQuery.data?.map((unit) => ({
-        id: unit.id,
-        label: unit.name,
-      })) ?? [],
-    [unitsQuery.data],
-  )
-  const serviceOptions = useMemo(
-    () =>
-      servicesQuery.data?.map((service) => ({
-        id: service.id,
-        label: service.name,
-      })) ?? [],
-    [servicesQuery.data],
-  )
-  const professionalOptions = useMemo(
-    () => [
-      { id: '', label: 'Sem profissional' },
-      ...(professionalsQuery.data?.map((professional) => ({
-        id: professional.id,
-        label: professional.name,
-      })) ?? []),
-    ],
-    [professionalsQuery.data],
   )
 
   useEffect(() => {
@@ -245,57 +209,80 @@ export function CreateAppointmentDialog({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField label="Paciente" error={fieldErrors.patientId}>
-              <SearchableSelect
+              <select
                 ref={patientRef}
-                options={patientOptions}
-                loading={patientsQuery.isLoading}
-                searchPlaceholder="Buscar paciente"
                 className={controlClassName}
                 value={form.patientId}
-                onValueChange={(patientId) =>
-                  setForm((current) => ({ ...current, patientId }))
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    patientId: event.target.value,
+                  }))
                 }
-              />
+              >
+                <option value="">Selecione</option>
+                {patientsQuery.data?.map((patient) => (
+                  <option key={patient.id} value={patient.id}>
+                    {patient.name}
+                  </option>
+                ))}
+              </select>
             </FormField>
 
             <FormField label="Unidade" error={fieldErrors.unitId}>
-              <SearchableSelect
-                options={unitOptions}
-                loading={unitsQuery.isLoading}
-                searchPlaceholder="Buscar unidade"
+              <select
                 className={controlClassName}
                 value={form.unitId}
-                onValueChange={(unitId) =>
-                  setForm((current) => ({ ...current, unitId }))
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    unitId: event.target.value,
+                  }))
                 }
-              />
+              >
+                <option value="">Selecione</option>
+                {unitsQuery.data?.map((unit) => (
+                  <option key={unit.id} value={unit.id}>
+                    {unit.name}
+                  </option>
+                ))}
+              </select>
             </FormField>
 
             <FormField label="Serviço" error={fieldErrors.serviceId}>
-              <SearchableSelect
-                options={serviceOptions}
-                loading={servicesQuery.isLoading}
-                searchPlaceholder="Buscar serviço"
+              <select
                 className={controlClassName}
                 value={form.serviceId}
-                onValueChange={changeService}
-              />
+                onChange={(event) => changeService(event.target.value)}
+              >
+                <option value="">Selecione</option>
+                {servicesQuery.data?.map((service) => (
+                  <option key={service.id} value={service.id}>
+                    {service.name}
+                  </option>
+                ))}
+              </select>
             </FormField>
 
             <FormField label="Profissional (opcional)">
-              <SearchableSelect
-                options={form.serviceId ? professionalOptions : []}
-                loading={professionalsQuery.isLoading}
-                placeholder="Sem profissional"
-                searchPlaceholder="Buscar profissional"
-                emptyLabel="Nenhum profissional disponível."
+              <select
                 className={controlClassName}
                 value={form.professionalId}
-                disabled={!form.serviceId}
-                onValueChange={(professionalId) =>
-                  setForm((current) => ({ ...current, professionalId }))
+                disabled={!form.serviceId || professionalsQuery.isLoading}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    professionalId: event.target.value,
+                  }))
                 }
-              />
+              >
+                <option value="">Sem profissional</option>
+                {professionalsQuery.data?.map((professional) => (
+                  <option key={professional.id} value={professional.id}>
+                    {professional.name}
+                  </option>
+                ))}
+              </select>
             </FormField>
 
             <FormField label="Data" error={fieldErrors.date}>
@@ -303,7 +290,7 @@ export function CreateAppointmentDialog({
                 type="date"
                 className={controlClassName}
                 value={form.date}
-                onChange={(event) =>Openspec Apply Change.
+                onChange={(event) =>
                   setForm((current) => ({
                     ...current,
                     date: event.target.value,
