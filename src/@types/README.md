@@ -2,56 +2,60 @@
 
 ## Objetivo do módulo
 
-Centralizar contratos TypeScript compartilhados sem transformar a pasta em um
-depósito de tipos internos de implementação.
+Centralizar contratos TypeScript compartilhados por domínio sem transformar a
+pasta em um depósito de tipos internos de implementação.
 
-## Responsabilidades e funcionalidades existentes
+## Contratos existentes
 
-- `appointment.ts` concentra os contratos de domínio e transporte da agenda;
-- `components.ts` concentra propriedades, estado e valores de formulário usados
-  pela camada de componentes;
-- `patient.ts` concentra o contrato do contexto legado de pacientes;
-- `ui.ts` concentra as propriedades nomeadas dos componentes-base;
-- `UserTypes.ts` mantém uma resposta de login legada, ainda sem consumidor ativo.
+- `appointment.ts`: contratos de domínio, transporte e composição da agenda;
+- `patient.ts`: entidade, entradas, contexto legado e props de pacientes;
+- `auth.ts`: entradas/saídas de autenticação e valores do formulário de login;
+- `profile.ts`: resposta compartilhada de perfil;
+- `session.ts`: sessão normalizada consumida pela agenda;
+- `user.ts`: entrada do cadastro de usuário ainda não conectado à interface;
+- `components.ts`: contratos visuais transversais, como navegação e tema;
+- `ui.ts`: propriedades derivadas dos componentes-base.
 
-## Dependências internas e externas
+## Dependências
 
-- `appointment.ts` não possui dependências;
-- `components.ts` depende apenas de tipos de React, Router e `appointment.ts`;
-- `patient.ts` depende apenas de tipos de React e Axios;
-- `ui.ts` deriva as variantes diretamente dos componentes-base;
-- módulos relacionados: componentes, agenda, pacientes e autenticação.
+Os arquivos são importados explicitamente com o alias `@/@types`; não há
+declarações globais implícitas. `session.ts` reutiliza o papel canônico da
+agenda em `appointment.ts`. Tipos de infraestrutura e fixtures de teste ficam
+próximos aos seus consumidores quando não representam contrato de domínio.
 
-## Pontos de entrada e fluxos de entrada
+## Regras
 
-Os arquivos desta pasta são importados explicitamente com o alias `@/@types`.
-Não há declarações globais implícitas.
+- Entidades da clínica carregam `tenantId`; entidades operacionais por unidade
+  também carregam `unitId` quando o contrato exigir.
+- Papéis da clínica usam a união canônica `ADMIN`/`BASIC`; o usuário master da
+  plataforma não deve ser confundido com esse papel.
+- Respostas de perfil e sessão não modelam senha. Senha só pertence a entradas
+  de autenticação quando é necessária para o comando.
+- Preço, data/hora e duração precisam de representações inequívocas; datas
+  trocadas com a API devem carregar fuso/offset.
+- Contratos compartilhados devem ser exportados daqui e importados com
+  `import type`.
+- Tipos triviais usados uma única vez, tipos derivados de schemas e estruturas
+de infraestrutura podem permanecer locais.
 
-## Arquivos críticos
+## Mapa da auditoria
 
-- `appointment.ts`: contrato canônico da agenda;
-- `components.ts`: contratos próprios da camada visual;
-- `ui.ts`: contratos derivados dos primitivos de interface;
-- `patient.ts`: contrato temporário do contexto legado;
-- `UserTypes.ts`: órfão.
+| Contrato | Local canônico | Evidência/decisão |
+| --- | --- | --- |
+| `CreatePatient*`, `PatientContext*`, `PaginationProps` | `patient.ts` | Usados pela API, contexto, página e componentes de pacientes |
+| `Appointment*` e props da agenda | `appointment.ts` | Usados por API, grade, diálogo e cartões de agendamento |
+| `SessionProfile` | `session.ts` | Parser de sessão é consumido pela API de agendamentos |
+| `GetProfileResponse` | `profile.ts` | API Axios e endpoint RTK Query compartilham a resposta de perfil |
+| `SignInBody`, `SignInResponse`, `SignInFormValues` | `auth.ts` | Mutation e tela de login usam o mesmo contrato de entrada/saída |
+| `RegisterUserBody` | `user.ts` | Entrada do adaptador de cadastro, ainda sem consumidor de tela |
+| `AxiosBaseQueryArgs/Error` | `src/lib/axios-base-query.ts` | Estruturas privadas de infraestrutura, sem consumidor de domínio |
+| envelopes internos de `appointments/api` | `features/appointments/api` | Usados somente para normalizar respostas daquele adaptador |
+| tipos de `src/test` e schemas | consumidor local | Fixtures, módulos de teste e inferência não são contratos compartilhados |
 
-## Regras próprias do módulo
+## Lacunas
 
-- Devem existir tipos canônicos para `Tenant`, `Unit`, `User`, `Patient`, `Professional`, `Service`, `Appointment`, `AppointmentSeries` e `AppointmentEvent`.
-- Entidades da clínica carregam `tenantId`; entidades operacionais por unidade também carregam `unitId`.
-- Papéis devem ser união/enum fechado com `ADMIN` e `BASIC`; o usuário master da plataforma não deve ser confundido com um papel da clínica.
-- Estados canônicos do agendamento são `AGENDADO`, `CONFIRMADO`, `EM_ATENDIMENTO`, `CONCLUIDO`, `CANCELADO`, `FALTA` e `REMARCADO`.
-- Respostas de perfil e demais DTOs nunca devem expor senha. Senha inicial e troca obrigatória pertencem somente aos contratos de comando apropriados.
-- Preço, data/hora e duração precisam de representações inequívocas; datas trocadas com a API devem carregar fuso/offset.
-- Props e contratos compartilhados devem ser exportados desta pasta e importados
-  com `import type`;
-- tipos triviais usados uma única vez, como `React.ComponentProps<'div'>`, podem
-  permanecer inline no componente;
-- tipos inferidos de schemas de validação devem continuar vinculados ao schema ou
-  possuir uma anotação que impeça divergência entre o contrato e a validação.
-
-## Observações técnicas e débitos
-
-- Perfil e paciente ainda possuem contratos legados ou locais que precisam ser
-  consolidados quando os respectivos fluxos forem modernizados.
-- O tipo de usuário inclui `password`; respostas de frontend não devem modelar senha quando ela não é necessária.
+Paciente ainda possui contratos legados de API/contexto que serão consolidados
+em changes funcionais posteriores, sem alterar endpoints nesta refatoração.
+Contratos futuros de `Tenant`, `Unit`, `Professional`, `Service`,
+`AppointmentSeries` e `AppointmentEvent` devem ser adicionados quando seus
+fluxos forem implementados, não como placeholders desta change.

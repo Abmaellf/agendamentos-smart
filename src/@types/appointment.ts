@@ -1,3 +1,5 @@
+import type { ReactElement } from 'react'
+
 export type AppointmentRole = 'ADMIN' | 'BASIC'
 
 export interface AppointmentSession {
@@ -99,4 +101,44 @@ export interface AppointmentApiError {
   code?: string
   message?: string
   fieldErrors?: Record<string, string[]>
+}
+
+export interface CardDayProps {
+  date: string
+  isToday: boolean
+  dayWeek: number
+}
+
+export interface CardPatientProps {
+  appointment: Appointment
+  isToday: boolean
+}
+
+export interface StatusPresentation {
+  label: string
+  className: string
+}
+
+export interface CreateAppointmentDialogProps {
+  session: AppointmentSession
+  defaultDate?: string
+  triggerLabel?: string
+  triggerAriaLabel?: string
+}
+
+export interface AppointmentFormState {
+  patientId: string
+  unitId: string
+  serviceId: string
+  professionalId: string
+  date: string
+  time: string
+  durationMinutes: number | string
+  price: string
+}
+
+export interface AppointmentFieldProps {
+  label: string
+  error?: string
+  children: ReactElement<{ id?: string; 'aria-describedby'?: string }>
 }

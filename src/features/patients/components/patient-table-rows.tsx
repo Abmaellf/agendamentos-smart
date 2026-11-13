@@ -1,22 +1,21 @@
-import type { PatientTableRowsProps } from '@/@types/components'
+import type { PatientTableRowsProps } from '@/@types/patient'
 import { Button } from '@/components/ui/button'
 import { TableRow, TableCell } from '@/components/ui/table'
 import { Search, ArrowRight, X } from 'lucide-react'
 
-export default function PatientTableRows({patientObj}: PatientTableRowsProps) {
-console.log("Row", patientObj)
+export default function PatientTableRows({ patientObj }: PatientTableRowsProps) {
+  console.log('Row', patientObj)
   return (
     <TableRow>
       <TableCell>
         <Button variant="outline" size={'xs'}>
           <Search className="h-3 w-3" />
-          <span className="sr-only"> Detalhes do pedido</span>
+          <span className="sr-only">Detalhes do pedido</span>
         </Button>
       </TableCell>
 
-
-      <TableCell className="font-medium"> 0001</TableCell>
-      <TableCell className="font-medium"> { patientObj.name }</TableCell>
+      <TableCell className="font-medium">0001</TableCell>
+      <TableCell className="font-medium">{patientObj.name}</TableCell>
 
       <TableCell>
         <div className="flex items-center gap-2">
@@ -24,19 +23,16 @@ console.log("Row", patientObj)
         </div>
       </TableCell>
 
-      <TableCell className="text-muted-foreground"> 
-        21/10/2025
-        
-      </TableCell>
+      <TableCell className="text-muted-foreground">21/10/2025</TableCell>
 
-      <TableCell >
+      <TableCell>
         <Button variant="outline" size="xs">
           <ArrowRight className="mr-2 h-3 w-3" />
           Editar
         </Button>
       </TableCell>
 
-      <TableCell >
+      <TableCell>
         <Button variant="ghost" size="xs">
           <X className="mr-2 h-3 w-3" />
           Desativar

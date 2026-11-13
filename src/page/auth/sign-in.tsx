@@ -11,7 +11,7 @@ import { Loader2Icon } from 'lucide-react'
 // 1. Importe o useRef e o useEffect do React
 import { useEffect, useRef } from 'react'
 
-import type { SignInFormValues } from '@/@types/components'
+import type { SignInFormValues } from '@/@types/auth'
 
 export function SignIn() {
 

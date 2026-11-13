@@ -8,7 +8,7 @@ Encapsular operações HTTP e utilitários de autenticação usados pelo fronten
 
 - login por `POST /auth/login`;
 - perfil por `GET auth/me`;
-- criação de paciente por `POST /patient/save`;
+- operações de pacientes foram movidas para `features/patients/api`;
 - função desconectada de cadastro de usuário por `POST /auth/register/:id`;
 - utilitários desconectados de token em `localStorage`;
 - redirecionamento inicial por cookie em `firstScreen/`, embora esse componente não seja uma API.
@@ -25,13 +25,13 @@ Encapsular operações HTTP e utilitários de autenticação usados pelo fronten
 | -------------------- | -------------------------------- | ------------------------------ |
 | `signIn`             | `page/auth/sign-in.tsx`          | formulário → mutation → API    |
 | `getProfile`         | `components/account-menu.tsx`    | Header → query → API           |
-| `RegisterPatient`    | `components/AddPatientModal.tsx` | modal → mutation → API         |
 | `registerUser`       | nenhum                           | órfão                          |
 | funções de `auth.ts` | nenhum                           | cadeia órfã com `storageProxy` |
 
 ## Arquivos críticos
 
-- `sign-in.ts`, `get-profile.ts`, `register-patient.ts`: contratos atualmente executados;
+- `sign-in.ts`, `get-profile.ts`: contratos atualmente executados nesta camada;
+- `features/patients/api/register-patient.ts`: adaptador de paciente migrado;
 - `auth.ts`, `storageProxy.ts`: estratégia alternativa de token não conectada;
 - `register-user.ts`: intenção de cadastro ainda não ligada à tela;
 - `firstScreen/first-screen.tsx`: decisão de navegação inicial.

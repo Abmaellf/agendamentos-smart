@@ -8,17 +8,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from './ui/dialog'
+} from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { PlusCircle } from 'lucide-react'
-import { useRegisterPatientMutation } from '@/api/register-patient'
+import { useRegisterPatientMutation } from '../api/register-patient'
 
-import type { CreatePatientFormValues } from '@/@types/components'
- 
+import type { CreatePatientFormValues } from '@/@types/patient'
+
 const createPatientSchema: z.ZodType<
   CreatePatientFormValues,
   CreatePatientFormValues
@@ -27,8 +27,7 @@ const createPatientSchema: z.ZodType<
 })
 
 export function AddPatientModal() {
-
-const {
+  const {
     register,
     handleSubmit,
     reset,
@@ -42,40 +41,35 @@ const {
   async function handlePatient(data: CreatePatientFormValues) {
     console.log(data)
 
-    try{
-         await addPatient({
-          name: data.name
-        }).unwrap()
-        console.log(data)
-        await new Promise((resolve) => setTimeout(resolve, 2000))
-        reset()
-        toast.success('Paciente cadastrado com sucesso', {
-          position:'bottom-center',
-          duration:500
-        })
+    try {
+      await addPatient({
+        name: data.name,
+      }).unwrap()
+      console.log(data)
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      reset()
+      toast.success('Paciente cadastrado com sucesso', {
+        position: 'bottom-center',
+        duration: 500,
+      })
     } catch {
-         toast.error('Dados incorretos')
+      toast.error('Dados incorretos')
     }
   }
 
   return (
-   <div className="flex justify-normal ">
-
+    <div className="flex justify-normal ">
       <Dialog>
-        <DialogTrigger >
-          <Button  variant={'ghost'}>
-             <PlusCircle className='m-0' />
+        <DialogTrigger>
+          <Button variant={'ghost'}>
+            <PlusCircle className="m-0" />
             Novo Paciente
           </Button>
         </DialogTrigger>
 
         <DialogContent>
           <DialogHeader>
-            
-            <DialogTitle>
-             
-              Novo Paciente
-            </DialogTitle>
+            <DialogTitle>Novo Paciente</DialogTitle>
             <DialogDescription>
               Criar um novo paciente no sistema
             </DialogDescription>
@@ -87,7 +81,7 @@ const {
                 Paciente
               </Label>
               <input
-                type='text'
+                type="text"
                 id="name"
                 className=" focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] col-span-3 file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                 {...register('name')}

@@ -1,7 +1,7 @@
 import type {
   CardPatientProps,
   StatusPresentation,
-} from '@/@types/components'
+} from '@/@types/appointment'
 import type { AppointmentStatus } from '@/@types/appointment'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'

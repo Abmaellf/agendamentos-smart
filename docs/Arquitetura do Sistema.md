@@ -74,13 +74,13 @@ Não existe rota curinga (`404`) nem guarda de rota no `AppLayout`.
 | `src/_layout`               | Estrutura visual pública e interna           | Router, Header, MenuMobile      | `Router.tsx`                   |
 | `src/page/auth`             | Telas de entrada e cadastro visual           | RTK Query, forms, router        | `Router.tsx`                   |
 | `src/features/appointments` | Domínio, API, cache, criação e grade semanal | RTK Query, Zod, date-fns        | `Router.tsx`                   |
-| `src/page/patient`          | Lista, filtro e criação de pacientes         | contexto, UI, forms             | `Router.tsx`                   |
+| `src/features/patients`     | Lista, filtro e criação de pacientes         | contexto legado, UI, forms      | `Router.tsx`, `App.tsx`        |
 | `src/page/doctor`           | Placeholder de profissional                  | React                           | `Router.tsx`                   |
 | `src/page/Configuration`    | Placeholder de configuração                  | React                           | `Router.tsx`                   |
-| `src/components`            | Navegação, modais, cartões e paginação       | UI, API, contexto               | layouts e páginas              |
+| `src/components`            | Navegação, cartões e UI compartilhada        | UI, API                         | layouts e páginas              |
 | `src/components/ui`         | Primitivos visuais reutilizáveis             | Radix, Tailwind, CVA            | páginas e componentes          |
-| `src/context`               | Estado e operações legadas de pacientes      | Axios, context selector         | pacientes                      |
-| `src/api`                   | Chamadas HTTP e utilitários de token         | Axios e Web Storage             | autenticação, Header, paciente |
+| `src/context`               | Contextos legados sem dono de domínio        | React                           | módulos ainda não migrados     |
+| `src/api`                   | Chamadas HTTP e utilitários de token         | Axios e Web Storage             | autenticação e perfil          |
 | `src/lib`                   | Axios, base API/store RTK e merge de classes | env, Axios, RTK Query           | API, contexto e UI             |
 | `src/globals.css`           | Tailwind e design tokens globais             | Tailwind                        | `App` e componentes visuais    |
 | `src/assets`                | Imagens locais atualmente sem consumidores   | bundler Vite                    | nenhum import ativo            |
@@ -105,8 +105,8 @@ entradas e respostas tipadas e mensagens de erro de domínio.
 
 ### Estado remoto misto
 
-- RTK Query executa login, perfil, consultas, criação de agendamentos e o cadastro em `AddPatientModal`.
-- `PatientContext` guarda a lista de pacientes e acessa Axios diretamente.
+- RTK Query executa login, perfil, consultas, criação de agendamentos e o cadastro em `features/patients`.
+- `features/patients/model/patient-context` ainda guarda a lista de pacientes e acessa Axios diretamente como legado.
 - A agenda mantém apenas a data de referência em estado local; os agendamentos
   remotos pertencem ao cache da `baseApi`.
 
@@ -138,10 +138,10 @@ Login e cadastros de paciente combinam React Hook Form e Zod. O cadastro visual 
 ### Fronteiras violadas ou pouco definidas
 
 - `src/api/firstScreen/first-screen.tsx` é um componente de roteamento dentro da camada de API;
-- `PatientContext` mistura estado remoto, chamadas HTTP e criação de paciente;
+- `features/patients/model/patient-context` mistura estado remoto, chamadas HTTP e criação de paciente;
 - `CardDay` contém massa antiga de agendamentos fixa, mas não participa da rota
   `/appointments`;
-- `AddPatientModal` usa mutação RTK Query enquanto outro modal delega a criação ao contexto;
+- `features/patients` mantém dois fluxos de criação: um por RTK Query e outro por contexto;
 - tipos de paciente são redefinidos localmente e não representam um contrato único;
 - componentes de navegação contêm textos de produto e caminhos diretamente.
 
@@ -173,9 +173,9 @@ Na qualidade estática, o projeto mantém `.eslintrc` legado e `eslint.config.mj
 | `POST /auth/login`        | `src/api/sign-in.ts`          | Autenticação                          |
 | `GET auth/me`             | `src/api/get-profile.ts`      | Perfil e clínica no Header            |
 | `POST /auth/register/:id` | `src/api/register-user.ts`    | Não conectado à interface             |
-| `GET patient/list`        | `PatientContext`              | Lista de pacientes                    |
-| `POST /patient/save`      | `src/api/register-patient.ts` | Cadastro pelo modal compartilhado     |
-| `POST patients`           | `PatientContext`              | Cadastro pelo diálogo local da página |
+| `GET patient/list`        | `features/patients/model`     | Lista de pacientes                    |
+| `POST /patient/save`      | `features/patients/api`       | Cadastro pelo modal compartilhado     |
+| `POST patients`           | `features/patients/model`     | Cadastro pelo diálogo local da página |
 | `GET /api/appointments`   | `features/appointments/api`   | Consulta externa de agendamentos      |
 | `POST /api/appointments`  | `features/appointments/api`   | Criação externa de agendamento        |
 
@@ -257,7 +257,7 @@ Para código novo: usar nomes de pasta em kebab-case ou minúsculas de forma uni
 | `src/api/register-user.ts`                                                   | Não chamado pelo `SignUp`                                   |
 | `src/context/useGlobalContext.tsx`                                           | Implementação comentada; exports não retornam estado útil   |
 | `src/hooks/useRequest.ts`                                                    | Arquivo integralmente comentado                             |
-| `src/@types/UserTypes.ts`                                                    | Referenciado somente pelo hook comentado                    |
+| `src/@types/user.ts`                                                         | Entrada de cadastro de usuário sem consumidor de tela      |
 | `src/components/nav-link.tsx`                                                | Não importado; Header usa o `NavLink` do Router diretamente |
 | `src/components/theme`                                                       | Provider e seletor de tema não montados                     |
 | `src/components/ui/pagination.tsx`                                           | Não usado; existe outra paginação compartilhada             |

@@ -13,8 +13,6 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 | `account-menu.tsx`    | Perfil da clínica/usuário            | Ativo                       |
 | `Card`                | Cartões antigos da agenda            | Legado sem consumidor       |
 | `WeekDate`            | Rótulos antigos dos dias úteis       | Legado sem consumidor       |
-| `AddPatientModal.tsx` | Cadastro mínimo de paciente          | Ativo, duplicado            |
-| `pagination.tsx`      | Resumo/paginador visual              | Ativo, sem callbacks        |
 | `nav-link.tsx`        | Link com estado atual                | Órfão                       |
 | `theme`               | Tema claro/escuro Tailwind           | Órfão                       |
 | `ui`                  | Primitivos Radix/shadcn              | Parcialmente ativo          |
@@ -31,14 +29,14 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 - `AppLayout` entra por `AppTopbar` e `AppSidebar`, com a mesma definição tipada de entradas em ambos os breakpoints;
 - `AppTopbar` concentra o hamburger, busca local, navegação temporal, ação de agendamento, notificações apresentacionais e menu de perfil;
 - `AppointmentsPage` usa apenas componentes de `features/appointments`;
-- `Patient` entra por `AddPatientModal` e `Pagination`;
+- `Patient` é composto por `features/patients`; componentes específicos não
+  entram mais por esta camada compartilhada;
 
 ## Arquivos críticos
 
 - `AppSidebar/index.tsx`: navegação lateral, destinos disponíveis/indisponíveis e card informativo;
 - `AppTopbar/index.tsx`: ações globais da casca, data compartilhada e acionamento responsivo da sidebar;
 - `account-menu.tsx`: avatar, identificação da conta e menu de perfil baseado no perfil remoto existente;
-- `AddPatientModal.tsx`: mutation de paciente;
 - `features/appointments/pages/appointments-page.tsx`: fonte da grade semanal;
 - `ui/`: base visual da maioria dos formulários.
 
@@ -53,7 +51,8 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 
 ## Observações técnicas e débitos
 
-- Há componentes compartilhados que possuem regra de negócio e chamadas de API.
+- Há componentes compartilhados que ainda possuem regra de negócio e chamadas
+  de API; novos componentes específicos devem ficar na feature correspondente.
 - `Card` e `WeekDate` permanecem como componentes legados sem consumidores e
   podem ser removidos em uma limpeza posterior.
 - Componentes órfãos devem ser conectados somente após confirmar contrato ou removidos.

@@ -12,7 +12,7 @@ import type {
   AppointmentFieldProps,
   AppointmentFormState,
   CreateAppointmentDialogProps,
-} from '@/@types/components'
+} from '@/@types/appointment'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

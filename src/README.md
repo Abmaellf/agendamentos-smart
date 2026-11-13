@@ -13,6 +13,10 @@ Concentrar a SPA React: bootstrap, providers, rotas, páginas, integração HTTP
 - oferecer telas de autenticação, agenda, pacientes e placeholders de profissional/configuração;
 - integrar com a API definida por `VITE_API_URL`.
 
+O código de domínio fica em `src/features/`; atualmente `appointments`,
+`session` e `patients` possuem fronteiras próprias. `src/page/`, `src/api/` e
+`src/context/` conservam somente módulos legados ainda não migrados.
+
 ## Dependências internas e externas
 
 - internas: todos os submódulos descritos abaixo;
@@ -58,6 +62,7 @@ Fluxo principal: `main.tsx` → `App.tsx` → providers → `Router.tsx` → `Ap
 - `StrictMode` está comentado em `main.tsx`.
 - O provider de agenda envolve também a área pública.
 - Não existe error boundary, rota 404 ou guarda global de autenticação.
-- A divisão atual é por camada técnica; regras de domínio não possuem módulo próprio.
+- A divisão por feature está em adoção; `appointments` e `patients` são os
+  módulos de domínio migrados, enquanto outras áreas ainda são legadas.
 - Veja `docs/Arquitetura do Sistema.md` para riscos e regras oficiais.
 - As regras acima ainda não estão implementadas de forma transversal no commit atual.

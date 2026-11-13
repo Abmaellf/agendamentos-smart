@@ -48,7 +48,8 @@ Os consumidores importam exports nomeados diretamente de cada arquivo. O catálo
 
 ## Observações técnicas e débitos
 
-- `pagination.tsx` duplica a finalidade de `components/pagination.tsx` e está órfão.
+- `pagination.tsx` é um primitivo genérico; o paginador específico de pacientes
+  fica em `features/patients/components/pagination.tsx`.
 - `select.tsx` está órfão, embora mantenha sua dependência Radix declarada.
 - A página de paciente importa `Dialog`/`DialogTrigger` diretamente do Radix, mas o conteúdo do wrapper local.
 - Alterações nesses primitivos têm impacto transversal e devem preservar acessibilidade e API pública.

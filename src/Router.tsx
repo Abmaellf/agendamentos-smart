@@ -3,7 +3,7 @@ import { AppointmentsPage } from '@/features/appointments/pages/appointments-pag
 
 import { SignIn } from './page/auth/sign-in'
 import { AuthLayout } from './_layout/auth'
-import { Patient } from './page/patient'
+import { Patient } from '@/features/patients/pages/patients-page'
 import { Doctor } from './page/doctor'
 import { AppLayout } from './_layout/app'
 import Configuration from './page/Configuration'

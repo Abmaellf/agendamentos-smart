@@ -97,7 +97,7 @@ O item de logout não executa nenhuma ação.
 
 A página contém duas implementações simultâneas:
 
-- `AddPatientModal` envia o nome por `POST /patient/save` usando React Query e mostra notificação;
+- `features/patients` envia o nome por `POST /patient/save` usando RTK Query e mostra notificação;
 - `CreatePatientDialog` chama o contexto, que envia `POST patients` e adiciona a resposta ao estado local.
 
 Os diálogos são aninhados na composição atual, os endpoints são diferentes e a primeira mutation não atualiza a lista visível. Esse fluxo deve ser unificado antes de ser considerado estável.

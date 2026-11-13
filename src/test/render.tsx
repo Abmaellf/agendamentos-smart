@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import { Toaster } from 'sonner'
 import type { PropsWithChildren, ReactElement } from 'react'
 
-import { PatientProvider } from '@/context/PatientContext'
+import { PatientProvider } from '@/features/patients/model/patient-context'
 import { baseApi } from '@/lib/base-api'
 import { createAppStore, type AppStore } from '@/lib/store'
 

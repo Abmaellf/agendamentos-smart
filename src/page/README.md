@@ -9,7 +9,6 @@ Concentrar os componentes associados diretamente a rotas e coordenar os fluxos d
 | Pasta           | Rota                   | Estado                        |
 | --------------- | ---------------------- | ----------------------------- |
 | `auth`          | `/sign-in`, `/sign-up` | Login ativo; cadastro visual  |
-| `patient`       | `/paciente`            | Lista e criação parciais      |
 | `doctor`        | `/doctor`              | Placeholder                   |
 | `Configuration` | `/configuration`       | Placeholder vazio             |
 
@@ -27,7 +26,7 @@ Todas as páginas entram pelo `Router`. Páginas públicas usam `AuthLayout`; p�
 
 - `auth/sign-in.tsx`: porta de entrada autenticada;
 - `features/appointments/pages/appointments-page.tsx`: fluxo principal de agenda;
-- `patient/index.tsx`: fluxo de pacientes.
+- `features/patients/pages/patients-page.tsx`: fluxo de pacientes migrado.
 
 ## Regras próprias do módulo
 
@@ -43,5 +42,6 @@ Todas as páginas entram pelo `Router`. Páginas públicas usam `AuthLayout`; p�
 - As rotas internas não têm guarda de autenticação.
 - Não há lazy loading; todas as páginas entram no bundle inicial.
 - Novas páginas de domínio devem permanecer na respectiva feature; `src/page`
-  conserva apenas as páginas legadas ainda não migradas.
+  conserva apenas as páginas legadas ainda não migradas, como `doctor`,
+  `Configuration` e os fluxos de autenticação ainda não reorganizados.
 - Páginas incompletas devem continuar identificadas como placeholders até terem integração comprovada.
