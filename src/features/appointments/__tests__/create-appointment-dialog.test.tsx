@@ -204,8 +204,8 @@ describe('diálogo de criação manual', () => {
     await chooseOption(user, /^unidade/i, /unidade centro/i)
     await chooseOption(user, /^serviço/i, /pilates/i)
 
-    expect(screen.getByRole('combobox', { name: /^paciente/i })).toHaveValue(
-      'patient-a',
+    expect(screen.getByRole('combobox', { name: /^paciente/i })).toHaveTextContent(
+      'Ana Paciente',
     )
   })
 
@@ -216,8 +216,56 @@ describe('diálogo de criação manual', () => {
 
     await chooseOption(user, /^paciente/i, /ana paciente/i)
 
-    expect(screen.getByRole('combobox', { name: /^paciente/i })).toHaveValue(
-      'patient-a',
+    expect(screen.getByRole('combobox', { name: /^paciente/i })).toHaveTextContent(
+      'Ana Paciente',
+    )
+  })
+
+  it('busca catálogos localmente por trecho e acentuação sem criar requests', async () => {
+    apiScenario.catalogs.patients = [
+      { id: 'patient-a', name: 'Ána Paciente', tenantId: 'tenant-a' },
+      ...apiScenario.catalogs.patients.slice(1),
+    ]
+    const { user } = await renderDialog()
+    await openDialog(user)
+
+    const requestsBeforeSearch = { ...apiScenario.catalogRequests }
+    const patient = screen.getByRole('combobox', { name: /^paciente/i })
+    await user.click(patient)
+    const search = screen.getByRole('textbox', { name: 'Buscar paciente' })
+    await user.type(search, 'ana')
+
+    expect(
+      await screen.findByRole('option', { name: /ána paciente/i }),
+    ).toBeVisible()
+    expect(
+      screen.queryByRole('option', { name: /bia paciente/i }),
+    ).not.toBeInTheDocument()
+    expect(apiScenario.catalogRequests).toEqual(requestsBeforeSearch)
+
+    await user.clear(search)
+    await user.type(search, 'sem correspondência')
+    expect(screen.getByText(/nenhuma opção encontrada/i)).toBeVisible()
+
+    await user.keyboard('{Escape}')
+    expect(patient).toHaveTextContent('Selecione')
+  })
+
+  it('seleciona o serviço pesquisado pelo teclado e mantém a seleção no formulário', async () => {
+    const { user } = await renderDialog()
+    await openDialog(user)
+
+    const service = screen.getByRole('combobox', { name: /^serviço/i })
+    await user.click(service)
+    const search = screen.getByRole('textbox', { name: 'Buscar serviço' })
+    await user.type(search, 'fisio')
+    await user.keyboard('{ArrowDown}{Enter}')
+
+    expect(service).toHaveTextContent('Fisioterapia')
+    expect(screen.getByLabelText(/duração/i)).toHaveValue(45)
+    expect(screen.getByLabelText(/preço/i)).toHaveValue('120.00')
+    await waitFor(() =>
+      expect(apiScenario.professionalQueries).toContain('service-fisio'),
     )
   })
 
@@ -229,9 +277,11 @@ describe('diálogo de criação manual', () => {
     await waitFor(() =>
       expect(apiScenario.professionalQueries).toContain('service-pilates'),
     )
-    expect(
-      screen.getByRole('combobox', { name: /profissional.*opcional/i }),
-    ).toHaveValue('')
+    const professional = screen.getByRole('combobox', {
+      name: /profissional.*opcional/i,
+    })
+    expect(professional).toHaveTextContent('Sem profissional')
+    await user.click(professional)
     expect(
       await screen.findByRole('option', { name: /carla profissional/i }),
     ).toBeInTheDocument()
