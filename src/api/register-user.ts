@@ -1,11 +1,6 @@
 import { api } from '@/lib/axios'
+import type { RegisterUserBody } from '@/@types/user'
 import { getProfile } from './get-profile';
-
-export interface RegisterUserBody {
-  login: string
-  password: string
-  role: string
-}
 
 export async function registerUser({ login, password, role='USER' }: RegisterUserBody) {
 

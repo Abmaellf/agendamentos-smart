@@ -6,7 +6,8 @@ Compartilhar estado e operações entre componentes sem passagem manual de propr
 
 ## Responsabilidades e funcionalidades existentes
 
-- `PatientContext`: mantém a lista e as operações legadas de pacientes;
+- `PatientContext`: foi movido para `features/patients/model` e permanece
+  documentado na própria feature durante a migração;
 - `useGlobalContext`: esqueleto comentado de um contexto de autenticação, sem comportamento útil.
 
 ## Dependências internas e externas
@@ -17,13 +18,12 @@ Compartilhar estado e operações entre componentes sem passagem manual de propr
 
 ## Pontos de entrada e fluxos de entrada
 
-`App` monta `PatientProvider`. Páginas de pacientes selecionam propriedades com
-`useContextSelector`. A lista entra por `GET patient/list`; uma criação
-alternativa sai por `POST patients`.
+`App` monta o `PatientProvider` pertencente à feature de pacientes. O diretório
+`src/context` não deve receber novos contextos de domínio.
 
 ## Arquivos críticos
 
-- `PatientContext.tsx`: provider ativo e seu contrato local;
+- `features/patients/model/patient-context.tsx`: provider ativo e seu contrato;
 - `useGlobalContext.tsx`: módulo órfão de uma estratégia antiga de token.
 
 ## Regras próprias do módulo
@@ -36,7 +36,8 @@ alternativa sai por `POST patients`.
 
 ## Observações técnicas e débitos
 
-- O contexto ainda mistura estado remoto, HTTP e mutação de pacientes.
+- O contexto da feature ainda mistura estado remoto, HTTP e mutação de
+  pacientes; isso é débito funcional preservado desta refatoração.
 - `CreatePatients` envia o export `uuid` do Zod como valor, não um UUID gerado.
 - A criação usa endpoint distinto do modal compartilhado.
 - O tipo `Patient` é local e exige campos que nem todos os consumidores usam.

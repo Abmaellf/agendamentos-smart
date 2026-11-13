@@ -18,7 +18,7 @@ cookies, mensagens e navegação existentes.
 | `POST /api/appointments` | `useCreateAppointmentMutation` |
 | `GET auth/me` (perfil) | `useGetProfileQuery` em `AccountMenu` |
 | `POST /auth/login` | `useSignInMutation` em `SignIn` |
-| `POST /patient/save` | `useRegisterPatientMutation` em `AddPatientModal` |
+| `POST /patient/save` | `useRegisterPatientMutation` em `features/patients/components/add-patient-modal` |
 
 Não foram incluídas mudanças de contrato com o backend, autorização,
 persistência de estado, optimistic updates ou regras novas de negócio.

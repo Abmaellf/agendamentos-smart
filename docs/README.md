@@ -9,6 +9,7 @@ Este diretório concentra os documentos transversais do sistema. Os detalhes loc
 - [Objetivo do sistema](Objetivo%20do%20sistema.md): propósito, atores, funcionalidades e fluxos de negócio comprovados pelo código.
 - [Requisitos do MVP](Requisitos%20do%20MVP.md): decisões confirmadas de produto, permissões, cadastros, agenda, modelo multi-tenant e corte das etapas.
 - [Migração de TanStack React Query para RTK Query](Migracao-React-Query-para-RTK-Query.md): plano técnico de migração, com comparações "antes" e "agora". Documento planejado; não descreve código já entregue.
+- [Usuários e unidades clínicas](Usuarios-e-Unidades-Clinicas.md): contrato de escopo por unidade, migração, endpoints e integração de interface.
 
 ## Regra de interpretação
 

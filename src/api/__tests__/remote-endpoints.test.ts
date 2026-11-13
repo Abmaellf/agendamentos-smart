@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
 import { profileApi } from '@/api/get-profile'
-import { registerPatientApi } from '@/api/register-patient'
+import { registerPatientApi } from '@/features/patients/api/register-patient'
 import { signInApi } from '@/api/sign-in'
 import { createTestStore } from '@/test/render'
 import { server } from '@/test/server'

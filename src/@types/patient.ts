@@ -23,3 +23,23 @@ export interface PatientContextItem {
 export interface CreatePatientInput {
   name: string
 }
+
+export interface PatientTableRowsProps {
+  patientObj: {
+    name: string
+  }
+}
+
+export interface CreatePatientFormValues {
+  name: string
+}
+
+export interface PatientTableFilterFormValues {
+  name: string
+}
+
+export interface PaginationProps {
+  pageIndex: number
+  perPage: number
+  totalCount: number
+}

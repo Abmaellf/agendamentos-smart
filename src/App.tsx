@@ -8,7 +8,7 @@ import { store } from './lib/store'
 import { Router } from './Router'
 
 import './globals.css'
-import { PatientProvider } from './context/PatientContext'
+import { PatientProvider } from './features/patients/model/patient-context'
 
 export function App() {
   return (

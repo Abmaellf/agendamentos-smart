@@ -12,47 +12,41 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
-// import { api } from '@/lib/axios'
-import { PatientContext } from '@/context/PatientContext'
-// import { useContext } from 'react'
+import { PatientContext } from '../model/patient-context'
 import { useContextSelector } from 'use-context-selector'
 
-import type { CreatePatientFormValues } from '@/@types/components'
+import type { CreatePatientFormValues } from '@/@types/patient'
 
 const createPatientSchema: z.ZodType<
   CreatePatientFormValues,
   CreatePatientFormValues
 > = z.object({
   name: z.string(),
-  // dataNascimento: z.string(),
 })
 
 export default function CreatePatientDialog() {
+  const createPatient = useContextSelector(
+    PatientContext,
+    (context) => context.createPatient,
+  )
 
-    const createPatient = useContextSelector(
-			PatientContext,
-			(context) => {
-			 return context.createPatient
-		    });
-	
-  
   const { register, handleSubmit, reset } = useForm<CreatePatientFormValues>({
     resolver: zodResolver(createPatientSchema),
   })
 
-  async function handleCreatePatient(data: CreatePatientFormValues ) {
-    const { name } = data;
+  async function handleCreatePatient(data: CreatePatientFormValues) {
+    const { name } = data
 
-     await createPatient({
-      name
-     })
-     reset()
+    await createPatient({
+      name,
+    })
+    reset()
   }
-  
+
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle> Novo Paciente</DialogTitle>
+        <DialogTitle>Novo Paciente</DialogTitle>
 
         <DialogDescription>
           {' '}
@@ -62,19 +56,9 @@ export default function CreatePatientDialog() {
 
       <form onSubmit={handleSubmit(handleCreatePatient)}>
         <div className="grid grid-cols-4 items-center text-right gap-3">
-          <Label htmlFor="name"> Paciente </Label>
+          <Label htmlFor="name">Paciente</Label>
           <Input className="col-span-3" id="name" {...register('name')} />
         </div>
-
-        {/* <div className="grid grid-cols-4 items-center text-right gap-3">
-          <Label htmlFor="name"> Data Nascimento </Label>
-          <Input
-            type="date"
-            className="col-span-3"
-            id="name"
-            {...register('dataNascimento')}
-          />
-        </div> */}
 
         <DialogFooter>
           <DialogClose asChild>
@@ -82,7 +66,7 @@ export default function CreatePatientDialog() {
               Cancelar
             </Button>
           </DialogClose>
-          <Button type="submit"> Salvar </Button>
+          <Button type="submit">Salvar</Button>
         </DialogFooter>
       </form>
     </DialogContent>

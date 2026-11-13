@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import type { SessionProfile } from '@/@types/session'
+
 const sessionProfileSchema = z.object({
   id: z.string().min(1),
   login: z.string().min(1),
@@ -9,19 +11,6 @@ const sessionProfileSchema = z.object({
   clinicName: z.string().min(1).optional(),
   unitName: z.string().min(1).optional(),
 })
-
-export interface SessionProfile {
-  user: {
-    id: string
-    login: string
-    role: 'ADMIN' | 'BASIC'
-    name?: string
-  }
-  tenantId: string
-  activeUnitId: string
-  clinicName?: string
-  unitName?: string
-}
 
 export function parseSessionProfile(value: unknown): SessionProfile {
   const parsed = sessionProfileSchema.parse(value)

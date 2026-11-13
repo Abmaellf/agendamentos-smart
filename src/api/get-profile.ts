@@ -1,21 +1,6 @@
 import { api } from '@/lib/axios'
 import { baseApi } from '@/lib/base-api'
-
-export interface GetProfileResponse {
-    id: string
-    login: string
-    role: string
-    clinic:{
-        id: string
-        code: number
-        name: string
-        createdAt: string 
-    },
-    username: string
-    clinicName?: string
-    unitName?: string
-    activeUnitName?: string
-}
+import type { GetProfileResponse } from '@/@types/profile'
 
 export const profileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

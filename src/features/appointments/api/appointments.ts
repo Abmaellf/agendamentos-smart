@@ -9,7 +9,7 @@ import type {
 } from '@/@types/appointment'
 import { baseApi } from '@/lib/base-api'
 
-import { parseSessionProfile } from '../../session/model/session'
+import { parseSessionProfile } from '@/features/session/model/session'
 
 interface ContentResponse<T> {
   content: T[]

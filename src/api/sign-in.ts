@@ -1,14 +1,5 @@
 import { baseApi } from '@/lib/base-api'
-
-export interface SignInBody {
-  login: string
-  password: string
-}
-
-export interface SignInResponse {
-  token?: unknown
-  user?: unknown
-}
+import type { SignInBody, SignInResponse } from '@/@types/auth'
 
 export const signInApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
