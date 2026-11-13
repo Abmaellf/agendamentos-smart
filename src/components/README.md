@@ -11,6 +11,7 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 | `AppSidebar`          | Navegação lateral responsiva         | Ativo                       |
 | `AppTopbar`           | Ações globais da casca interna      | Ativo                       |
 | `account-menu.tsx`    | Perfil da clínica/usuário            | Ativo                       |
+| `form-field.tsx`      | Rótulo, controle e erro acessíveis   | Ativo                       |
 | `Card`                | Cartões antigos da agenda            | Legado sem consumidor       |
 | `WeekDate`            | Rótulos antigos dos dias úteis       | Legado sem consumidor       |
 | `nav-link.tsx`        | Link com estado atual                | Órfão                       |
@@ -37,12 +38,16 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 - `AppSidebar/index.tsx`: navegação lateral, destinos disponíveis/indisponíveis e card informativo;
 - `AppTopbar/index.tsx`: ações globais da casca, data compartilhada e acionamento responsivo da sidebar;
 - `account-menu.tsx`: avatar, identificação da conta e menu de perfil baseado no perfil remoto existente;
+- `form-field.tsx`: apresentação compartilhada de rótulo, controle e mensagem
+  de erro; não contém schemas, chamadas HTTP ou regras de domínio;
 - `features/appointments/pages/appointments-page.tsx`: fonte da grade semanal;
 - `ui/`: base visual da maioria dos formulários.
 
 ## Regras próprias do módulo
 
 - Componentes compartilhados devem ser predominantemente visuais; regras de agenda, autorização e persistência entram por propriedades/hooks tipados.
+- `FormField` recebe o controle e o erro por propriedades; validação e estado
+  continuam nos componentes das features consumidoras.
 - A interface pode ocultar ou desabilitar ações por papel, mas o adaptador/API deve repetir a autorização.
 - Componentes de agenda devem usar IDs, estados e DTOs canônicos e representar um agendamento por paciente, inclusive em turmas.
 - Formulários precisam exibir validações de conflito, capacidade e permissão sem oferecer exceção administrativa.

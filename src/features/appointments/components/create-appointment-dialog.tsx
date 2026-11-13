@@ -1,18 +1,11 @@
-import {
-  cloneElement,
-  type FormEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { type FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import type {
-  AppointmentFieldProps,
   AppointmentFormState,
   CreateAppointmentDialogProps,
 } from '@/@types/appointment'
+import { FormField } from '@/components/form-field'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -48,32 +41,6 @@ const emptyForm = (defaultDate = ''): AppointmentFormState => ({
   durationMinutes: '',
   price: '',
 })
-
-function Field({
-  label,
-  error,
-  children,
-}: AppointmentFieldProps) {
-  const id = children.props.id ?? label.toLowerCase().replace(/\W+/g, '-')
-  const errorId = `${id}-error`
-
-  return (
-    <div className="grid gap-1">
-      <label htmlFor={id} className="text-sm font-medium">
-        {label}
-      </label>
-      {cloneElement(children, {
-        id,
-        'aria-describedby': error ? errorId : undefined,
-      })}
-      {error ? (
-        <p id={errorId} className="text-sm text-red-700">
-          {error}
-        </p>
-      ) : null}
-    </div>
-  )
-}
 
 const controlClassName =
   'h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-black disabled:bg-gray-100'
@@ -241,7 +208,7 @@ export function CreateAppointmentDialog({
           ) : null}
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Paciente" error={fieldErrors.patientId}>
+            <FormField label="Paciente" error={fieldErrors.patientId}>
               <select
                 ref={patientRef}
                 className={controlClassName}
@@ -260,9 +227,9 @@ export function CreateAppointmentDialog({
                   </option>
                 ))}
               </select>
-            </Field>
+            </FormField>
 
-            <Field label="Unidade" error={fieldErrors.unitId}>
+            <FormField label="Unidade" error={fieldErrors.unitId}>
               <select
                 className={controlClassName}
                 value={form.unitId}
@@ -280,9 +247,9 @@ export function CreateAppointmentDialog({
                   </option>
                 ))}
               </select>
-            </Field>
+            </FormField>
 
-            <Field label="Serviço" error={fieldErrors.serviceId}>
+            <FormField label="Serviço" error={fieldErrors.serviceId}>
               <select
                 className={controlClassName}
                 value={form.serviceId}
@@ -295,9 +262,9 @@ export function CreateAppointmentDialog({
                   </option>
                 ))}
               </select>
-            </Field>
+            </FormField>
 
-            <Field label="Profissional (opcional)">
+            <FormField label="Profissional (opcional)">
               <select
                 className={controlClassName}
                 value={form.professionalId}
@@ -316,9 +283,9 @@ export function CreateAppointmentDialog({
                   </option>
                 ))}
               </select>
-            </Field>
+            </FormField>
 
-            <Field label="Data" error={fieldErrors.date}>
+            <FormField label="Data" error={fieldErrors.date}>
               <input
                 type="date"
                 className={controlClassName}
@@ -330,9 +297,9 @@ export function CreateAppointmentDialog({
                   }))
                 }
               />
-            </Field>
+            </FormField>
 
-            <Field label="Horário" error={fieldErrors.time}>
+            <FormField label="Horário" error={fieldErrors.time}>
               <input
                 type="time"
                 className={controlClassName}
@@ -344,9 +311,9 @@ export function CreateAppointmentDialog({
                   }))
                 }
               />
-            </Field>
+            </FormField>
 
-            <Field
+            <FormField
               label="Duração (minutos)"
               error={fieldErrors.durationMinutes}
             >
@@ -365,9 +332,9 @@ export function CreateAppointmentDialog({
                   }))
                 }}
               />
-            </Field>
+            </FormField>
 
-            <Field label="Preço" error={fieldErrors.price}>
+            <FormField label="Preço" error={fieldErrors.price}>
               <input
                 type="text"
                 inputMode="decimal"
@@ -382,7 +349,7 @@ export function CreateAppointmentDialog({
                   }))
                 }}
               />
-            </Field>
+            </FormField>
           </div>
 
           {patientsQuery.isSuccess && patientsQuery.data.length === 0 ? (

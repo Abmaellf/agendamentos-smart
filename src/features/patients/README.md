@@ -33,8 +33,10 @@ escopo de uma change funcional posterior.
 
 Os contratos compartilhados de paciente e dos formulários da feature ficam em
 `src/@types/patient.ts`. A feature usa componentes visuais de
-`src/components/ui` e clientes HTTP compartilhados de `src/lib`, mas não move
-regras de pacientes para componentes globais.
+`src/components/ui`, o `FormField` compartilhado para a apresentação do campo
+de nome no modal RTK Query e clientes HTTP compartilhados de `src/lib`, mas não
+move regras de pacientes para componentes globais. Os dois fluxos de criação
+continuam com seus contratos e estados próprios.
 
 ## Lacunas preservadas
 

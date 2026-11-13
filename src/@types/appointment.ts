@@ -1,5 +1,3 @@
-import type { ReactElement } from 'react'
-
 export type AppointmentRole = 'ADMIN' | 'BASIC'
 
 export interface AppointmentSession {
@@ -135,10 +133,4 @@ export interface AppointmentFormState {
   time: string
   durationMinutes: number | string
   price: string
-}
-
-export interface AppointmentFieldProps {
-  label: string
-  error?: string
-  children: ReactElement<{ id?: string; 'aria-describedby'?: string }>
 }
