@@ -9,6 +9,7 @@ import {
   Search,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useGetAppointmentSessionQuery } from '@/features/appointments/api/appointments'
 import { CreateAppointmentDialog } from '@/features/appointments/components/create-appointment-dialog'
@@ -188,13 +189,20 @@ export function AppTopbar({
 
       <div className="ml-auto flex items-center gap-2 max-[720px]:order-2">
         {session ? (
-          <div className="hidden sm:block">
+          <div className="hidden items-center gap-2 sm:flex">
             <CreateAppointmentDialog
               session={session}
               defaultDate={dateValue}
               triggerLabel="Agendar"
               triggerAriaLabel="Novo agendamento"
             />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => toast.info('Agendamento de Pacotes estará disponível após a SPEC 02.')}
+            >
+              Agendamento de Pacotes
+            </Button>
           </div>
         ) : null}
 

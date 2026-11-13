@@ -13,6 +13,7 @@ export const baseApi = createApi({
     'UnitCatalog',
     'ServiceCatalog',
     'ProfessionalCatalog',
+    'ServicePackage',
   ],
   endpoints: () => ({}),
 })

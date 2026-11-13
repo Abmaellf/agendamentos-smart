@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import { AppointmentsPage } from '@/features/appointments/pages/appointments-page'
+import { PackagesPage } from '@/features/packages/pages/packages-page'
 
 import { SignIn } from './page/auth/sign-in'
 import { AuthLayout } from './_layout/auth'
@@ -25,6 +26,7 @@ export function Router() {
         <Route path="/paciente" element={<Patient />} />
         <Route path="/doctor" element={<Doctor />} />
         <Route path="/configuration" element={<Configuration />} />
+        <Route path="/services/packages" element={<PackagesPage />} />
       </Route>
     </Routes>
   )
