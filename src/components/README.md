@@ -12,6 +12,7 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 | `AppTopbar`           | Ações globais da casca interna      | Ativo                       |
 | `account-menu.tsx`    | Perfil da clínica/usuário            | Ativo                       |
 | `form-field.tsx`      | Rótulo, controle e erro acessíveis   | Ativo                       |
+| `searchable-select.tsx` | Combobox local para catálogos       | Ativo                       |
 | `Card`                | Cartões antigos da agenda            | Legado sem consumidor       |
 | `WeekDate`            | Rótulos antigos dos dias úteis       | Legado sem consumidor       |
 | `nav-link.tsx`        | Link com estado atual                | Órfão                       |
@@ -40,6 +41,9 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 - `account-menu.tsx`: avatar, identificação da conta e menu de perfil baseado no perfil remoto existente;
 - `form-field.tsx`: apresentação compartilhada de rótulo, controle e mensagem
   de erro; não contém schemas, chamadas HTTP ou regras de domínio;
+- `searchable-select.tsx`: combobox apresentacional com filtro local por nome,
+  lupa no dropdown e estados acessíveis; recebe opções e seleção por
+  propriedades e não consulta API;
 - `features/appointments/pages/appointments-page.tsx`: fonte da grade semanal;
 - `ui/`: base visual da maioria dos formulários.
 
