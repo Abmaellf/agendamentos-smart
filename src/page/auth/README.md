@@ -2,12 +2,17 @@
 
 ## Objetivo do módulo
 
-Oferecer telas públicas de login e intenção de cadastro de usuário/clínica.
+Oferecer telas públicas de login e intenção de cadastro de clínica com a
+identidade visual da Equilíbrio Fisioterapia & Pilates.
 
 ## Responsabilidades e funcionalidades existentes
 
-- `SignIn`: coleta login/senha, chama autenticação, notifica resultado e navega para a agenda;
-- `SignUp`: coleta três campos visuais e navega para a agenda sem enviar dados.
+- `AuthLayout`: compõe o painel institucional, marca, benefícios, rodapé e
+  cartão responsivo compartilhado entre login e cadastro;
+- `SignIn`: coleta login/senha, chama autenticação, notifica resultado e navega
+  para a agenda;
+- `SignUp`: apresenta os campos visuais de clínica, e-mail e CPF/CNPJ sem
+  persistir o cadastro nesta etapa.
 
 ## Dependências internas e externas
 
@@ -18,12 +23,14 @@ Oferecer telas públicas de login e intenção de cadastro de usuário/clínica.
 ## Pontos de entrada e fluxos de entrada
 
 - `/sign-in` → `POST /auth/login` → sucesso: `/appointments`; falha: toast;
-- `/sign-up` → clique em link/botão → `/appointments`, sem mutation.
+- `/sign-up` → ação “Efetuar login” → `/sign-in`; o botão “Salvar cadastro” é
+  visual e não executa mutation nesta etapa.
 
 ## Arquivos críticos
 
+- `../_layout/auth.tsx`: composição pública compartilhada;
 - `sign-in.tsx`: fluxo real de autenticação;
-- `sign-up.tsx`: fluxo apenas visual.
+- `sign-up.tsx`: fluxo visual de intenção de cadastro.
 
 ## Regras próprias do módulo
 
@@ -45,8 +52,9 @@ Oferecer telas públicas de login e intenção de cadastro de usuário/clínica.
 ## Observações técnicas e débitos
 
 - O schema de login exige somente strings, sem mínimo ou validação de e-mail do Zod.
-- O login imprime token e usuário no console.
+- O login não imprime token, usuário ou dados pessoais no console.
 - O cliente não armazena o token; depende de comportamento do backend/cookie não comprovado aqui.
 - `SignUp` não usa React Hook Form, não chama `registerUser` e não persiste clínica.
-- `redirect()` retornado pelo `onClick` não controla a navegação; o `Link` é quem navega.
-- O texto “Acompanhe suas vendas” não corresponde aos fluxos de agenda presentes.
+- O texto “Acompanhe suas vendas pelo painel do parceiro” é mantido por
+  compatibilidade visual com a referência, embora o produto principal seja a
+  gestão de agendamentos.
