@@ -10,6 +10,7 @@ Este diretório concentra os documentos transversais do sistema. Os detalhes loc
 - [Requisitos do MVP](Requisitos%20do%20MVP.md): decisões confirmadas de produto, permissões, cadastros, agenda, modelo multi-tenant e corte das etapas.
 - [Migração de TanStack React Query para RTK Query](Migracao-React-Query-para-RTK-Query.md): plano técnico de migração, com comparações "antes" e "agora". Documento planejado; não descreve código já entregue.
 - [Usuários e unidades clínicas](Usuarios-e-Unidades-Clinicas.md): contrato de escopo por unidade, migração, endpoints e integração de interface.
+- [Refatoração da página de login](refacto-pagina-login.md): passo a passo da branch `refacto/pagina-login`, comparativos antes/agora, códigos, testes e limites do login/cadastro visual.
 
 ## Regra de interpretação
 

@@ -6,12 +6,16 @@ Armazenar imagens que podem ser empacotadas pelo Vite quando importadas pelo có
 
 ## Responsabilidades e funcionalidades existentes
 
-Contém quatro arquivos PNG: `BolaUnTra.png`, `abm_avatar.png`, `avatar.png` e `img_pilates.png`.
+Contém quatro arquivos PNG: `BolaUnTra.png`, `abm_avatar.png`, `avatar.png` e
+`img_pilates.png`. `img_pilates.png` é reutilizado como imagem atmosférica do
+painel público de autenticação; a composição escurece e sobrepõe a imagem para
+preservar a leitura do conteúdo.
 
 ## Dependências internas e externas
 
 - dependência externa potencial: pipeline de assets do Vite;
-- módulos consumidores: `components/account-menu.tsx` e `components/AppTopbar/index.tsx` por composição;
+- módulos consumidores: `components/account-menu.tsx`, `components/AppTopbar/index.tsx`
+  e `_layout/auth.tsx` por composição;
 - `abm_avatar.png` é o avatar sintético reutilizado no menu de perfil do topbar.
 
 ## Pontos de entrada e fluxos de entrada
