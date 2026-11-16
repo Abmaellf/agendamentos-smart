@@ -1,59 +1,48 @@
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale/pt-BR'
 
-import type { CardDayProps } from '@/@types/appointment'
+import type { Appointment, CardDayProps } from '@/@types/appointment'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
 import { CardPatient } from '../CardPatient/cardPatient'
 
-export function CardDay(cardDay: CardDayProps) {
-  const appointmentDate = new Date()
-  const appointments = [
-    {
-      id: '889',
-      namePatient: 'Abmael',
-      pathology: ['Fisioterapia', 'Pilates'],
-      date: appointmentDate,
-      hours: '10:00',
-      status: 'Ativo',
-      image: 'local',
-    },
-    {
-      id: '890',
-      namePatient: 'Ana',
-      pathology: ['Fisioterapia', 'Pilates'],
-      date: appointmentDate,
-      hours: '10:00',
-      status: 'Ativo',
-      image: 'local',
-    },
-  ]
+function appointmentLocalDateKey(appointment: Appointment) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: appointment.timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date(appointment.startsAt))
+}
 
+
+
+export function CardDay({
+    date,
+    isToday,
+    dayWeek,
+    appointments,
+  }: CardDayProps) {
   return (
     <Card
-      data-day-week={cardDay.dayWeek}
-      data-today={cardDay.isToday}
+      data-day-week={dayWeek}
+      data-today={isToday}
       className={cn(
         'flex w-80 flex-col gap-2 rounded-[10px] border-0 p-2.5 text-[#202024] shadow-none',
-        cardDay.isToday ? 'bg-[#323238]' : 'bg-white',
+        isToday ? 'bg-[#323238]' : 'bg-white',
       )}
     >
-      {appointments.map((appointment) => {
-        const appointmentDay = format(appointment.date, 'dd/MM/yyyy', {
-          locale: ptBR,
-        })
-
-        if (appointmentDay !== cardDay.date) return null
-
-        return (
-          <CardPatient
-            key={appointment.id}
-            appointment={appointment}
-            isToDay={cardDay.isToday}
-          />
-        )
-      })}
+        {appointments.map((appointment) => {
+             if (appointmentLocalDateKey(appointment) !== date ) return null
+                return (
+                  <CardPatient
+                    key={appointment.id}
+                    appointment={appointment}
+                    isToday={isToday}
+                  />
+                )
+        })}
     </Card>
   )
 }
