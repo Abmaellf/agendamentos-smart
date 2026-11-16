@@ -1,7 +1,13 @@
 import { baseApi } from '@/lib/base-api'
 
 export type PackageWeekDay =
-  | 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
+  | 'MONDAY'
+  | 'TUESDAY'
+  | 'WEDNESDAY'
+  | 'THURSDAY'
+  | 'FRIDAY'
+  | 'SATURDAY'
+  | 'SUNDAY'
 
 export interface ServicePackage {
   id: string
@@ -29,6 +35,14 @@ export interface ServicePackageInput {
   active: boolean
 }
 
+export interface ServicePackageFilters {
+  unitId?: string
+  serviceId?: string
+  active?: boolean
+  totalSessions?: number
+  name?: string
+}
+
 function contentOf(value: unknown): ServicePackage[] {
   if (Array.isArray(value)) return value as ServicePackage[]
   return (value as { content?: ServicePackage[] }).content ?? []
@@ -36,20 +50,63 @@ function contentOf(value: unknown): ServicePackage[] {
 
 export const packagesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getServicePackages: builder.query<ServicePackage[], Record<string, string | boolean | number | undefined> | void>({
+    getServicePackages: builder.query<
+      ServicePackage[],
+      ServicePackageFilters | void
+    >({
       query: (params) => ({ url: '/api/service-packages', params }),
       transformResponse: contentOf,
       providesTags: ['ServicePackage'],
     }),
-    createServicePackage: builder.mutation<ServicePackage, ServicePackageInput>({
-      query: (data) => ({ url: '/api/service-packages', method: 'POST', data }),
-      invalidatesTags: ['ServicePackage'],
+    getServicePackage: builder.query<ServicePackage, string>({
+      query: (id) => ({ url: `/api/service-packages/${id}` }),
+      providesTags: (_result, _error, id) => [{ type: 'ServicePackage', id }],
     }),
-    updateServicePackageStatus: builder.mutation<ServicePackage, { id: string; active: boolean }>({
-      query: ({ id, active }) => ({ url: `/api/service-packages/${id}/status`, method: 'PATCH', data: { active } }),
-      invalidatesTags: ['ServicePackage'],
+    createServicePackage: builder.mutation<ServicePackage, ServicePackageInput>(
+      {
+        query: (data) => ({
+          url: '/api/service-packages',
+          method: 'POST',
+          data,
+        }),
+        invalidatesTags: ['ServicePackage'],
+      },
+    ),
+    updateServicePackage: builder.mutation<
+      ServicePackage,
+      { id: string; data: ServicePackageInput }
+    >({
+      query: ({ id, data }) => ({
+        url: `/api/service-packages/${id}`,
+        method: 'PATCH',
+        data,
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        'ServicePackage',
+        { type: 'ServicePackage', id },
+      ],
+    }),
+    updateServicePackageStatus: builder.mutation<
+      ServicePackage,
+      { id: string; active: boolean }
+    >({
+      query: ({ id, active }) => ({
+        url: `/api/service-packages/${id}/status`,
+        method: 'PATCH',
+        data: { active },
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        'ServicePackage',
+        { type: 'ServicePackage', id },
+      ],
     }),
   }),
 })
 
-export const { useGetServicePackagesQuery, useCreateServicePackageMutation, useUpdateServicePackageStatusMutation } = packagesApi
+export const {
+  useGetServicePackagesQuery,
+  useGetServicePackageQuery,
+  useCreateServicePackageMutation,
+  useUpdateServicePackageMutation,
+  useUpdateServicePackageStatusMutation,
+} = packagesApi

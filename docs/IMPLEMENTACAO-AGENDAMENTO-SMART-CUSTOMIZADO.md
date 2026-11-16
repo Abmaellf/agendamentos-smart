@@ -1,11 +1,15 @@
-# Implementação da branch `feat/agendamento-smart-customizado`
+# Implementação completa da branch `feat/criar-agendamento-com-pacote`
 
-> Documento de rastreabilidade técnica criado em 13 de novembro de 2026.
+> Documento de rastreabilidade técnica atualizado em 14 de novembro de 2026.
 >
 > Este arquivo descreve o estado efetivamente implementado e presente no
 > diretório de trabalho no momento da auditoria. Ele também distingue, de forma
 > explícita, os pontos apenas planejados ou preparados para a SPEC 02. Não deve
 > ser interpretado como confirmação de que toda a change OpenSpec foi concluída.
+>
+> **Nota de leitura:** as seções 1 a 10 preservam o histórico da implementação
+> inicial. A seção 11 é a referência autoritativa para o estado atual da branch
+> `feat/criar-agendamento-com-pacote` e corrige os pontos que evoluíram depois.
 
 ## 1. Escopo, origem e estado da branch
 
@@ -29,9 +33,10 @@ serviços e de disponibilizar, ao lado do agendamento manual, o botão
    somente depois de o fluxo novo estar consolidado.
 
 No instante desta documentação, a branch local
-`feat/agendamento-smart-customizado` aponta para o mesmo commit de `main`
-(`5f8b40b`). Assim, **não há commits próprios da branch para comparar**; o que
-foi implementado está em alterações locais ainda não commitadas. Há trabalho em
+`feat/criar-agendamento-com-pacote` aponta atualmente para o commit de merge
+`3702ef0`. O histórico funcional principal vem do commit `d4cf285`, que adiciona
+o cadastro inicial de pacotes; a evolução administrativa descrita neste
+documento também possui alterações locais ainda não commitadas. Há trabalho em
 dois repositórios coordenados:
 
 | Repositório | Papel | Estado observado |
@@ -57,10 +62,11 @@ foram validados com `openspec validate gerenciar-pacotes-flexiveis --strict`:
   - `openspec/changes/gerenciar-pacotes-flexiveis/tasks.md`;
   - `openspec/changes/gerenciar-pacotes-flexiveis/specs/service-package-management/spec.md`.
 
-As listas de tarefas das duas changes ainda estão sem marcação de conclusão.
-Isso é intencional e correto neste estado: há código inicial funcional, mas os
-testes de integração, a documentação modular, a página completa de edição e as
-verificações finais exigidas pela change ainda não foram realizados.
+O estado atual das tarefas OpenSpec é: API `gerenciar-pacotes-flexiveis` com
+9/9 tarefas concluídas; frontend com 19/20 tarefas concluídas. A única pendência
+é a inspeção visual manual em viewport estreito, pois não havia navegador
+disponível nesta sessão. Os testes automatizados, documentação e validações
+estritas foram executados.
 
 ## 3. Passo a passo da implementação realizada
 
@@ -1268,3 +1274,1602 @@ atenção durante manutenção:
 7. O documento descreve código local não commitado. Antes de revisão, merge ou
    deploy, é necessário concluir os testes e registrar evidências nas tarefas
    OpenSpec, como indicado na seção 8.
+
+---
+
+# 11. Versão definitiva da branch `feat/criar-agendamento-com-pacote`
+
+As seções anteriores registram a evolução inicial da branch
+`feat/agendamento-smart-customizado`. Esta seção é a referência final para o
+estado atual de `feat/criar-agendamento-com-pacote`. Ela descreve exatamente o
+que foi alterado depois do commit-base `3702ef0` e usa o formato solicitado:
+**onde era assim, agora é assim**, seguido do código e da finalidade.
+
+## 11.1 Estado de referência e escopo
+
+Antes desta atualização, a branch já possuía o cadastro inicial de pacotes
+(commit funcional `d4cf285`): migration, controller, serviço de domínio, rota,
+formulário básico e botão informativo. A versão atual aperfeiçoa o cadastro
+administrativo para suportar a operação completa prevista na SPEC 01:
+
+- consultar e filtrar pacotes por nome, unidade, serviço, situação e sessões;
+- abrir um pacote existente para edição;
+- validar os campos no frontend com Zod;
+- preservar os dados digitados quando a API rejeitar a mutation;
+- ativar e desativar sem exclusão física;
+- manter a frequência semanal derivada dos dias, sem campo independente;
+- exibir Serviços → Pacotes como submenu navegável;
+- documentar API, modelo, repositório, serviço, controller, DTOs e migration;
+- verificar a integração real com PostgreSQL descartável.
+
+Ficam deliberadamente fora desta branch: contratação por paciente, data inicial,
+seleção de horários, profissional, feriados, bloqueios, geração de séries e
+ocorrências. Esses itens pertencem à SPEC 02 ou a futuras especificações de
+calendário.
+
+## 11.2 Passo 1 — Organização OpenSpec
+
+### Onde era assim
+
+Existia apenas a intenção de cadastrar pacotes, sem um contrato formal que
+separasse a configuração administrativa do agendamento automático.
+
+### Agora é assim
+
+Foram mantidas as changes OpenSpec coordenadas:
+
+```text
+Frontend:
+openspec/changes/gerenciar-pacotes-flexiveis/
+├── proposal.md
+├── design.md
+├── tasks.md
+└── specs/
+    ├── application-shell-baseline/spec.md
+    └── service-package-management/spec.md
+
+API:
+openspec/changes/gerenciar-pacotes-flexiveis/
+├── proposal.md
+├── design.md
+├── tasks.md
+└── specs/service-package-management/spec.md
+```
+
+O contrato da API foi validado com:
+
+```bash
+openspec validate gerenciar-pacotes-flexiveis --strict
+```
+
+Resultado: change válida nos dois repositórios. A API concluiu 9/9 tarefas. O
+frontend concluiu 19/20; resta somente a revisão visual manual em viewport
+estreito, pois o ambiente desta execução não disponibilizou navegador.
+
+## 11.3 Passo 2 — Migration e integridade do banco
+
+### Onde era assim
+
+Não existiam tabelas para definir pacotes, seus dias, preço ou auditoria. O
+agendamento manual não podia distinguir uma configuração comercial de uma
+ocorrência individual.
+
+### Agora é assim
+
+`V012__create_service_packages.sql` cria duas estruturas:
+
+```sql
+CREATE TABLE SERVICE_PACKAGE (
+    id UUID NOT NULL,
+    clinic_id UUID NOT NULL,
+    tenant_id UUID NOT NULL,
+    unit_id UUID NOT NULL,
+    service_id UUID NOT NULL,
+    created_by UUID NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(2000),
+    total_sessions INT NOT NULL,
+    total_price DECIMAL(10, 2) NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    version BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT pk_service_package PRIMARY KEY (id),
+    CONSTRAINT uk_service_package_clinic_id UNIQUE (clinic_id, id),
+    CONSTRAINT fk_service_package_clinic
+      FOREIGN KEY (clinic_id) REFERENCES CLINIC (id),
+    CONSTRAINT fk_service_package_unit_tenant
+      FOREIGN KEY (clinic_id, unit_id)
+      REFERENCES CLINIC_UNIT (clinic_id, id),
+    CONSTRAINT fk_service_package_service_tenant
+      FOREIGN KEY (clinic_id, service_id)
+      REFERENCES SERVICE_OFFERING (clinic_id, id),
+    CONSTRAINT fk_service_package_created_by_tenant
+      FOREIGN KEY (clinic_id, created_by)
+      REFERENCES USERS (clinic_id, id),
+    CONSTRAINT chk_service_package_sessions CHECK (total_sessions > 0),
+    CONSTRAINT chk_service_package_price CHECK (total_price >= 0)
+);
+
+CREATE TABLE SERVICE_PACKAGE_WEEK_DAY (
+    service_package_id UUID NOT NULL,
+    week_day VARCHAR(16) NOT NULL,
+    CONSTRAINT pk_service_package_week_day
+      PRIMARY KEY (service_package_id, week_day),
+    CONSTRAINT fk_service_package_week_day_package
+      FOREIGN KEY (service_package_id)
+      REFERENCES SERVICE_PACKAGE (id),
+    CONSTRAINT chk_service_package_week_day CHECK (
+      week_day IN (
+        'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY',
+        'FRIDAY', 'SATURDAY', 'SUNDAY'
+      )
+    )
+);
+
+CREATE INDEX idx_service_package_clinic_unit
+    ON SERVICE_PACKAGE (clinic_id, unit_id);
+CREATE INDEX idx_service_package_clinic_service
+    ON SERVICE_PACKAGE (clinic_id, service_id);
+CREATE INDEX idx_service_package_clinic_active
+    ON SERVICE_PACKAGE (clinic_id, active);
+```
+
+### Funcionalidade resultante
+
+1. `DECIMAL(10,2)` preserva o valor monetário sem `float`.
+2. As FKs compostas impedem uma unidade ou serviço de outra clínica.
+3. Os `CHECK` rejeitam zero sessões, sessões negativas e preço negativo mesmo
+   que a chamada não venha do frontend.
+4. A chave `(service_package_id, week_day)` impede o mesmo dia duas vezes.
+5. `active` permite desativação sem apagar histórico.
+6. `version`, `created_at` e `updated_at` permitem auditoria e controle de
+   atualização.
+
+A classe `ServicePackageControllerIntegrationTest` confirmou a migration em
+PostgreSQL 18 descartável. O teste também tentou inserir diretamente um dia já
+existente e recebeu `DataIntegrityViolationException`, comprovando a restrição
+física do banco.
+
+## 11.4 Passo 3 — Entidades, DTOs e repositório da API
+
+### Onde era assim
+
+O catálogo tinha serviço e unidade, mas não havia uma entidade de pacote nem um
+contrato que retornasse frequência semanal.
+
+### Agora é assim
+
+Arquivos adicionados:
+
+```text
+src/main/java/com/agendamento/smart/model/servicepackage/
+├── PackageWeekDay.java
+└── ServicePackageDefinition.java
+
+src/main/java/com/agendamento/smart/dtos/servicepackage/
+├── ServicePackageRequest.java
+├── ServicePackageStatusRequest.java
+└── ServicePackageResponse.java
+
+src/main/java/com/agendamento/smart/repository/
+└── ServicePackageRepository.java
+```
+
+Enum dos dias:
+
+```java
+public enum PackageWeekDay {
+    MONDAY, TUESDAY, WEDNESDAY, THURSDAY,
+    FRIDAY, SATURDAY, SUNDAY
+}
+```
+
+Contrato recebido pela API:
+
+```java
+public record ServicePackageRequest(
+        @NotBlank String name,
+        String description,
+        @NotNull UUID unitId,
+        @NotNull UUID serviceId,
+        @NotNull @Positive Integer totalSessions,
+        @NotNull @DecimalMin(value = "0.00") BigDecimal totalPrice,
+        @NotEmpty List<PackageWeekDay> weekDays,
+        @NotNull Boolean active) {}
+```
+
+O contrato não recebe `weeklyFrequency`: ela é sempre `weekDays.size()`.
+
+Mapeamento JPA principal:
+
+```java
+@Entity
+@Table(name = "SERVICE_PACKAGE")
+public class ServicePackageDefinition {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "clinic_id")
+    private Clinic clinic;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "unit_id")
+    private ClinicUnit unit;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "service_id")
+    private ServiceOffering service;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "SERVICE_PACKAGE_WEEK_DAY",
+        joinColumns = @JoinColumn(name = "service_package_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "week_day", nullable = false)
+    private Set<PackageWeekDay> weekDays = new LinkedHashSet<>();
+}
+```
+
+Consulta escopada:
+
+```java
+public interface ServicePackageRepository
+        extends JpaRepository<ServicePackageDefinition, UUID> {
+    List<ServicePackageDefinition> findAllByClinicIdOrderByNameAsc(UUID clinicId);
+
+    Optional<ServicePackageDefinition> findByIdAndClinicId(
+            UUID id, UUID clinicId);
+}
+```
+
+O repositório não oferece `delete`, preservando a decisão de ativar/desativar.
+
+## 11.5 Passo 4 — Serviço de domínio e regras de negócio
+
+### Onde era assim
+
+As operações de pacote eram apenas uma camada inicial de cadastro. Não havia
+edição, filtro, detalhe, validação de uso ou normalização completa.
+
+### Agora é assim
+
+`ServicePackageService` concentra criação, consulta, detalhe, edição e situação:
+
+```java
+@Transactional
+public ServicePackageResponse create(
+        User user, ServicePackageRequest request) {
+    requireAdmin(user);
+    ServicePackageDefinition definition = new ServicePackageDefinition();
+    definition.setClinic(user.getClinic());
+    definition.setCreatedBy(user);
+    apply(definition, user, request);
+    return toResponse(packageRepository.saveAndFlush(definition));
+}
+
+@Transactional(readOnly = true)
+public List<ServicePackageResponse> findAll(
+        User user, UUID unitId, UUID serviceId, Boolean active,
+        Integer totalSessions, String name) {
+    requireAdmin(user);
+    Stream<ServicePackageDefinition> packages = packageRepository
+        .findAllByClinicIdOrderByNameAsc(user.getClinic().getId())
+        .stream();
+
+    if (unitId != null)
+        packages = packages.filter(item -> item.getUnit().getId().equals(unitId));
+    if (serviceId != null)
+        packages = packages.filter(item -> item.getService().getId().equals(serviceId));
+    if (active != null)
+        packages = packages.filter(item -> item.isActive() == active);
+    if (totalSessions != null)
+        packages = packages.filter(item ->
+            item.getTotalSessions().equals(totalSessions));
+    if (name != null && !name.isBlank()) {
+        String normalized = name.trim().toLowerCase();
+        packages = packages.filter(item ->
+            item.getName().toLowerCase().contains(normalized));
+    }
+    return packages.map(this::toResponse).toList();
+}
+```
+
+Aplicação e validação do payload:
+
+```java
+private void apply(
+        ServicePackageDefinition definition,
+        User user,
+        ServicePackageRequest request) {
+    LinkedHashSet<PackageWeekDay> days =
+        new LinkedHashSet<>(request.weekDays());
+
+    if (days.size() != request.weekDays().size()) {
+        throw new DomainException(
+            "PACKAGE_VALIDATION_ERROR",
+            "Os dias da semana não podem se repetir.",
+            HttpStatus.BAD_REQUEST);
+    }
+
+    UUID clinicId = user.getClinic().getId();
+    ClinicUnit unit = unitRepository
+        .findByIdAndClinicId(request.unitId(), clinicId)
+        .orElseThrow(this::packageNotFound);
+    ServiceOffering service = serviceRepository
+        .findByIdAndClinicId(request.serviceId(), clinicId)
+        .orElseThrow(this::packageNotFound);
+
+    definition.setTenantId(unit.getTenantId());
+    definition.setUnit(unit);
+    definition.setService(service);
+    definition.setName(request.name().trim());
+    definition.setDescription(normalizeDescription(request.description()));
+    definition.setTotalSessions(request.totalSessions());
+    definition.setTotalPrice(
+        request.totalPrice().setScale(2, RoundingMode.HALF_UP));
+    definition.setWeekDays(days);
+    definition.setActive(request.active());
+}
+```
+
+Imutabilidade preparada para a SPEC 02:
+
+```java
+private void requireMutable(ServicePackageDefinition definition) {
+    if (usageService.hasPackageAppointments(definition.getId())) {
+        throw new DomainException(
+            "PACKAGE_IMMUTABLE",
+            "O pacote possui agendamentos vinculados e não pode ser alterado.",
+            HttpStatus.CONFLICT);
+    }
+}
+```
+
+`ServicePackageUsageService` ainda retorna `false`, pois a relação pacote–
+agendamento será criada somente na SPEC 02. O teste unitário
+`ServicePackageServiceTest` simula essa relação como existente e confirma que
+`PATCH` de situação lança `PACKAGE_IMMUTABLE` sem chamar `saveAndFlush`.
+
+Resposta e frequência:
+
+```java
+private ServicePackageResponse toResponse(
+        ServicePackageDefinition definition) {
+    List<PackageWeekDay> days = definition.getWeekDays()
+        .stream()
+        .sorted()
+        .toList();
+
+    return new ServicePackageResponse(
+        definition.getId(),
+        definition.getUnit().getId(),
+        definition.getUnit().getName(),
+        definition.getService().getId(),
+        definition.getService().getName(),
+        definition.getName(),
+        definition.getDescription(),
+        definition.getTotalSessions(),
+        definition.getTotalPrice()
+            .setScale(2, RoundingMode.HALF_UP)
+            .toPlainString(),
+        days,
+        days.size(),
+        definition.isActive(),
+        definition.getCreatedBy().getId(),
+        definition.getCreatedAt(),
+        definition.getUpdatedAt());
+}
+```
+
+## 11.6 Passo 5 — Controller HTTP
+
+### Onde era assim
+
+Não existia uma API administrativa completa para detalhe, edição e mudança de
+situação de pacotes.
+
+### Agora é assim
+
+```java
+@RestController
+@RequestMapping("/api/service-packages")
+@RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
+public class ServicePackageController {
+    private final ServicePackageService service;
+
+    @PostMapping
+    public ResponseEntity<ServicePackageResponse> create(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody ServicePackageRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(service.create(user, request));
+    }
+
+    @GetMapping
+    public CatalogResponse<ServicePackageResponse> findAll(
+            @AuthenticationPrincipal User user,
+            @RequestParam(required = false) UUID unitId,
+            @RequestParam(required = false) UUID serviceId,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) Integer totalSessions,
+            @RequestParam(required = false) String name) {
+        return new CatalogResponse<>(service.findAll(
+            user, unitId, serviceId, active, totalSessions, name));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ServicePackageResponse> findById(
+            @AuthenticationPrincipal User user, @PathVariable UUID id) {
+        return ResponseEntity.ok(service.findById(user, id));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ServicePackageResponse> update(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID id,
+            @Valid @RequestBody ServicePackageRequest request) {
+        return ResponseEntity.ok(service.update(user, id, request));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ServicePackageResponse> updateStatus(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID id,
+            @Valid @RequestBody ServicePackageStatusRequest request) {
+        return ResponseEntity.ok(
+            service.updateStatus(user, id, request.active()));
+    }
+}
+```
+
+### Contrato disponível
+
+| Método | Rota | Resultado |
+| --- | --- | --- |
+| `POST` | `/api/service-packages` | Cria e retorna `201` |
+| `GET` | `/api/service-packages` | Lista com filtros e envelope `content` |
+| `GET` | `/api/service-packages/{id}` | Detalha dentro da clínica autorizada |
+| `PATCH` | `/api/service-packages/{id}` | Edita antes do primeiro uso |
+| `PATCH` | `/api/service-packages/{id}/status` | Ativa/desativa sem remover |
+| `DELETE` | — | Não existe por decisão de negócio |
+
+O controller exige `ROLE_ADMIN`; o serviço repete a verificação para evitar que
+uma chamada interna contorne a regra. A clínica nunca vem de um campo enviado
+pelo navegador: é derivada de `@AuthenticationPrincipal`.
+
+## 11.7 Passo 6 — API RTK Query no frontend
+
+### Onde era assim
+
+O adaptador inicial só listava, criava e alterava situação. Não havia consulta
+de detalhe, edição, filtros tipados ou invalidação por id.
+
+### Agora é assim
+
+Tipos e filtros atuais:
+
+```ts
+export interface ServicePackageFilters {
+  unitId?: string
+  serviceId?: string
+  active?: boolean
+  totalSessions?: number
+  name?: string
+}
+
+export interface ServicePackageInput {
+  name: string
+  description?: string
+  unitId: string
+  serviceId: string
+  totalSessions: number
+  totalPrice: string
+  weekDays: PackageWeekDay[]
+  active: boolean
+}
+```
+
+Endpoints atuais:
+
+```ts
+getServicePackages: builder.query<
+  ServicePackage[], ServicePackageFilters | void
+>({
+  query: (params) => ({ url: '/api/service-packages', params }),
+  transformResponse: contentOf,
+  providesTags: ['ServicePackage'],
+})
+
+getServicePackage: builder.query<ServicePackage, string>({
+  query: (id) => ({ url: `/api/service-packages/${id}` }),
+  providesTags: (_result, _error, id) => [
+    { type: 'ServicePackage', id },
+  ],
+})
+
+updateServicePackage: builder.mutation<
+  ServicePackage, { id: string; data: ServicePackageInput }
+>({
+  query: ({ id, data }) => ({
+    url: `/api/service-packages/${id}`,
+    method: 'PATCH',
+    data,
+  }),
+  invalidatesTags: (_result, _error, { id }) => [
+    'ServicePackage',
+    { type: 'ServicePackage', id },
+  ],
+})
+```
+
+O cache invalida tanto a lista quanto o detalhe por id. `contentOf` aceita a
+resposta atual `{ content: [...] }` e também array direto, reduzindo o acoplamento
+da interface ao wrapper de catálogo.
+
+## 11.8 Passo 7 — Schema Zod e transformação do formulário
+
+### Onde era assim
+
+A validação do formulário era feita manualmente dentro de `submit`, sem
+mensagens por campo, sem validação de decimal e sem proteção contra duplicidade
+caso outro componente montasse o payload.
+
+### Agora é assim
+
+`src/features/packages/model/package-form-schema.ts` centraliza a regra:
+
+```ts
+const pricePattern = /^(?:0|[1-9]\d*)(?:\.\d{2})$/
+
+export const packageWeekDays = [
+  'SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY',
+  'THURSDAY', 'FRIDAY', 'SATURDAY',
+] as const satisfies readonly PackageWeekDay[]
+
+export const packageFormSchema = z.object({
+  name: z.string().trim().min(1, 'Informe o nome do pacote.'),
+  description: z.string(),
+  unitId: z.string().trim().min(1, 'Selecione uma unidade.'),
+  serviceId: z.string().trim().min(1, 'Selecione um serviço.'),
+  totalSessions: z.coerce.number()
+    .int('Informe um número inteiro.')
+    .min(1, 'Informe ao menos uma sessão.'),
+  totalPrice: z.string()
+    .regex(pricePattern, 'Informe o valor no formato 0.00.'),
+  weekDays: z.array(z.enum(packageWeekDays))
+    .min(1, 'Selecione ao menos um dia.')
+    .refine(
+      (days) => new Set(days).size === days.length,
+      'Os dias da semana não podem se repetir.',
+    ),
+})
+```
+
+Conversão para o contrato HTTP:
+
+```ts
+export function toServicePackageInput(
+  value: PackageFormValues,
+  active: boolean,
+): ServicePackageInput {
+  const parsed = packageFormSchema.parse(value)
+  return {
+    ...parsed,
+    description: parsed.description.trim() || undefined,
+    active,
+  }
+}
+```
+
+Assim, a tela mantém sessões como texto para o `<input>`, mas envia número para
+a API; mantém preço como string decimal para não perder precisão; e remove
+descrição vazia antes de enviar.
+
+## 11.9 Passo 8 — Página atual: filtros, detalhe e edição
+
+### Onde era assim
+
+A página apenas criava novos pacotes e listava todos os registros. Não tinha
+filtros, carregamento de detalhe, edição, botão de cancelar edição nem mensagens
+de validação por campo.
+
+### Agora é assim
+
+Consultas e estados principais:
+
+```tsx
+const sessionQuery = useGetAppointmentSessionQuery()
+const units = useGetUnitsQuery()
+const services = useGetServicesQuery()
+const isAdmin = sessionQuery.data?.user.role === 'ADMIN'
+
+const [filters, setFilters] = useState<ServicePackageFilters>({})
+const [filterDraft, setFilterDraft] =
+  useState<ServicePackageFilters>({})
+
+const packages = useGetServicePackagesQuery(filters, {
+  skip: sessionQuery.isLoading || !isAdmin,
+})
+
+const [editingId, setEditingId] = useState<string | null>(null)
+const detailQuery = useGetServicePackageQuery(editingId ?? '', {
+  skip: !editingId,
+})
+```
+
+O `skip` impede que usuário básico ou sessão ainda não resolvida consulte a
+coleção administrativa. Ao clicar em **Editar**, `editingId` habilita o detalhe;
+quando `detailQuery.data` chega, `formFromPackage` popula o formulário e troca o
+título para **Editar pacote**.
+
+Filtros disponíveis na tela:
+
+```tsx
+<Input
+  value={filterDraft.name ?? ''}
+  onChange={(event) => setFilterDraft({
+    ...filterDraft,
+    name: event.target.value || undefined,
+  })}
+/>
+
+<select
+  value={filterDraft.active === undefined
+    ? '' : String(filterDraft.active)}
+  onChange={(event) => setFilterDraft({
+    ...filterDraft,
+    active: event.target.value === ''
+      ? undefined
+      : event.target.value === 'true',
+  })}
+>
+  <option value="">Todas</option>
+  <option value="true">Ativos</option>
+  <option value="false">Inativos</option>
+</select>
+```
+
+Há filtros equivalentes para unidade, serviço e total de sessões. **Filtrar**
+move `filterDraft` para `filters`; **Limpar filtros** restaura ambos para `{}`.
+
+Submissão atual:
+
+```tsx
+const parsed = packageFormSchema.safeParse(form)
+
+if (!parsed.success) {
+  const errors = parsed.error.flatten().fieldErrors
+  setFieldErrors(Object.fromEntries(
+    Object.entries(errors).map(([field, messages]) => [
+      field,
+      messages?.[0] ?? 'Revise este campo.',
+    ]),
+  ))
+  return
+}
+
+try {
+  const active = detailQuery.data?.active ?? true
+  const data = toServicePackageInput(parsed.data, active)
+
+  if (editingId) {
+    await updatePackage({ id: editingId, data }).unwrap()
+    toast.success('Pacote atualizado com sucesso.')
+  } else {
+    await createPackage(data).unwrap()
+    toast.success('Pacote criado com sucesso.')
+  }
+  resetForm()
+} catch (error) {
+  toast.error(messageFrom(error))
+}
+```
+
+Diferenças importantes em relação à primeira versão:
+
+1. `safeParse` não lança exceção; transforma erros em `fieldErrors` exibidos
+   abaixo de cada campo.
+2. O modo edição preserva a situação atual do pacote e envia `PATCH`.
+3. O modo criação envia `active: true`.
+4. O `catch` exibe a mensagem da API quando disponível e não limpa os campos,
+   permitindo correção/reenvio.
+5. O reset só ocorre depois de uma resposta bem-sucedida.
+
+## 11.10 Passo 9 — Situação, histórico e ausência de exclusão
+
+### Onde era assim
+
+A primeira versão tinha apenas uma chamada simples de situação, sem estado de
+carregamento compartilhado nem tratamento visual de erro.
+
+### Agora é assim
+
+```tsx
+async function toggleStatus(item: ServicePackage) {
+  try {
+    await changeStatus({
+      id: item.id,
+      active: !item.active,
+    }).unwrap()
+    toast.success(item.active
+      ? 'Pacote desativado.'
+      : 'Pacote ativado.')
+  } catch (error) {
+    toast.error(messageFrom(error))
+  }
+}
+```
+
+O cartão apresenta **Ativo** ou **Inativo** e alterna o texto do botão entre
+**Desativar** e **Ativar**. A mutation invalida a lista, mantendo pacotes
+inativos consultáveis no histórico administrativo. Não existe botão **Excluir**
+nem endpoint `DELETE`.
+
+Se a SPEC 02 conectar um pacote a agendamentos, a API recusará essa mutation
+com `PACKAGE_IMMUTABLE`. A interface já possui o tratamento genérico para o
+retorno; a decisão definitiva continua no backend.
+
+## 11.11 Passo 10 — Navegação lateral: antes e depois
+
+### Onde era assim
+
+Serviços era um item indisponível:
+
+```tsx
+{
+  label: 'Serviços',
+  icon: CircleHelp,
+  availability: 'unavailable',
+}
+```
+
+### Agora é assim
+
+Serviços possui submenu com rota real:
+
+```tsx
+{
+  label: 'Serviços',
+  icon: CircleHelp,
+  children: [
+    { label: 'Pacotes', to: '/services/packages' },
+  ],
+}
+```
+
+O renderer identifica `children`, desenha o cabeçalho de Serviços e cria um
+`NavLink` filho. Quando a sidebar está recolhida, o item filho exibe `P`, mantém
+`aria-label="Serviços: Pacotes"` e preserva foco e tooltip. Quando está em modo
+compacto, `onNavigate` fecha o painel após a navegação.
+
+Relatórios e Financeiro continuam assim:
+
+```tsx
+{
+  label: 'Relatórios',
+  icon: ChartNoAxesCombined,
+  availability: 'unavailable',
+}
+```
+
+Portanto, não foram transformados em rotas fictícias.
+
+## 11.12 Passo 11 — Botão temporário do topbar
+
+### Onde era assim
+
+```tsx
+{session ? (
+  <div className="hidden sm:block">
+    <CreateAppointmentDialog
+      session={session}
+      defaultDate={dateValue}
+      triggerLabel="Agendar"
+      triggerAriaLabel="Novo agendamento"
+    />
+  </div>
+) : null}
+```
+
+### Agora é assim
+
+```tsx
+{session ? (
+  <div className="hidden items-center gap-2 sm:flex">
+    <CreateAppointmentDialog
+      session={session}
+      defaultDate={dateValue}
+      triggerLabel="Agendar"
+      triggerAriaLabel="Novo agendamento"
+    />
+    <Button
+      type="button"
+      variant="outline"
+      onClick={() => toast.info(
+        'Agendamento de Pacotes estará disponível após a SPEC 02.',
+      )}
+    >
+      Agendamento de Pacotes
+    </Button>
+  </div>
+) : null}
+```
+
+O que permaneceu igual: o botão **Agendar**, o diálogo manual, os campos do
+agendamento manual e a chamada `/api/appointments`. O que foi adicionado: um
+botão visualmente irmão, com espaçamento `gap-2`, que só dispara uma notificação
+informativa. Ele não navega, não chama HTTP, não altera paciente, não cria
+agendamento e não remove o botão manual.
+
+## 11.13 Passo 12 — Testes adicionados
+
+### Frontend
+
+Arquivos novos/alterados:
+
+```text
+src/features/packages/model/package-form-schema.test.ts
+src/features/packages/pages/packages-page.test.tsx
+src/components/__tests__/app-topbar.test.tsx
+src/components/__tests__/app-sidebar.test.tsx
+```
+
+Os 24 cenários focalizados validam:
+
+- payload decimal e conversão de sessões;
+- configuração com um e sete dias;
+- dias vazios e repetidos;
+- sessões inválidas e preço fora do padrão `0.00`;
+- carregamento da página, lista, filtros e envelope `content`;
+- mensagens de validação antes da criação;
+- bloqueio da página para papel `BASIC`;
+- ativação/desativação mantendo o cartão no histórico;
+- submenu Pacotes em sidebar desktop/compacta;
+- botão temporário do topbar sem abrir o diálogo manual.
+
+Exemplo do teste de filtro:
+
+```tsx
+server.use(
+  http.get('http://localhost:8080/api/service-packages', ({ request }) => {
+    queries.push(new URL(request.url).searchParams)
+    return HttpResponse.json({ content: [servicePackage] })
+  }),
+)
+
+await user.type(
+  screen.getAllByRole('textbox', { name: 'Nome' })[0],
+  'fisioterapia',
+)
+await user.click(screen.getByRole('button', { name: 'Filtrar' }))
+
+await waitFor(() =>
+  expect(queries.at(-1)?.get('name')).toBe('fisioterapia'),
+)
+```
+
+### API
+
+```text
+src/test/java/com/agendamento/smart/controller/servicepackage/
+└── ServicePackageControllerIntegrationTest.java
+
+src/test/java/com/agendamento/smart/service/
+└── ServicePackageServiceTest.java
+```
+
+Os testes da API confirmam criação, filtros, preço, frequência, edição,
+ativação, dias duplicados, usuário básico, isolamento entre duas clínicas,
+constraint física no PostgreSQL e imutabilidade simulada após vínculo de uso.
+
+## 11.14 Passo 13 — Documentação modular adicionada
+
+Foram adicionados ou atualizados READMEs para que a implementação não fique
+dependente somente deste documento:
+
+```text
+API:
+src/main/java/com/agendamento/smart/model/servicepackage/README.md
+src/main/java/com/agendamento/smart/dtos/servicepackage/README.md
+src/main/java/com/agendamento/smart/controller/servicepackage/README.md
+src/main/java/com/agendamento/smart/repository/README.md
+src/main/java/com/agendamento/smart/service/README.md
+src/main/resources/db/migration/README.md
+
+Frontend:
+src/features/packages/README.md
+src/features/appointments/README.md
+src/components/AppSidebar/README.md
+```
+
+Esses arquivos registram endpoints, responsabilidade de cada camada, situação
+da SPEC 02, ausência de exclusão e a fonte de verdade do isolamento.
+
+## 11.15 Passo 14 — Verificações executadas
+
+### Frontend
+
+```bash
+npm run lint
+npm test -- --run \
+  src/features/packages/pages/packages-page.test.tsx \
+  src/features/packages/model/package-form-schema.test.ts \
+  src/components/__tests__/app-topbar.test.tsx \
+  src/components/__tests__/app-sidebar.test.tsx
+npm run build
+```
+
+Resultados:
+
+- lint: aprovado;
+- testes focalizados: 24 aprovados;
+- build: a checagem TypeScript encontra somente três erros preexistentes nas
+  fixtures legadas de `CardDay` e `legacy-calendar-components.test.tsx`, que
+  não pertencem a esta branch nem foram alteradas;
+- não foi detectado erro de tipo nos arquivos da feature `packages`.
+
+### API
+
+```bash
+./mvnw clean verify
+```
+
+Resultado: aprovado com PostgreSQL 18 via Testcontainers, migration V012
+aplicada e testes de integração/unitários concluídos sem falhas. Permanece
+apenas o warning preexistente do MapStruct sobre `UserMapper.clinicUnit`.
+
+### OpenSpec
+
+```bash
+openspec validate gerenciar-pacotes-flexiveis --strict
+```
+
+Resultado: change válida no frontend e na API.
+
+## 11.16 Resumo final “antes → agora”
+
+| Área | Antes | Agora |
+| --- | --- | --- |
+| Persistência | Nenhum pacote persistido | `SERVICE_PACKAGE` + `SERVICE_PACKAGE_WEEK_DAY` |
+| Frequência | Não existia | Derivada de `weekDays.size()` |
+| API | Cadastro/listagem inicial | CRUD administrativo sem `DELETE`, filtros e status |
+| Segurança | Regra não consolidada | `ADMIN` + clínica derivada da sessão + FKs compostas |
+| Frontend | Formulário básico | Filtros, detalhe, edição, Zod, erros por campo e status |
+| Menu | Serviços indisponível | Serviços → Pacotes navegável |
+| Topbar | Somente Agendar | Agendar preservado + Agendamento de Pacotes informativo |
+| Testes | Sem cobertura específica | 24 testes frontend + suíte API com PostgreSQL |
+| Documentação | Documento histórico inicial | Documento atualizado + READMEs modulares |
+| Automação | Não existia | Continua reservada para SPEC 02 |
+
+## 11.17 Limites que não devem ser confundidos com bugs
+
+1. Pacote ainda não contrata paciente.
+2. Pacote ainda não recebe data inicial nem horário.
+3. Pacote não indica profissional.
+4. A API ainda não consulta vínculo real de agendamento, porque a entidade da
+   SPEC 02 ainda não existe; a proteção está preparada e testada por mock.
+5. Feriados, funcionamento da unidade e bloqueios não fazem parte da SPEC 01.
+6. Pacotes inativos permanecem consultáveis administrativamente, mas a seleção
+   para contratação futura será responsabilidade da SPEC 02.
+7. A ação “Agendamento de Pacotes” não deve ser transformada em fluxo parcial:
+   sua implementação definitiva depende da contratação e geração automática
+   especificadas na change `agendamento-automatico-por-pacotes`.
+
+---
+
+# 12. Atualização da branch `feat/criar-agendamento-com-pacote`
+
+As seções anteriores preservam o histórico da SPEC 01. Esta seção registra o
+estado implementado posteriormente na branch, no formato “onde era assim → agora
+é assim”, incluindo frontend, API, banco, contratos e verificações.
+
+## 12.1 Resultado funcional
+
+O botão `Agendamento de Pacotes`, que antes somente mostrava uma mensagem, agora
+abre um fluxo de contratação. O usuário seleciona paciente e pacote, informa
+data inicial e horário, ajusta os dias da semana, gera uma prévia e confirma a
+criação dos agendamentos individuais.
+
+Nesta versão, a data inicial e os dias efetivos são suficientes para calcular as
+sessões. Feriados, funcionamento da unidade e bloqueios de calendário não
+bloqueiam a confirmação e foram registrados para uma próxima SPEC.
+
+## 12.2 Topbar: antes e depois
+
+### Onde era assim
+
+```tsx
+<Button
+  type="button"
+  variant="outline"
+  onClick={() =>
+    toast.info(
+      'Agendamento de Pacotes estará disponível após a SPEC 02.',
+    )
+  }
+>
+  Agendamento de Pacotes
+</Button>
+```
+
+O botão não abria tela, não consultava a API e não alterava o estado da agenda.
+
+### Agora é assim
+
+```tsx
+<CreateAppointmentDialog
+  session={session}
+  defaultDate={dateValue}
+  triggerLabel="Agendar"
+  triggerAriaLabel="Novo agendamento"
+/>
+
+<PackageAppointmentDialog
+  session={session}
+  defaultDate={dateValue}
+/>
+```
+
+O botão manual continua usando `CreateAppointmentDialog`. O botão novo usa
+`PackageAppointmentDialog`, mantendo os dois fluxos separados.
+
+Arquivo alterado:
+
+```text
+src/components/AppTopbar/index.tsx
+```
+
+Importação acrescentada:
+
+```tsx
+import { PackageAppointmentDialog } from
+  '@/features/packages/components/package-appointment-dialog'
+```
+
+`defaultDate={dateValue}` reutiliza a mesma data atualmente exibida no cabeçalho
+da agenda.
+
+## 12.3 Novo diálogo de contratação
+
+Arquivo:
+
+```text
+src/features/packages/components/package-appointment-dialog.tsx
+```
+
+### Estado do formulário
+
+```tsx
+const [open, setOpen] = useState(false)
+const [patientId, setPatientId] = useState('')
+const [packageId, setPackageId] = useState('')
+const [startDate, setStartDate] = useState(defaultDate ?? '')
+const [time, setTime] = useState('')
+const [professionalId, setProfessionalId] = useState('')
+const [effectiveWeekDays, setEffectiveWeekDays] =
+  useState<PackageWeekDay[]>([])
+```
+
+| Campo | Função |
+| --- | --- |
+| `patientId` | Paciente que receberá as sessões. |
+| `packageId` | Pacote administrativo selecionado. |
+| `startDate` | Data mínima para procurar a primeira sessão. |
+| `time` | Horário manual aplicado às sessões. |
+| `professionalId` | Profissional opcional da contratação. |
+| `effectiveWeekDays` | Dias usados somente no contrato atual. |
+
+### Catálogos
+
+```tsx
+const patients = useGetPatientsQuery(undefined, { skip: !open })
+const packages = useGetServicePackagesQuery(
+  { active: true },
+  { skip: !open },
+)
+const professionals = useGetProfessionalsQuery(
+  selectedPackage?.serviceId ?? '',
+  { skip: !open || !selectedPackage },
+)
+```
+
+Os pacotes ativos são filtrados visualmente para BASIC:
+
+```tsx
+const availablePackages = packages.data?.filter(
+  (item) =>
+    session.user.role === 'ADMIN' ||
+    item.unitId === session.activeUnitId,
+) ?? []
+```
+
+O filtro não substitui a autorização do backend.
+
+### Dias pré-preenchidos e editáveis
+
+```tsx
+function choosePackage(id: string) {
+  const item = availablePackages.find((value) => value.id === id)
+  setPackageId(id)
+  setEffectiveWeekDays(item?.weekDays ?? [])
+}
+```
+
+Antes, os dias só podiam ser definidos pelo administrador. Agora são uma
+configuração padrão que pode ser ajustada durante a contratação sem executar
+`PATCH /api/service-packages`.
+
+### Prévia
+
+```tsx
+async function simulate() {
+  if (
+    !packageId ||
+    !patientId ||
+    !startDate ||
+    !time ||
+    effectiveWeekDays.length === 0
+  ) return
+
+  await preview({
+    packageId,
+    patientId,
+    startDate,
+    time,
+    professionalId: professionalId || null,
+    effectiveWeekDays,
+  }).unwrap()
+}
+```
+
+A prévia mostra quantidade, primeira data, última data e cada sessão. Ela não
+cria reserva nem reduz capacidade.
+
+### Confirmação
+
+```tsx
+await confirm({
+  data: {
+    packageId,
+    patientId,
+    startDate,
+    time,
+    professionalId: professionalId || null,
+    effectiveWeekDays,
+  },
+  fingerprint: previewState.data.fingerprint,
+}).unwrap()
+```
+
+Após sucesso, o diálogo fecha, uma mensagem é apresentada e a tag de appointments
+é invalidada para atualizar a agenda.
+
+## 12.4 Adaptador RTK Query
+
+Arquivo novo:
+
+```text
+src/features/packages/api/package-appointments.ts
+```
+
+### Onde era assim
+
+`packages.ts` possuía somente o CRUD administrativo:
+
+```text
+GET    /api/service-packages
+GET    /api/service-packages/{id}
+POST   /api/service-packages
+PATCH  /api/service-packages/{id}
+PATCH  /api/service-packages/{id}/status
+```
+
+### Agora é assim
+
+```ts
+export interface PackageAppointmentInput {
+  packageId: string
+  patientId: string
+  startDate: string
+  time: string
+  professionalId?: string | null
+  effectiveWeekDays: PackageWeekDay[]
+}
+
+previewPackageAppointment: builder.mutation({
+  query: (data) => ({
+    url: '/api/package-appointments/preview',
+    method: 'POST',
+    data,
+  }),
+})
+
+confirmPackageAppointment: builder.mutation({
+  query: ({ data, fingerprint }) => ({
+    url: '/api/package-appointments/confirm',
+    method: 'POST',
+    data,
+    headers: {
+      'Idempotency-Key': crypto.randomUUID(),
+      'X-Preview-Fingerprint': fingerprint,
+    },
+  }),
+  invalidatesTags: [{ type: 'Appointment', id: 'LIST' }],
+})
+```
+
+## 12.5 Payloads e respostas
+
+Payload enviado:
+
+```json
+{
+  "packageId": "package-uuid",
+  "patientId": "patient-uuid",
+  "startDate": "2026-11-16",
+  "time": "14:00",
+  "professionalId": null,
+  "effectiveWeekDays": ["MONDAY", "WEDNESDAY"]
+}
+```
+
+A resposta de prévia possui fingerprint e sessões calculadas:
+
+```json
+{
+  "packageId": "package-uuid",
+  "patientId": "patient-uuid",
+  "unitId": "unit-uuid",
+  "totalPrice": "400.00",
+  "firstDate": "2026-11-16",
+  "lastDate": "2026-12-16",
+  "fingerprint": "sha256...",
+  "sessions": [
+    {
+      "sequence": 1,
+      "date": "2026-11-16",
+      "time": "14:00",
+      "startsAt": "2026-11-16T18:00:00Z"
+    }
+  ]
+}
+```
+
+## 12.6 API: nova contratação
+
+Change coordenada:
+
+```text
+api-agendamento-smart-api/agendamento-smart-api/
+└── openspec/changes/agendamento-automatico-por-pacotes/
+    ├── proposal.md
+    ├── design.md
+    ├── tasks.md
+    └── specs/package-appointment-contracts/spec.md
+```
+
+### Onde era assim
+
+O backend possuía somente a definição administrativa
+`ServicePackageDefinition` e o método manual `AppointmentService.create`, que
+criava uma sessão por requisição.
+
+### Agora é assim
+
+Foi criada a entidade:
+
+```text
+src/main/java/com/agendamento/smart/model/packageappointment/
+PackageAppointmentContract.java
+```
+
+Ela guarda o snapshot da contratação:
+
+```java
+@Entity
+@Table(name = "PACKAGE_CONTRACT")
+public class PackageAppointmentContract {
+    private UUID id;
+    private Clinic clinic;
+    private ServicePackageDefinition packageDefinition;
+    private Patient patient;
+    private ClinicUnit unit;
+    private ServiceOffering service;
+    private Integer totalSessions;
+    private BigDecimal totalPrice;
+    private LocalDate requestedStartDate;
+    private LocalTime appointmentTime;
+    private LocalDate effectiveFirstDate;
+    private LocalDate effectiveLastDate;
+    private String idempotencyKey;
+    private Set<PackageWeekDay> effectiveWeekDays;
+}
+```
+
+O modelo passou a ser:
+
+```text
+SERVICE_PACKAGE
+      ↓ definição administrativa
+PACKAGE_CONTRACT
+      ↓ snapshot por paciente
+APPOINTMENT (vários registros)
+```
+
+### Repository
+
+Arquivo:
+
+```text
+src/main/java/com/agendamento/smart/repository/
+PackageAppointmentContractRepository.java
+```
+
+Métodos:
+
+```java
+findByClinicIdAndIdempotencyKey(UUID clinicId, String idempotencyKey)
+findByIdAndClinicId(UUID id, UUID clinicId)
+```
+
+O primeiro evita duplicidade da contratação. O segundo impede consulta entre
+clínicas.
+
+### Vínculo em Appointment
+
+Antes, todos os appointments eram independentes. Agora existe vínculo opcional:
+
+```java
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "package_contract_id")
+private PackageAppointmentContract packageContract;
+```
+
+Agendamentos manuais continuam com valor `null`.
+
+## 12.7 Migration V013
+
+Arquivo novo:
+
+```text
+src/main/resources/db/migration/V013__create_package_appointment_contracts.sql
+```
+
+Criação da contratação:
+
+```sql
+CREATE TABLE PACKAGE_CONTRACT (
+    id UUID NOT NULL,
+    clinic_id UUID NOT NULL,
+    package_id UUID NOT NULL,
+    patient_id UUID NOT NULL,
+    unit_id UUID NOT NULL,
+    service_id UUID NOT NULL,
+    total_sessions INT NOT NULL,
+    total_price DECIMAL(10,2) NOT NULL,
+    requested_start_date DATE NOT NULL,
+    appointment_time TIME NOT NULL,
+    effective_first_date DATE NOT NULL,
+    effective_last_date DATE NOT NULL,
+    idempotency_key VARCHAR(120) NOT NULL,
+    created_by UUID NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE (clinic_id, idempotency_key)
+);
+```
+
+Dias efetivos:
+
+```sql
+CREATE TABLE PACKAGE_CONTRACT_WEEK_DAY (
+    contract_id UUID NOT NULL,
+    week_day VARCHAR(16) NOT NULL,
+    PRIMARY KEY (contract_id, week_day)
+);
+```
+
+Vínculo não obrigatório para dados legados:
+
+```sql
+ALTER TABLE APPOINTMENT
+  ADD COLUMN package_contract_id UUID NULL;
+
+ALTER TABLE APPOINTMENT
+  ADD CONSTRAINT fk_appointment_package_contract
+  FOREIGN KEY (package_contract_id)
+  REFERENCES PACKAGE_CONTRACT (id);
+```
+
+## 12.8 Serviço e algoritmo da API
+
+Arquivo:
+
+```text
+src/main/java/com/agendamento/smart/service/packageappointment/
+PackageAppointmentService.java
+```
+
+### Geração de datas
+
+Antes, não havia cálculo de lote. Agora o backend percorre o calendário somente
+para encontrar os dias da semana escolhidos:
+
+```java
+LocalDate date = request.startDate();
+
+while (result.size() < definition.getTotalSessions()) {
+    if (days.contains(date.getDayOfWeek())) {
+        ZonedDateTime start = ZonedDateTime.of(
+            date,
+            request.time(),
+            zone);
+
+        result.add(new PackageAppointmentSession(
+            result.size() + 1,
+            date,
+            request.time(),
+            start.toInstant()));
+    }
+    date = date.plusDays(1);
+}
+```
+
+Não há substituição de dia. Se segunda e quarta foram escolhidas, terça não é
+usada apenas para completar a frequência.
+
+### Horário e regras existentes
+
+O horário informado é reutilizado em cada `ZonedDateTime`. A confirmação chama
+o mesmo `AppointmentService.create` usado no agendamento manual:
+
+```java
+appointmentService.create(
+    new AppointmentRequest(
+        request.patientId(),
+        definition.getUnit().getId(),
+        definition.getService().getId(),
+        request.professionalId(),
+        session.startsAt(),
+        definition.getService().getDurationMinutes(),
+        price),
+    user,
+    key + "-" + sequence);
+```
+
+Assim permanecem centralizadas as regras de unidade, paciente, serviço,
+duração, preço, profissional opcional, conflitos e capacidade.
+
+### Prévia e confirmação
+
+```java
+@Transactional(readOnly = true)
+public PackageAppointmentPreviewResponse preview(
+        PackageAppointmentRequest request,
+        User user) {
+    ServicePackageDefinition definition =
+        findPackage(request.packageId(), user);
+    validatePatient(request.patientId(), definition);
+    return response(definition, request, sessions(definition, request));
+}
+```
+
+Na confirmação, a chave é verificada antes da criação:
+
+```java
+var existing = contractRepository
+    .findByClinicIdAndIdempotencyKey(clinicId, key);
+
+if (existing.isPresent()) {
+    return existingContract(existing.get());
+}
+```
+
+O contrato e os appointments são criados dentro da transação do serviço.
+
+## 12.9 Controllers e endpoints
+
+Arquivo:
+
+```text
+src/main/java/com/agendamento/smart/controller/packageappointment/
+PackageAppointmentController.java
+```
+
+Endpoints implementados:
+
+```http
+POST /api/package-appointments/preview
+POST /api/package-appointments/confirm
+GET  /api/package-appointments/{id}
+```
+
+O endpoint de confirmação recebe:
+
+```http
+Idempotency-Key: <chave-da-operacao>
+X-Preview-Fingerprint: <fingerprint-da-previa>
+```
+
+Não houve alteração no contrato de `POST /api/appointments`.
+
+## 12.10 Passo a passo do usuário
+
+1. O usuário abre uma tela interna autenticada.
+2. O topbar exibe `Agendar` e `Agendamento de Pacotes`.
+3. Ao clicar no novo botão, o diálogo carrega catálogos.
+4. O usuário seleciona paciente e pacote ativo.
+5. Os dias do pacote aparecem marcados.
+6. O usuário pode alterar os dias para aquela contratação.
+7. O usuário informa data inicial e horário.
+8. O frontend chama a prévia.
+9. A API calcula exatamente a quantidade do pacote.
+10. A tela lista as sessões sem reservar.
+11. O usuário confirma.
+12. A API grava o snapshot e os appointments.
+13. A agenda é invalidada e recarregada.
+
+## 12.11 O que ficou fora desta branch
+
+Não foram inferidos nem implementados:
+
+- fonte de feriados;
+- calendário de funcionamento da unidade;
+- bloqueios operacionais;
+- reposição de sessão;
+- regras financeiras de cancelamento;
+- devolução ou consumo de sessões;
+- alteração futura de profissional por sessão;
+- integração PostgreSQL específica da migration V013;
+- correção das fixtures legadas do build frontend.
+
+Esses pontos devem ser tratados em mudanças próprias.
+
+## 12.12 Verificações executadas
+
+### API
+
+```bash
+./mvnw -q -DskipTests compile
+openspec validate agendamento-automatico-por-pacotes --strict
+```
+
+Resultado: compilação aprovada e change válida.
+
+### Frontend
+
+```bash
+npx vitest run src/components/__tests__/app-topbar.test.tsx \
+  --passWithNoTests
+```
+
+Resultado:
+
+```text
+Test Files  1 passed
+Tests       7 passed
+```
+
+O teste antigo que esperava o toast da SPEC 02 passou a verificar a abertura do
+diálogo real. O build geral ainda registra erros preexistentes nas fixtures
+legadas de `Appointment` e no uso de `URLSearchParams.at()` em teste antigo.
+
+## 12.13 Comparativo final
+
+| Área | Onde era assim | Agora é assim |
+| --- | --- | --- |
+| Botão | Toast “disponível após SPEC 02” | Abre contratação |
+| Paciente | Não participava | Selecionado no diálogo |
+| Pacote | Só cadastro administrativo | Selecionado para contratação |
+| Data | Inexistente | Data mínima obrigatória |
+| Horário | Inexistente | Horário manual reutilizado |
+| Dias | Fixos no cadastro | Padrão editável por contratação |
+| Profissional | Não indicado no pacote | Opcional na contratação |
+| Prévia | Inexistente | Lista sessões sem persistência |
+| Confirmação | Inexistente | Idempotente e transacional |
+| Persistência | `SERVICE_PACKAGE` | `PACKAGE_CONTRACT` + `APPOINTMENT` |
+| Feriados | Não modelados | Não bloqueiam nesta SPEC |
+| Manual | Fluxo existente | Preservado sem alteração de contrato |

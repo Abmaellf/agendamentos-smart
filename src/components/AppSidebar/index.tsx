@@ -29,9 +29,19 @@ type UnavailableNavigationItem = {
   availability: 'unavailable'
 }
 
+type NavigationSubmenuItem = {
+  label: string
+  icon: LucideIcon
+  children: Array<{
+    label: string
+    to: string
+  }>
+}
+
 export type SidebarNavigationItem =
   | AvailableNavigationItem
   | UnavailableNavigationItem
+  | NavigationSubmenuItem
 
 export const sidebarNavigationItems: SidebarNavigationItem[] = [
   { label: 'Início', icon: Home, to: '/', availability: 'available' },
@@ -62,8 +72,7 @@ export const sidebarNavigationItems: SidebarNavigationItem[] = [
   {
     label: 'Serviços',
     icon: CircleHelp,
-    to: '/services/packages',
-    availability: 'available',
+    children: [{ label: 'Pacotes', to: '/services/packages' }],
   },
   {
     label: 'Relatórios',
@@ -99,18 +108,29 @@ function Brand({ isCollapsed }: { isCollapsed: boolean }) {
         isCollapsed && 'px-3',
       )}
     >
-      <div className={cn('flex items-center gap-3', isCollapsed && 'justify-center')}>
+      <div
+        className={cn(
+          'flex items-center gap-3',
+          isCollapsed && 'justify-center',
+        )}
+      >
         <span
           aria-hidden="true"
-          title={clinicName && unitName ? `${clinicName} — ${unitName}` : undefined}
+          title={
+            clinicName && unitName ? `${clinicName} — ${unitName}` : undefined
+          }
           className="grid size-10 place-items-center rounded-xl bg-[#78c85e] text-lg font-bold text-[#143f32] shadow-sm"
         >
           E
         </span>
         {!isCollapsed ? (
           <div>
-            <p className="text-base font-semibold tracking-tight">{clinicName ?? 'Clínica indisponível'}</p>
-            <p className="text-xs text-white/65">{unitName ?? 'Unidade indisponível'}</p>
+            <p className="text-base font-semibold tracking-tight">
+              {clinicName ?? 'Clínica indisponível'}
+            </p>
+            <p className="text-xs text-white/65">
+              {unitName ?? 'Unidade indisponível'}
+            </p>
           </div>
         ) : null}
       </div>
@@ -128,9 +148,63 @@ function NavigationItems({
   const [unavailableMessage, setUnavailableMessage] = useState('')
 
   return (
-    <nav aria-label="Navegação principal" className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-5">
+    <nav
+      aria-label="Navegação principal"
+      className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-5"
+    >
       {sidebarNavigationItems.map((item) => {
         const Icon = item.icon
+
+        if ('children' in item) {
+          return (
+            <div key={item.label} className="space-y-1">
+              <div
+                aria-label={isCollapsed ? item.label : undefined}
+                title={isCollapsed ? item.label : undefined}
+                className={cn(
+                  'flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-white/75',
+                  isCollapsed && 'justify-center px-2',
+                )}
+              >
+                <Icon aria-hidden="true" className="size-5 shrink-0" />
+                <span className={isCollapsed ? 'sr-only' : undefined}>
+                  {item.label}
+                </span>
+              </div>
+              <div
+                aria-label={`Submenu ${item.label}`}
+                className={cn(
+                  'ml-7 space-y-1 border-l border-white/15 pl-3',
+                  isCollapsed && 'ml-0 border-0 pl-0',
+                )}
+              >
+                {item.children.map((child) => (
+                  <NavLink
+                    key={child.to}
+                    to={child.to}
+                    onClick={onNavigate}
+                    title={
+                      isCollapsed ? `${item.label}: ${child.label}` : undefined
+                    }
+                    aria-label={
+                      isCollapsed ? `${item.label}: ${child.label}` : undefined
+                    }
+                    className={({ isActive }) =>
+                      cn(
+                        'block rounded-lg px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-[#a8df81] focus-visible:outline-none',
+                        isActive &&
+                          'bg-[#78c85e] font-medium text-[#143f32] hover:bg-[#93d978] hover:text-[#143f32]',
+                        isCollapsed && 'px-2 text-center text-xs',
+                      )
+                    }
+                  >
+                    {isCollapsed ? 'P' : child.label}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
+          )
+        }
 
         if (item.availability === 'unavailable') {
           return (
@@ -140,7 +214,9 @@ function NavigationItems({
               aria-disabled="true"
               aria-label={isCollapsed ? `${item.label} — Em breve` : undefined}
               onClick={() =>
-                setUnavailableMessage(`${item.label} ainda não está disponível.`)
+                setUnavailableMessage(
+                  `${item.label} ainda não está disponível.`,
+                )
               }
               title={isCollapsed ? `${item.label} — Em breve` : undefined}
               className={cn(
@@ -170,13 +246,16 @@ function NavigationItems({
             className={({ isActive }) =>
               cn(
                 'flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-[#a8df81] focus-visible:outline-none',
-                isActive && 'bg-[#78c85e] text-[#143f32] shadow-sm hover:bg-[#93d978] hover:text-[#143f32]',
+                isActive &&
+                  'bg-[#78c85e] text-[#143f32] shadow-sm hover:bg-[#93d978] hover:text-[#143f32]',
                 isCollapsed && 'justify-center px-2',
               )
             }
           >
             <Icon aria-hidden="true" className="size-5 shrink-0" />
-            <span className={isCollapsed ? 'sr-only' : undefined}>{item.label}</span>
+            <span className={isCollapsed ? 'sr-only' : undefined}>
+              {item.label}
+            </span>
           </NavLink>
         )
       })}
@@ -217,7 +296,10 @@ export function AppSidebar({
   return (
     <>
       {isCompact ? (
-        <div aria-hidden="true" className="fixed inset-0 z-40 bg-[#071d16]/45 min-[981px]:hidden" />
+        <div
+          aria-hidden="true"
+          className="fixed inset-0 z-40 bg-[#071d16]/45 min-[981px]:hidden"
+        />
       ) : null}
       <aside
         id={isCompact ? 'app-sidebar-compact' : 'app-sidebar-desktop'}
@@ -234,9 +316,7 @@ export function AppSidebar({
               ),
         )}
       >
-        <Brand
-          isCollapsed={!isCompact && isCollapsed}
-        />
+        <Brand isCollapsed={!isCompact && isCollapsed} />
         {isCompact ? (
           <button
             type="button"
@@ -247,7 +327,10 @@ export function AppSidebar({
             <X aria-hidden="true" className="size-5" />
           </button>
         ) : null}
-        <NavigationItems isCollapsed={!isCompact && isCollapsed} onNavigate={onNavigate} />
+        <NavigationItems
+          isCollapsed={!isCompact && isCollapsed}
+          onNavigate={onNavigate}
+        />
         <InformationCard isCollapsed={!isCompact && isCollapsed} />
       </aside>
     </>

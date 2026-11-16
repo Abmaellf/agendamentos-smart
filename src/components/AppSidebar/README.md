@@ -13,10 +13,14 @@ Oferecer uma única navegação responsiva para as rotas internas da aplicação
 - abaixo desse breakpoint, o mesmo menu é um painel lateral aberto por controle nomeado;
 - Escape, o controle de fechamento e uma navegação disponível fecham o painel compacto;
 - o layout bloqueia temporariamente a rolagem do documento e devolve o foco ao acionador;
-- Serviços, Relatórios e Financeiro comunicam `Em breve` sem rota;
+- Serviços apresenta o submenu navegável Pacotes, que leva a
+  `/services/packages`; Relatórios e Financeiro continuam comunicando `Em breve`
+  sem rota;
 - o card de rodapé é apenas informativo, sem link ou ação de domínio.
 
 ## Limites
 
-As entradas disponíveis refletem exclusivamente as rotas já entregues. A marca é
-textual/CSS nesta change; nenhum asset novo é usado.
+As entradas disponíveis refletem exclusivamente as rotas já entregues. Pacotes
+é gestão administrativa; ele não inicia contratação ou agendamento automático,
+que pertencem à SPEC 02. A marca é textual/CSS nesta change; nenhum asset novo
+é usado.

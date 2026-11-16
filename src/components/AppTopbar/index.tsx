@@ -9,11 +9,11 @@ import {
   Search,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
 
 import { useGetAppointmentSessionQuery } from '@/features/appointments/api/appointments'
 import { CreateAppointmentDialog } from '@/features/appointments/components/create-appointment-dialog'
 import { useAppShellDate } from '@/_layout/app-shell-context'
+import { PackageAppointmentDialog } from '@/features/packages/components/package-appointment-dialog'
 
 import AccountMenu from '../account-menu'
 import { Button } from '../ui/button'
@@ -33,7 +33,8 @@ function formatHeaderDate(date: Date) {
   const day = format(date, 'dd')
   const month = format(date, 'MMMM', { locale: ptBR })
   const year = format(date, 'yyyy')
-  const capitalizedMonth = month.charAt(0).toLocaleUpperCase('pt-BR') + month.slice(1)
+  const capitalizedMonth =
+    month.charAt(0).toLocaleUpperCase('pt-BR') + month.slice(1)
   return `${day} de ${capitalizedMonth} de ${year}`
 }
 
@@ -196,13 +197,7 @@ export function AppTopbar({
               triggerLabel="Agendar"
               triggerAriaLabel="Novo agendamento"
             />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => toast.info('Agendamento de Pacotes estará disponível após a SPEC 02.')}
-            >
-              Agendamento de Pacotes
-            </Button>
+            <PackageAppointmentDialog session={session} defaultDate={dateValue} />
           </div>
         ) : null}
 

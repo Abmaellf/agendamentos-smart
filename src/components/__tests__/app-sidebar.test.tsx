@@ -1,6 +1,6 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
 import { AppSidebar } from '@/components/AppSidebar'
@@ -65,6 +65,10 @@ describe('AppSidebar', () => {
     expect(screen.getByRole('link', { name: 'Configurações' })).toHaveAttribute(
       'href',
       '/configuration',
+    )
+    expect(screen.getByRole('link', { name: 'Pacotes' })).toHaveAttribute(
+      'href',
+      '/services/packages',
     )
     expect(screen.getByRole('link', { name: 'Agenda' })).toHaveAttribute(
       'aria-current',
@@ -135,7 +139,7 @@ describe('AppSidebar', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('comunica destinos indisponíveis sem alterar a rota', async () => {
+  it('navega pelo submenu Pacotes e comunica destinos indisponíveis sem alterar a rota', async () => {
     const user = userEvent.setup()
     renderLayout('/appointments', true)
 
@@ -143,17 +147,28 @@ describe('AppSidebar', () => {
       screen.getByRole('button', { name: /abrir menu lateral/i }),
     )
     const dialog = screen.getByRole('dialog', { name: /menu lateral/i })
-    const unavailable = within(dialog).getByRole('button', {
-      name: /serviços.*em breve/i,
+    await user.click(within(dialog).getByRole('link', { name: 'Pacotes' }))
+    expect(screen.getByTestId('current-path')).toHaveTextContent(
+      '/services/packages',
+    )
+
+    await user.click(
+      screen.getByRole('button', { name: /abrir menu lateral/i }),
+    )
+    const reopenedDialog = screen.getByRole('dialog', { name: /menu lateral/i })
+    const unavailable = within(reopenedDialog).getByRole('button', {
+      name: /relatórios.*em breve/i,
     })
 
     expect(unavailable).toHaveAttribute('aria-disabled', 'true')
     await user.click(unavailable)
 
-    expect(within(dialog).getByRole('status')).toHaveTextContent(
-      /serviços ainda não está disponível/i,
+    expect(within(reopenedDialog).getByRole('status')).toHaveTextContent(
+      /relatórios ainda não está disponível/i,
     )
-    expect(screen.getByTestId('current-path')).toHaveTextContent('/appointments')
+    expect(screen.getByTestId('current-path')).toHaveTextContent(
+      '/services/packages',
+    )
   })
 
   it('fecha o painel depois de navegar e mantém o card informativo não interativo', async () => {
@@ -164,16 +179,22 @@ describe('AppSidebar', () => {
       screen.getByRole('button', { name: /abrir menu lateral/i }),
     )
     const dialog = screen.getByRole('dialog', { name: /menu lateral/i })
-    const informationCard = within(dialog).getByLabelText(/informação da clínica/i)
+    const informationCard = within(dialog).getByLabelText(
+      /informação da clínica/i,
+    )
 
     expect(within(informationCard).queryByRole('link')).not.toBeInTheDocument()
-    expect(within(informationCard).queryByRole('button')).not.toBeInTheDocument()
+    expect(
+      within(informationCard).queryByRole('button'),
+    ).not.toBeInTheDocument()
 
     await user.click(within(dialog).getByRole('link', { name: 'Agenda' }))
 
     expect(
       screen.queryByRole('dialog', { name: /menu lateral/i }),
     ).not.toBeInTheDocument()
-    expect(screen.getByTestId('current-path')).toHaveTextContent('/appointments')
+    expect(screen.getByTestId('current-path')).toHaveTextContent(
+      '/appointments',
+    )
   })
 })
