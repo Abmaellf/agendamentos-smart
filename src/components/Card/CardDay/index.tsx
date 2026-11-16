@@ -1,6 +1,3 @@
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale/pt-BR'
-
 import type { Appointment, CardDayProps } from '@/@types/appointment'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
