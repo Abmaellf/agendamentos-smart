@@ -105,6 +105,7 @@ export interface CardDayProps {
   date: string
   isToday: boolean
   dayWeek: number
+  appointments: Appointment[]
 }
 
 export interface CardPatientProps {

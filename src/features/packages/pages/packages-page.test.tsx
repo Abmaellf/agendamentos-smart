@@ -51,7 +51,7 @@ describe('PackagesPage', () => {
     await user.click(screen.getByRole('button', { name: 'Filtrar' }))
 
     await waitFor(() =>
-      expect(queries.at(-1)?.get('name')).toBe('fisioterapia'),
+      expect(queries[queries.length -1]?.get('name')).toBe('fisioterapia'),
     )
   })
 
