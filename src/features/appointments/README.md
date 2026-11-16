@@ -16,6 +16,11 @@ front-end.
 
 O caminho externo de agenda é `/api/appointments` para consulta e criação.
 
+O topbar também expõe “Agendamento de Pacotes”. Nesta SPEC 01 ele é somente
+informativo e não chama a API nem cria dados; a contratação, a data inicial e a
+geração automática pertencem à SPEC 02. As definições administrativas ficam na
+feature irmã `packages` e não alteram o fluxo manual desta feature.
+
 ## Estrutura
 
 ```text

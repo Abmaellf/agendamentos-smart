@@ -95,6 +95,20 @@ describe('AppTopbar', () => {
     ).toBeVisible()
   })
 
+  it('abre o fluxo de agendamento de pacotes', async () => {
+    const user = userEvent.setup()
+    renderTopbar()
+
+    await user.click(
+      await screen.findByRole('button', { name: /agendamento de pacotes/i }),
+    )
+
+    expect(await screen.findByRole('dialog', { name: /agendamento de pacotes/i })).toBeVisible()
+    expect(
+      screen.queryByRole('dialog', { name: /novo agendamento/i }),
+    ).not.toBeInTheDocument()
+  })
+
   it('não exibe uma ação de agendamento sem sessão disponível', async () => {
     server.use(
       http.get('http://localhost:8080/auth/me', () => HttpResponse.error()),
