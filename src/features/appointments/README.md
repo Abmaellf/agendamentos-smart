@@ -45,9 +45,14 @@ apresenta carregamento, erro e estado vazio e distribui os registros nos cinco
 dias úteis. O `AppTopbar` fornece a navegação temporal e abre o
 `CreateAppointmentDialog`, que mantém a mesma implementação de criação e usa
 `FormField` e `SearchableSelect` compartilhados para a apresentação acessível
-dos controles de catálogo. Paciente, unidade, serviço e profissional podem ser
-localizados por trecho do nome no dropdown; essa filtragem ocorre localmente
-sobre o catálogo já carregado e não cria contrato de busca remota.
+dos controles de catálogo. Para a criação manual, Unidade é o contexto do
+catálogo de Paciente: `ADMIN` seleciona a unidade primeiro, o catálogo de
+pacientes é consultado com essa unidade e a troca de unidade limpa a seleção
+anterior. Paciente, unidade, serviço e profissional podem ser localizados por
+trecho do nome no dropdown; essa filtragem ocorre localmente sobre o catálogo
+já carregado e não cria chamadas por tecla. O catálogo e o vínculo entre
+paciente e unidade continuam sob autoridade da API; o frontend apenas orienta
+o fluxo e envia os IDs selecionados.
 A unidade do usuário `BASIC` é inicializada a partir de `activeUnitId`, fica
 visível porém sem edição e só pode ser enviada quando estiver presente no
 catálogo autorizado pela API. `ADMIN` mantém a seleção editável entre as

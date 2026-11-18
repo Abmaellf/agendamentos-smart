@@ -21,7 +21,7 @@ import {
 
 import {
   useCreateAppointmentMutation,
-  useGetPatientsQuery,
+  useGetAppointmentPatientsQuery,
   useGetProfessionalsQuery,
   useGetServicesQuery,
   useGetUnitsQuery,
@@ -53,6 +53,7 @@ export function CreateAppointmentDialog({
   triggerAriaLabel,
 }: CreateAppointmentDialogProps) {
   const patientRef = useRef<HTMLButtonElement>(null)
+  const unitRef = useRef<HTMLButtonElement>(null)
   const submittingRef = useRef(false)
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<AppointmentFormState>(() =>
@@ -63,21 +64,33 @@ export function CreateAppointmentDialog({
   const [durationOverridden, setDurationOverridden] = useState(false)
   const [priceOverridden, setPriceOverridden] = useState(false)
 
-  const patientsQuery = useGetPatientsQuery(undefined, { skip: !open })
+  const unitIsReadOnly = session.user.role === 'BASIC'
   const unitsQuery = useGetUnitsQuery(undefined, { skip: !open })
+  const patientsQuery = useGetAppointmentPatientsQuery(form.unitId, {
+    skip: !open || !form.unitId,
+  })
   const servicesQuery = useGetServicesQuery(undefined, { skip: !open })
   const professionalsQuery = useGetProfessionalsQuery(form.serviceId, {
     skip: !open || !form.serviceId,
   })
   const [createAppointment, mutation] = useCreateAppointmentMutation()
 
-  const requiredQueries = [patientsQuery, unitsQuery, servicesQuery]
-  const isCatalogLoading = requiredQueries.some((query) => query.isLoading)
+  const requiredQueries = [unitsQuery, servicesQuery]
+  const patientCatalogLoading = Boolean(form.unitId) && patientsQuery.isLoading
+  const isCatalogLoading =
+    requiredQueries.some((query) => query.isLoading) || patientCatalogLoading
   const catalogError = requiredQueries.find((query) => query.isError)
+    ? requiredQueries.find((query) => query.isError)
+    : form.unitId && patientsQuery.isError
+      ? patientsQuery
+      : undefined
   const hasEmptyCatalog = requiredQueries.some(
     (query) => query.isSuccess && query.data.length === 0,
   )
-  const unitIsReadOnly = session.user.role === 'BASIC'
+  const hasEmptyPatientCatalog =
+    Boolean(form.unitId) &&
+    patientsQuery.isSuccess &&
+    patientsQuery.data.length === 0
   const basicUnitUnavailable =
     unitIsReadOnly &&
     unitsQuery.isSuccess &&
@@ -165,9 +178,9 @@ export function CreateAppointmentDialog({
   }
 
   function retryCatalogs() {
-    void patientsQuery.refetch()
     void unitsQuery.refetch()
     void servicesQuery.refetch()
+    if (form.unitId) void patientsQuery.refetch()
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -190,7 +203,11 @@ export function CreateAppointmentDialog({
       )
       setFieldErrors(nextErrors)
       setFeedback('Revise os campos indicados antes de continuar.')
-      patientRef.current?.focus()
+      if (nextErrors.unitId) {
+        unitRef.current?.focus()
+      } else {
+        patientRef.current?.focus()
+      }
       return
     }
 
@@ -220,8 +237,10 @@ export function CreateAppointmentDialog({
   const roleCanOverride = session.user.role === 'ADMIN'
   const createDisabled =
     isCatalogLoading ||
+    patientCatalogLoading ||
     Boolean(catalogError) ||
     hasEmptyCatalog ||
+    hasEmptyPatientCatalog ||
     basicUnitUnavailable ||
     mutation.isLoading
 
@@ -276,22 +295,9 @@ export function CreateAppointmentDialog({
           ) : null}
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="Paciente" error={fieldErrors.patientId}>
-              <SearchableSelect
-                ref={patientRef}
-                options={patientOptions}
-                loading={patientsQuery.isLoading}
-                searchPlaceholder="Buscar paciente"
-                className={controlClassName}
-                value={form.patientId}
-                onValueChange={(patientId) =>
-                  setForm((current) => ({ ...current, patientId }))
-                }
-              />
-            </FormField>
-
             <FormField label="Unidade" error={fieldErrors.unitId}>
               <SearchableSelect
+                ref={unitRef}
                 options={unitOptions}
                 loading={unitsQuery.isLoading}
                 searchPlaceholder="Buscar unidade"
@@ -300,8 +306,27 @@ export function CreateAppointmentDialog({
                 disabled={unitIsReadOnly || basicUnitUnavailable}
                 onValueChange={(unitId) => {
                   if (unitIsReadOnly) return
-                  setForm((current) => ({ ...current, unitId }))
+                  setForm((current) => ({ ...current, unitId, patientId: '' }))
                 }}
+              />
+            </FormField>
+
+            <FormField label="Paciente" error={fieldErrors.patientId}>
+              <SearchableSelect
+                ref={patientRef}
+                options={patientOptions}
+                loading={patientsQuery.isLoading}
+                placeholder={
+                  form.unitId ? 'Selecione' : 'Selecione uma unidade primeiro'
+                }
+                searchPlaceholder="Buscar paciente"
+                emptyLabel="Nenhum paciente disponível para esta unidade."
+                className={controlClassName}
+                value={form.patientId}
+                disabled={!form.unitId || patientsQuery.isError}
+                onValueChange={(patientId) =>
+                  setForm((current) => ({ ...current, patientId }))
+                }
               />
             </FormField>
 
@@ -399,8 +424,8 @@ export function CreateAppointmentDialog({
             </FormField>
           </div>
 
-          {patientsQuery.isSuccess && patientsQuery.data.length === 0 ? (
-            <p>Nenhum paciente disponível.</p>
+          {hasEmptyPatientCatalog ? (
+            <p>Nenhum paciente disponível para esta unidade.</p>
           ) : null}
           {unitsQuery.isSuccess && unitsQuery.data.length === 0 ? (
             <p>Nenhuma unidade disponível.</p>

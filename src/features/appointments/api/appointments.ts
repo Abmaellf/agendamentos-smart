@@ -36,6 +36,18 @@ export const appointmentsApi = baseApi.injectEndpoints({
         contentOf(response as CollectionResponse<PatientOption>),
       providesTags: ['PatientCatalog'],
     }),
+    getAppointmentPatients: builder.query<PatientOption[], string>({
+      query: (unitId) => ({
+        url: '/api/patients',
+        params: { unitId },
+      }),
+      transformResponse: (response: unknown) =>
+        contentOf(response as CollectionResponse<PatientOption>),
+      providesTags: (_result, _error, unitId) => [
+        { type: 'PatientCatalog', id: 'LIST' },
+        { type: 'PatientCatalog', id: `UNIT-${unitId}` },
+      ],
+    }),
     getUnits: builder.query<UnitOption[], void>({
       query: () => ({ url: '/api/units' }),
       transformResponse: (response: unknown) =>
@@ -79,6 +91,7 @@ export const appointmentsApi = baseApi.injectEndpoints({
 
 export const {
   useCreateAppointmentMutation,
+  useGetAppointmentPatientsQuery,
   useGetAppointmentSessionQuery,
   useGetAppointmentsQuery,
   useGetPatientsQuery,

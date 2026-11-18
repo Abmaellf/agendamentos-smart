@@ -42,6 +42,7 @@ interface ApiScenario {
   patientCreateNetworkError: boolean
   patientCreateRequests: Record<string, unknown>[]
   patientQueries: URLSearchParams[]
+  appointmentPatientQueries: URLSearchParams[]
   createdPatient: TestPatientListItem
 }
 
@@ -78,6 +79,7 @@ function initialScenario(): ApiScenario {
     patientCreateNetworkError: false,
     patientCreateRequests: [],
     patientQueries: [],
+    appointmentPatientQueries: [],
     createdPatient,
   }
 }
@@ -165,6 +167,46 @@ async function patientListResponse(request: Request) {
   })
 }
 
+async function appointmentPatientCatalogResponse(request: Request) {
+  apiScenario.catalogRequests.patients += 1
+  const searchParams = new URL(request.url).searchParams
+  apiScenario.appointmentPatientQueries.push(searchParams)
+
+  if (apiScenario.catalogDelayMs > 0) {
+    await delay(apiScenario.catalogDelayMs)
+  }
+
+  const errorStatus = apiScenario.catalogErrors.patients
+  if (errorStatus) {
+    return HttpResponse.json(
+      {
+        code: 'PATIENT_CATALOG_FAILED',
+        message: 'Falha ao carregar pacientes da unidade',
+      },
+      { status: errorStatus },
+    )
+  }
+
+  const unitId = searchParams.get('unitId')
+  const patients = (apiScenario.catalogs.patients as PatientListItem[]).filter(
+    (patient) => !unitId || patient.unitIds.includes(unitId),
+  )
+
+  const options = patients.map((patient) => ({
+    id: patient.id,
+    name: patient.name,
+    tenantId:
+      (patient as PatientListItem & { tenantId?: string }).tenantId ??
+      patient.clinicId,
+  }))
+
+  return HttpResponse.json(
+    apiScenario.collectionResponse === 'array'
+      ? options
+      : { content: options },
+  )
+}
+
 function patientErrorStatus(code: string) {
   switch (code) {
     case 'VALIDATION_ERROR':
@@ -196,6 +238,9 @@ const handlers = [
   }),
   http.get('http://localhost:8080/patient/list', ({ request }) =>
     patientListResponse(request),
+  ),
+  http.get('http://localhost:8080/api/patients', ({ request }) =>
+    appointmentPatientCatalogResponse(request),
   ),
   http.post('http://localhost:8080/patient/save', async ({ request }) => {
     const payload = (await request.json()) as Record<string, unknown>
