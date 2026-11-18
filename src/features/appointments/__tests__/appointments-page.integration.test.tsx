@@ -86,7 +86,7 @@ describe('integração da criação com a agenda semanal', () => {
         screen.getAllByTestId('appointment-appointment-created'),
       ).toHaveLength(1),
     )
-    expect(screen.getByText('Ana Paciente')).toBeVisible()
+    expect(screen.getByText('Ana')).toBeVisible()
     expect(screen.getByText('08:30')).toBeVisible()
     expect(screen.getByText('AGENDADO')).toBeVisible()
     expect(screen.getByText(/60 min/i)).toBeVisible()
@@ -125,8 +125,8 @@ describe('integração da criação com a agenda semanal', () => {
     expect(
       await screen.findByTestId('appointment-appointment-new-group'),
     ).toHaveAttribute('data-lane-count', '2')
-    expect(screen.getByText('Ana Paciente')).toBeVisible()
-    expect(screen.getByText('Bia Paciente')).toBeVisible()
+    expect(screen.getByText('Ana')).toBeVisible()
+    expect(screen.getByText('Bia')).toBeVisible()
   })
 
   it('WB-17 apresenta carregamento da agenda', () => {
@@ -305,30 +305,101 @@ describe('integração da criação com a agenda semanal', () => {
     expect(afterHours).toHaveAttribute('data-height-minutes', '120')
   })
 
-  it('apresenta todos os pacientes de uma turma simultânea em cartões identificáveis', async () => {
+  it('quebra uma turma simultânea em linhas e exibe somente o primeiro nome', async () => {
     apiScenario.appointments = Array.from({ length: 5 }, (_, index) => ({
       ...createdAppointment,
       id: `appointment-group-${index + 1}`,
       patient: {
         id: `patient-group-${index + 1}`,
-        name: `Paciente da turma ${index + 1}`,
+        name: `Paciente${index + 1} da turma`,
       },
-      startsAt: '2026-08-13T14:00:00.000Z',
+      startsAt: '2026-08-13T11:00:00.000Z',
       durationMinutes: 60,
     }))
     renderAppointmentsPage()
 
     for (let index = 0; index < 5; index += 1) {
-      const patientName = `Paciente da turma ${index + 1}`
+      const patientFullName = `Paciente${index + 1} da turma`
+      const patientName = `Paciente${index + 1}`
       const card = await screen.findByTestId(`appointment-appointment-group-${index + 1}`)
 
       expect(card).toHaveAttribute('data-lane', String(index))
       expect(card).toHaveAttribute('data-lane-count', '5')
       expect(card).toHaveAttribute('data-density', 'compact')
-      expect(card).toHaveAttribute('title', expect.stringContaining(patientName))
+      expect(card).toHaveAttribute('title', expect.stringContaining(patientFullName))
+      expect(card).toHaveAttribute('aria-label', expect.stringContaining(patientFullName))
       expect(within(card).getByText(patientName)).toBeVisible()
       expect(within(card).getByText('Pilates')).toBeVisible()
+      expect(card).toHaveClass('overflow-hidden')
     }
+
+    expect(
+      screen.getByTestId('appointment-appointment-group-1'),
+    ).toHaveAttribute('data-visual-row', '0')
+    expect(
+      screen.getByTestId('appointment-appointment-group-3'),
+    ).toHaveAttribute('data-visual-column', '2')
+    expect(
+      screen.getByTestId('appointment-appointment-group-4'),
+    ).toHaveAttribute('data-visual-row', '1')
+    expect(
+      screen.getByTestId('appointment-appointment-group-4'),
+    ).toHaveAttribute('data-visual-column', '0')
+
+    const timeRuler = screen.getByTestId('weekly-appointments-time-ruler')
+    expect(timeRuler.querySelector('[data-hour="7"]')).toHaveAttribute(
+      'data-row-height',
+      '132',
+    )
+    expect(timeRuler.querySelector('[data-hour="8"]')).toHaveAttribute(
+      'data-row-top',
+      '132',
+    )
+  })
+
+  it('destaca a linha horária inteira ao passar o cursor e remove o destaque ao sair', async () => {
+    renderAppointmentsPage()
+
+    const weeklyGrid = await screen.findByTestId('weekly-appointments')
+    const hourRows = weeklyGrid.querySelectorAll('[data-hour="7"]')
+
+    expect(hourRows).toHaveLength(6)
+    fireEvent.mouseEnter(hourRows[1] as HTMLElement)
+
+    expect(
+      weeklyGrid.querySelectorAll('[data-hour="7"][data-hovered="true"]'),
+    ).toHaveLength(6)
+
+    fireEvent.mouseLeave(hourRows[1] as HTMLElement)
+
+    expect(
+      weeklyGrid.querySelectorAll('[data-hour="7"][data-hovered="true"]'),
+    ).toHaveLength(0)
+  })
+
+  it('mantém o destaque da linha quando o cursor está sobre o card do paciente', async () => {
+    apiScenario.appointments = [
+      {
+        ...createdAppointment,
+        startsAt: '2026-08-13T11:00:00.000Z',
+      },
+    ]
+    renderAppointmentsPage()
+
+    const weeklyGrid = await screen.findByTestId('weekly-appointments')
+    const card = await screen.findByTestId('appointment-appointment-created')
+
+    fireEvent.mouseEnter(card)
+
+    expect(
+      weeklyGrid.querySelectorAll('[data-hour="7"][data-hovered="true"]'),
+    ).toHaveLength(6)
+
+    fireEvent.mouseLeave(card)
+
+    expect(
+      weeklyGrid.querySelectorAll('[data-hour="7"][data-hovered="true"]'),
+    ).toHaveLength(0)
   })
 
   it('exibe a legenda completa e mantém a matriz rolável em telas estreitas', async () => {
@@ -364,7 +435,7 @@ describe('integração da criação com a agenda semanal', () => {
     ]
     renderAppointmentsPage()
 
-    expect(await screen.findByText('Ana Paciente')).toBeVisible()
+    expect(await screen.findByText('Ana')).toBeVisible()
     expect(
       within(screen.getByTestId('weekly-appointments-time-ruler')).getByText(
         '10:00',
@@ -381,8 +452,8 @@ describe('integração da criação com a agenda semanal', () => {
 
     renderAppointmentsPage()
 
-    expect(await screen.findAllByText('Ana Oliveira')).toHaveLength(2)
-    expect(screen.getByText('Carla Mendes')).toBeVisible()
+    expect(await screen.findAllByText('Ana')).toHaveLength(2)
+    expect(screen.getByText('Carla')).toBeVisible()
     expect(screen.getAllByText('Turma de reabilitação')).toHaveLength(2)
     expect(screen.getByText('Pilates')).toBeVisible()
     expect(screen.getAllByText('R$ 150,00')).toHaveLength(3)
@@ -453,7 +524,7 @@ describe('integração da criação com a agenda semanal', () => {
     },
   )
 
-  it('preserva o conteúdo completo em nomes e serviços longos', async () => {
+  it('mantém o nome completo acessível sem rolagem interna em conteúdo longo', async () => {
     const patientName = 'Paciente com nome completo para coluna estreita'
     const serviceName = 'Atendimento individual de reabilitação funcional'
     apiScenario.appointments = [
@@ -468,9 +539,12 @@ describe('integração da criação com a agenda semanal', () => {
     renderAppointmentsPage()
 
     const card = await screen.findByTestId('appointment-appointment-created')
-    expect(within(card).getByText(patientName)).toHaveClass('break-words')
-    expect(within(card).getByText(serviceName)).toHaveClass('break-words')
+    expect(within(card).getByText('Paciente')).toHaveClass('truncate')
+    expect(within(card).getByText(serviceName)).toHaveClass('truncate')
     expect(within(card).getByText('AGENDADO')).toHaveClass('sr-only')
+    expect(card).toHaveClass('overflow-hidden')
+    expect(card).not.toHaveClass('overflow-auto')
+    expect(card).toHaveAttribute('aria-label', expect.stringContaining(patientName))
     expect(card).toHaveAttribute('aria-label', expect.stringContaining('10:00'))
   })
 

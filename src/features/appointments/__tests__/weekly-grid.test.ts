@@ -3,8 +3,10 @@ import { createdAppointment } from '@/test/builders/appointment'
 import { describe, expect, it } from 'vitest'
 
 import {
+  appointmentCardsPerRow,
   appointmentLocalDateKey,
   appointmentLocalTime,
+  buildVisualAppointmentLayout,
   buildWeeklyAppointmentGrid,
 } from '../model/weekly-grid'
 
@@ -98,5 +100,39 @@ describe('modelo da grade horária semanal', () => {
       true,
     )
     expect(day?.appointments[5]).toMatchObject({ lane: 0, laneCount: 1 })
+  })
+
+  it('quebra o grupo visual na linha seguinte quando a largura da coluna termina', () => {
+    const appointments = Array.from({ length: 5 }, (_, index) =>
+      makeAppointment({
+        id: `appointment-visual-${index + 1}`,
+        startsAt: '2026-08-13T14:00:00.000Z',
+        durationMinutes: 60,
+      }),
+    )
+    const [day] = buildWeeklyAppointmentGrid(
+      appointments,
+      new Date('2026-08-10T12:00:00-04:00'),
+    ).filter((item) => item.appointments.length > 0)
+
+    expect(appointmentCardsPerRow(320)).toBe(3)
+
+    const visualAppointments = buildVisualAppointmentLayout(
+      day!,
+      320,
+      64 / 60,
+    )
+
+    expect(visualAppointments.map((item) => [item.visualRow, item.visualColumn])).toEqual([
+      [0, 0],
+      [0, 1],
+      [0, 2],
+      [1, 0],
+      [1, 1],
+    ])
+    expect(visualAppointments.every((item) => item.visualRowCount === 2)).toBe(true)
+    expect(visualAppointments[3]?.visualTopPx).toBeGreaterThan(
+      visualAppointments[0]?.visualTopPx ?? 0,
+    )
   })
 })
