@@ -25,16 +25,16 @@ permanece em `src/lib`; contratos de domínio compartilhados permanecem em
 
 ## Matriz de migração e expansão
 
-| Domínio | Estado | Local canônico | Escopo desta change |
-| --- | --- | --- | --- |
-| `appointments` | Implementado parcialmente | `src/features/appointments` | Referência estrutural; sem migração funcional |
-| `patients` | Em migração | `src/features/patients` | Migrar página, componentes, contexto, API, testes e documentação |
-| `session` | Contrato parcial | `src/features/session` | Preservar modelo existente; `activeUnitId` inicializa controles BASIC sem substituir a autorização da API |
-| `professionals` | Planejado | `src/features/professionals` | Não criar fluxo nesta change |
-| `services` | Planejado | `src/features/services` | Não criar fluxo nesta change |
-| `reports` | Planejado | `src/features/reports` | Não criar fluxo nesta change |
-| `financial` | Planejado | `src/features/financial` | Não criar fluxo nesta change |
-| `users` | Planejado | `src/features/users` | Não criar fluxo nesta change |
+| Domínio         | Estado                       | Local canônico               | Escopo desta change                                                                                       |
+| --------------- | ---------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `appointments`  | Implementado parcialmente    | `src/features/appointments`  | Referência estrutural; sem migração funcional                                                             |
+| `patients`      | Implementado no escopo atual | `src/features/patients`      | Listagem, filtros, paginação e cadastro com vínculo de unidades                                           |
+| `session`       | Contrato parcial             | `src/features/session`       | Preservar modelo existente; `activeUnitId` inicializa controles BASIC sem substituir a autorização da API |
+| `professionals` | Planejado                    | `src/features/professionals` | Não criar fluxo nesta change                                                                              |
+| `services`      | Planejado                    | `src/features/services`      | Não criar fluxo nesta change                                                                              |
+| `reports`       | Planejado                    | `src/features/reports`       | Não criar fluxo nesta change                                                                              |
+| `financial`     | Planejado                    | `src/features/financial`     | Não criar fluxo nesta change                                                                              |
+| `users`         | Planejado                    | `src/features/users`         | Não criar fluxo nesta change                                                                              |
 
 Os nomes das features usam plural em inglês, alinhados a `appointments` e ao
 alias de domínio. Rotas e textos de interface podem preservar o contrato atual,
@@ -55,8 +55,9 @@ por um único consumidor podem permanecer locais.
 
 ## Estado atual e lacunas
 
-Esta convenção não declara os domínios planejados como implementados. A feature
-de pacientes mantém, durante esta mudança, os dois fluxos de criação legados e
-seus contratos HTTP observados. Unificação de cadastro, edição, desativação,
+A feature de pacientes usa uma única integração RTK Query. O contexto remoto e
+o endpoint legado `POST patients` foram removidos. Edição, detalhe e
+desativação continuam planejados para changes específicas.
+Unificação de cadastro, edição, desativação,
 paginação real e autorização continuam dependendo de changes funcionais
 próprias.

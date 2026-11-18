@@ -1,11 +1,10 @@
 import { render, type RenderOptions } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import type { PropsWithChildren, ReactElement } from 'react'
 import { HelmetProvider } from 'react-helmet-async'
 import { Provider } from 'react-redux'
+import { MemoryRouter } from 'react-router-dom'
 import { Toaster } from 'sonner'
-import type { PropsWithChildren, ReactElement } from 'react'
 
-import { PatientProvider } from '@/features/patients/model/patient-context'
 import { baseApi } from '@/lib/base-api'
 import { createAppStore, type AppStore } from '@/lib/store'
 
@@ -43,12 +42,10 @@ export function renderWithProviders(
     return (
       <MemoryRouter initialEntries={[route]}>
         <HelmetProvider>
-          <PatientProvider>
-            <Provider store={store}>
-              {children}
-              <Toaster richColors />
-            </Provider>
-          </PatientProvider>
+          <Provider store={store}>
+            {children}
+            <Toaster richColors />
+          </Provider>
         </HelmetProvider>
       </MemoryRouter>
     )
