@@ -29,7 +29,7 @@ describe('feature de pacientes', () => {
     await user.click(screen.getByRole('button', { name: 'Filtrar' }))
 
     await waitFor(() => {
-      const lastQuery = apiScenario.patientQueries.at(-1)
+      const lastQuery =  apiScenario.patientQueries[apiScenario.patientQueries.length - 1]
       expect(lastQuery?.get('name')).toBe('Ana')
       expect(lastQuery?.get('page')).toBe('0')
     })
@@ -53,7 +53,7 @@ describe('feature de pacientes', () => {
 
     expect(await screen.findByText('Fernanda Lopes')).toBeVisible()
     await waitFor(() =>
-      expect(apiScenario.patientQueries.at(-1)?.get('page')).toBe('1'),
+      expect(apiScenario.patientQueries[apiScenario.patientQueries.length - 1]?.get('page')).toBe('1'),
     )
     expect(screen.getByText('Página 2 de 2')).toBeVisible()
   })
