@@ -7,7 +7,7 @@ import {
   List,
   LoaderCircle,
 } from 'lucide-react'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 
 import type { AppointmentStatus } from '@/@types/appointment'
@@ -22,11 +22,11 @@ import {
 import { cn } from '@/lib/utils'
 
 import {
+  buildVisualAppointmentLayout,
   buildWeeklyAppointmentGrid,
   WEEK_GRID_END_HOUR,
   WEEK_GRID_END_MINUTES,
   WEEK_GRID_START_HOUR,
-  WEEK_GRID_START_MINUTES,
 } from '../model/weekly-grid'
 
 const feedbackPanelClassName =
@@ -96,6 +96,12 @@ function dayDateLabel(date: Date) {
   return `${format(date, 'd')} de ${capitalize(format(date, 'MMMM', { locale: ptBR }))}`
 }
 
+function firstName(value: string) {
+  return value.trim().split(/\s+/)[0] ?? value.trim()
+}
+
+const DEFAULT_DAY_COLUMN_WIDTH_PX = 320
+
 export function AppointmentsPage() {
   const { selectedDate } = useAppShellDate()
   const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 })
@@ -119,21 +125,128 @@ export function AppointmentsPage() {
     () => buildWeeklyAppointmentGrid(appointments, weekStart),
     [appointments, weekStart],
   )
+  const firstDayColumnRef = useRef<HTMLElement | null>(null)
+  const [dayColumnWidth, setDayColumnWidth] = useState(
+    DEFAULT_DAY_COLUMN_WIDTH_PX,
+  )
+  const [hoveredHour, setHoveredHour] = useState<number | null>(null)
+
+  useEffect(() => {
+    const element = firstDayColumnRef.current
+    if (!element) return
+
+    const measure = () => {
+      const width = element.getBoundingClientRect().width
+      if (width > 0) setDayColumnWidth(Math.round(width))
+    }
+
+    measure()
+    if (typeof ResizeObserver === 'undefined') return
+
+    const observer = new ResizeObserver(measure)
+    observer.observe(element)
+
+    return () => observer.disconnect()
+  }, [weeklyGrid.length])
+
+  const baseVisualWeeklyGrid = useMemo(
+    () =>
+      weeklyGrid.map((day) => ({
+        ...day,
+        appointments: buildVisualAppointmentLayout(
+          day,
+          dayColumnWidth,
+          MINUTE_HEIGHT_PX,
+        ),
+      })),
+    [dayColumnWidth, weeklyGrid],
+  )
   const selectedDayKey = format(selectedDate, 'yyyy-MM-dd')
   const todayKey = format(new Date(), 'yyyy-MM-dd')
   const hourLabels = Array.from(
     { length: WEEK_GRID_END_HOUR - WEEK_GRID_START_HOUR + 1 },
     (_, index) => WEEK_GRID_START_HOUR + index,
   )
-  const maxAppointmentEndMinutes = weeklyGrid
+  const visualHourRows = useMemo(() => {
+    const heights = new Map(
+      hourLabels.map((hour) => [hour, HOUR_HEIGHT_PX]),
+    )
+
+    baseVisualWeeklyGrid.forEach((day) => {
+      const groups = new Map<number, typeof day.appointments>()
+
+      day.appointments.forEach((appointment) => {
+        const group = groups.get(appointment.overlapGroup) ?? []
+        group.push(appointment)
+        groups.set(appointment.overlapGroup, group)
+      })
+
+      groups.forEach((group) => {
+        const groupStartMinutes = group[0]?.overlapGroupStartMinutes
+        if (
+          groupStartMinutes === undefined ||
+          groupStartMinutes < WEEK_GRID_START_HOUR * 60 ||
+          groupStartMinutes >= WEEK_GRID_END_HOUR * 60 ||
+          group[0]?.visualRowCount === 1
+        ) {
+          return
+        }
+
+        const hour = Math.floor(groupStartMinutes / 60)
+        const requiredHeight = Math.max(
+          ...group.map(
+            (appointment) =>
+              appointment.visualTopPx + appointment.visualHeightPx -
+              (hour - WEEK_GRID_START_HOUR) * HOUR_HEIGHT_PX,
+          ),
+        )
+        heights.set(hour, Math.max(heights.get(hour) ?? HOUR_HEIGHT_PX, requiredHeight))
+      })
+    })
+
+    let topPx = 0
+    return hourLabels.map((hour) => {
+      const row = { hour, topPx, heightPx: heights.get(hour) ?? HOUR_HEIGHT_PX }
+      topPx += row.heightPx
+      return row
+    })
+  }, [baseVisualWeeklyGrid, hourLabels])
+
+  const visualWeeklyGrid = useMemo(
+    () =>
+      baseVisualWeeklyGrid.map((day) => ({
+        ...day,
+        appointments: day.appointments.map((appointment) => {
+          const groupStartMinutes = appointment.overlapGroupStartMinutes
+          const hour = Math.floor(groupStartMinutes / 60)
+          const row = visualHourRows.find((item) => item.hour === hour)
+          const baseGroupTopPx =
+            (groupStartMinutes - WEEK_GRID_START_HOUR * 60) * MINUTE_HEIGHT_PX
+          const expandedGroupTopPx = row
+            ? row.topPx +
+              (groupStartMinutes - hour * 60) * MINUTE_HEIGHT_PX
+            : baseGroupTopPx
+
+          return {
+            ...appointment,
+            visualTopPx:
+              expandedGroupTopPx + appointment.visualTopPx - baseGroupTopPx,
+          }
+        }),
+      })),
+    [baseVisualWeeklyGrid, visualHourRows],
+  )
+  const maxAppointmentEndPx = visualWeeklyGrid
     .flatMap((day) => day.appointments)
     .reduce(
-      (latest, appointment) => Math.max(latest, appointment.endMinutes),
-      WEEK_GRID_END_MINUTES,
+      (latest, appointment) =>
+        Math.max(latest, appointment.visualTopPx + appointment.visualHeightPx),
+      (WEEK_GRID_END_MINUTES - WEEK_GRID_START_HOUR * 60) *
+        MINUTE_HEIGHT_PX,
     )
   const matrixHeight = Math.max(
-    hourLabels.length * HOUR_HEIGHT_PX,
-    (maxAppointmentEndMinutes - WEEK_GRID_START_MINUTES) * MINUTE_HEIGHT_PX,
+    visualHourRows.reduce((total, row) => total + row.heightPx, 0),
+    maxAppointmentEndPx,
   )
 
   function retry() {
@@ -301,14 +414,32 @@ export function AppointmentsPage() {
                     aria-label="Régua de horários da agenda"
                     className="border-r border-[#dfe9ef] bg-[#f8fbfd] text-right text-xs font-semibold text-[#53657a]"
                   >
-                    {hourLabels.map((hour) => (
+                    {visualHourRows.map((row) => (
                       <div
-                        key={hour}
-                        className="relative border-b border-[#dfe9ef] pr-2"
-                        style={{ height: `${HOUR_HEIGHT_PX}px` }}
+                        key={row.hour}
+                        data-hour={row.hour}
+                        data-row-top={row.topPx}
+                        data-row-height={row.heightPx}
+                        data-hovered={hoveredHour === row.hour}
+                        tabIndex={0}
+                        onMouseEnter={() => setHoveredHour(row.hour)}
+                        onMouseLeave={() => setHoveredHour(null)}
+                        onFocus={() => setHoveredHour(row.hour)}
+                        onBlur={() => setHoveredHour(null)}
+                        className={cn(
+                          'relative border-b border-[#dfe9ef] pr-2 outline-none transition-colors',
+                          hoveredHour === row.hour && 'bg-[#dff7eb]',
+                        )}
+                        style={{ height: `${row.heightPx}px` }}
                       >
-                        <time className="relative -top-2 inline-block bg-[#f8fbfd] pl-1">
-                          {String(hour).padStart(2, '0')}:00
+                        <time
+                          className={cn(
+                            'relative -top-2 inline-block bg-[#f8fbfd] pl-1',
+                            hoveredHour === row.hour &&
+                              'rounded-sm bg-[#dff7eb] text-[#075e46]',
+                          )}
+                        >
+                          {String(row.hour).padStart(2, '0')}:00
                         </time>
                       </div>
                     ))}
@@ -324,19 +455,23 @@ export function AppointmentsPage() {
                     <div
                       aria-hidden="true"
                       className="pointer-events-none absolute inset-0 z-0"
-                      style={{
-                        backgroundImage:
-                          'linear-gradient(to bottom, rgb(223 233 239 / 80%) 1px, transparent 1px)',
-                        backgroundSize: `100% ${HOUR_HEIGHT_PX}px`,
-                      }}
-                    />
+                    >
+                      {visualHourRows.map((row) => (
+                        <div
+                          key={row.hour}
+                          className="absolute inset-x-0 border-b border-[#dfe9ef]"
+                          style={{ top: `${row.topPx + row.heightPx - 1}px` }}
+                        />
+                      ))}
+                    </div>
 
-                    {weeklyGrid.map((day) => {
+                    {visualWeeklyGrid.map((day, dayIndex) => {
                       const isSelected = day.key === selectedDayKey
 
                       return (
                         <section
                           key={day.key}
+                          ref={dayIndex === 0 ? firstDayColumnRef : undefined}
                           role="region"
                           aria-label={`${dayName(day.date)} - ${format(day.date, 'd')}`}
                           data-testid={`appointments-day-${day.key}`}
@@ -346,10 +481,46 @@ export function AppointmentsPage() {
                             isSelected && 'bg-[#f4fcf8]/70',
                           )}
                         >
+                          {hourLabels.map((hour) => (
+                            (() => {
+                              const row = visualHourRows.find(
+                                (item) => item.hour === hour,
+                              )
+
+                              return (
+                                <div
+                                  key={hour}
+                                  data-hour={hour}
+                                  data-row-top={row?.topPx}
+                                  data-row-height={row?.heightPx}
+                                  data-hovered={hoveredHour === hour}
+                                  aria-hidden="true"
+                                  onMouseEnter={() => setHoveredHour(hour)}
+                                  onMouseLeave={() => setHoveredHour(null)}
+                                  className={cn(
+                                    'pointer-events-auto absolute inset-x-0 z-0 border-b border-transparent transition-colors',
+                                    hoveredHour === hour && 'bg-[#dff7eb]/70',
+                                  )}
+                                  style={{
+                                    top: `${row?.topPx ?? (hour - WEEK_GRID_START_HOUR) * HOUR_HEIGHT_PX}px`,
+                                    height: `${row?.heightPx ?? HOUR_HEIGHT_PX}px`,
+                                  }}
+                                />
+                              )
+                            })()
+                          ))}
+
                           {day.appointments.map((positioned) => {
-                            const laneWidth = 100 / positioned.laneCount
                             const statusLabel =
                               appointmentStatusLabels[positioned.appointment.status]
+                            const patientFullName = positioned.appointment.patient.name
+                            const appointmentHour = Math.min(
+                              Math.max(
+                                Math.floor(positioned.startMinutes / 60),
+                                WEEK_GRID_START_HOUR,
+                              ),
+                              WEEK_GRID_END_HOUR,
+                            )
 
                             return (
                               <article
@@ -360,13 +531,20 @@ export function AppointmentsPage() {
                                 data-height-minutes={positioned.heightMinutes}
                                 data-lane={positioned.lane}
                                 data-lane-count={positioned.laneCount}
+                                data-visual-row={positioned.visualRow}
+                                data-visual-column={positioned.visualColumn}
+                                data-visual-row-count={positioned.visualRowCount}
+                                data-visual-column-count={positioned.visualColumnCount}
+                                data-hover-hour={appointmentHour}
                                 data-density={
                                   positioned.laneCount > 2 ? 'compact' : 'regular'
                                 }
-                                aria-label={`${positioned.appointment.patient.name}, ${positioned.appointment.service.name}, ${positioned.localTime}, ${statusLabel}`}
-                                title={`${positioned.appointment.patient.name} — ${positioned.appointment.service.name} — ${statusLabel}`}
+                                aria-label={`${patientFullName}, ${positioned.appointment.service.name}, ${positioned.localTime}, ${statusLabel}`}
+                                title={`${patientFullName} — ${positioned.appointment.service.name} — ${statusLabel}`}
+                                onMouseEnter={() => setHoveredHour(appointmentHour)}
+                                onMouseLeave={() => setHoveredHour(null)}
                                 className={cn(
-                                  'absolute z-[1] flex min-w-0 flex-col justify-center gap-0.5 overflow-auto rounded-[0.35rem] border border-white/80 leading-tight shadow-[0_4px_10px_rgb(32_32_36_/_16%)] transition-[transform,box-shadow,filter] duration-[160ms] hover:z-[2] hover:-translate-y-0.5 hover:saturate-[1.04] hover:shadow-[0_8px_16px_rgb(32_32_36_/_22%)]',
+                                  'absolute z-[2] flex min-w-0 flex-col justify-center gap-0.5 overflow-hidden rounded-[0.35rem] border border-white/80 leading-tight shadow-[0_4px_10px_rgb(32_32_36_/_16%)] transition-[transform,box-shadow,filter] duration-[160ms] hover:z-[3] hover:-translate-y-0.5 hover:saturate-[1.04] hover:shadow-[0_8px_16px_rgb(32_32_36_/_22%)]',
                                   positioned.laneCount > 2
                                     ? 'px-1 py-1 text-xs'
                                     : 'px-2 py-1.5 text-sm',
@@ -375,13 +553,10 @@ export function AppointmentsPage() {
                                   ],
                                 )}
                                 style={{
-                                  top: `${positioned.topMinutes * MINUTE_HEIGHT_PX}px`,
-                                  height: `${Math.max(
-                                    positioned.heightMinutes * MINUTE_HEIGHT_PX,
-                                    48,
-                                  )}px`,
-                                  left: `calc(${positioned.lane * laneWidth}% + 0.25rem)`,
-                                  width: `calc(${laneWidth}% - 0.5rem)`,
+                                  top: `${positioned.visualTopPx}px`,
+                                  height: `${positioned.visualHeightPx}px`,
+                                  left: `calc(${positioned.visualColumn * (100 / Math.max(positioned.visualColumnCount, 1))}% + 0.25rem)`,
+                                  width: `calc(${100 / Math.max(positioned.visualColumnCount, 1)}% - 0.5rem)`,
                                 }}
                               >
                                 <time
@@ -390,10 +565,10 @@ export function AppointmentsPage() {
                                 >
                                   {positioned.localTime}
                                 </time>
-                                <strong className="break-words text-[0.9rem] font-bold">
-                                  {positioned.appointment.patient.name}
+                                <strong className="truncate text-[0.9rem] font-bold">
+                                  {firstName(patientFullName)}
                                 </strong>
-                                <span className="break-words">
+                                <span className="truncate">
                                   {positioned.appointment.service.name}
                                 </span>
                                 <span className="sr-only">
