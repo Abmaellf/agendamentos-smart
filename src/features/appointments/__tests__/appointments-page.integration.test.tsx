@@ -43,8 +43,8 @@ async function fillAndSubmitAppointment(
   patientName: RegExp = /ana paciente/i,
 ) {
   await user.click(screen.getByRole('button', { name: /novo agendamento/i }))
-  await chooseOption(user, /^paciente/i, patientName)
   await chooseOption(user, /^unidade/i, /unidade centro/i)
+  await chooseOption(user, /^paciente/i, patientName)
   await chooseOption(user, /^serviço/i, /pilates/i)
 
   const date = screen.getByLabelText(/^data/i)

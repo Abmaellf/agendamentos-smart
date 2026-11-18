@@ -8,6 +8,7 @@ import {
   basicSession,
   type TestSession,
 } from '@/test/builders/appointment'
+import { patientListItems } from '@/test/builders/patient'
 import { loadSubject } from '@/test/load-subject'
 import { renderWithProviders } from '@/test/render'
 import { apiScenario } from '@/test/server'
@@ -69,11 +70,11 @@ async function typeInto(user: UserEvent, label: RegExp, value: string) {
 }
 
 async function fillValidForm(user: UserEvent) {
-  await chooseOption(user, /^paciente/i, /ana paciente/i)
   const unit = screen.getByRole('combobox', { name: /^unidade/i })
   if (!unit.hasAttribute('disabled')) {
     await chooseOption(user, /^unidade/i, /unidade centro/i)
   }
+  await chooseOption(user, /^paciente/i, /ana paciente/i)
   await chooseOption(user, /^serviço/i, /pilates/i)
   await typeInto(user, /^data/i, '2026-08-20')
   await typeInto(user, /^horário/i, '08:30')
@@ -149,6 +150,25 @@ describe('diálogo de criação manual', () => {
     expect(unit).toBeDisabled()
   })
 
+  it('ADMIN só consulta pacientes depois de selecionar a unidade', async () => {
+    const { user } = await renderDialog(adminSession)
+    await openDialog(user)
+
+    expect(screen.getByRole('combobox', { name: /^paciente/i })).toBeDisabled()
+    expect(apiScenario.appointmentPatientQueries).toHaveLength(0)
+
+    await chooseOption(user, /^unidade/i, /unidade centro/i)
+
+    await waitFor(() =>
+      expect(
+        apiScenario.appointmentPatientQueries[
+          apiScenario.appointmentPatientQueries.length - 1
+        ]?.get('unitId'),
+      ).toBe('unit-a'),
+    )
+    expect(screen.getByRole('combobox', { name: /^paciente/i })).toBeEnabled()
+  })
+
   it('mantém a seleção de unidade editável para ADMIN', async () => {
     apiScenario.catalogs.units = [
       ...apiScenario.catalogs.units,
@@ -166,6 +186,50 @@ describe('diálogo de criação manual', () => {
     expect(unit).toBeEnabled()
     await chooseOption(user, /^unidade/i, /parque do lago/i)
     expect(unit).toHaveTextContent('Unidade Parque do Lago')
+  })
+
+  it('escopa pacientes pela unidade e limpa a seleção ao trocar de unidade', async () => {
+    apiScenario.catalogs.units = [
+      ...apiScenario.catalogs.units,
+      {
+        id: 'unit-b',
+        name: 'Unidade Parque do Lago',
+        tenantId: 'tenant-a',
+        timeZone: 'America/Cuiaba',
+      },
+    ]
+    apiScenario.catalogs.patients.push({
+      ...patientListItems[0],
+      id: 'patient-unit-b',
+      name: 'Paciente do Parque',
+      unitIds: ['unit-b'],
+    })
+
+    const { user } = await renderDialog(adminSession)
+    await openDialog(user)
+    await chooseOption(user, /^unidade/i, /unidade centro/i)
+    await chooseOption(user, /^paciente/i, /ana paciente/i)
+
+    await chooseOption(user, /^unidade/i, /parque do lago/i)
+    expect(screen.getByRole('combobox', { name: /^paciente/i })).toHaveTextContent(
+      'Selecione',
+    )
+
+    await waitFor(() =>
+      expect(
+        apiScenario.appointmentPatientQueries[
+          apiScenario.appointmentPatientQueries.length - 1
+        ]?.get('unitId'),
+      ).toBe('unit-b'),
+    )
+    const patient = screen.getByRole('combobox', { name: /^paciente/i })
+    await user.click(patient)
+    expect(
+      await screen.findByRole('option', { name: /paciente do parque/i }),
+    ).toBeVisible()
+    expect(
+      screen.queryByRole('option', { name: /ana paciente/i }),
+    ).not.toBeInTheDocument()
   })
 
   it('bloqueia o BASIC quando sua unidade não está no catálogo', async () => {
@@ -221,6 +285,7 @@ describe('diálogo de criação manual', () => {
     apiScenario.catalogErrors.patients = 500
     const { user } = await renderDialog()
     await openDialog(user)
+    await chooseOption(user, /^unidade/i, /unidade centro/i)
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       /não foi possível carregar.*paciente/i,
@@ -231,23 +296,35 @@ describe('diálogo de criação manual', () => {
   })
 
   it('WB-08 apresenta estado vazio para cada cadastro obrigatório', async () => {
-    apiScenario.catalogs.patients = []
     apiScenario.catalogs.units = []
     apiScenario.catalogs.services = []
     const { user } = await renderDialog()
     await openDialog(user)
 
-    expect(await screen.findByText(/nenhum paciente disponível/i)).toBeVisible()
     expect(screen.getByText(/nenhuma unidade disponível/i)).toBeVisible()
     expect(screen.getByText(/nenhum serviço disponível/i)).toBeVisible()
+  })
+
+  it('apresenta estado vazio para pacientes da unidade selecionada', async () => {
+    apiScenario.catalogs.patients = []
+    const { user } = await renderDialog()
+    await openDialog(user)
+    await chooseOption(user, /^unidade/i, /unidade centro/i)
+
+    expect(
+      await screen.findByText(/nenhum paciente disponível para esta unidade/i),
+    ).toBeVisible()
+    expect(
+      screen.getByRole('button', { name: /criar agendamento/i }),
+    ).toBeDisabled()
   })
 
   it('WB-08 apresenta os cadastros carregados com sucesso', async () => {
     const { user } = await renderDialog()
     await openDialog(user)
 
-    await chooseOption(user, /^paciente/i, /ana paciente/i)
     await chooseOption(user, /^unidade/i, /unidade centro/i)
+    await chooseOption(user, /^paciente/i, /ana paciente/i)
     await chooseOption(user, /^serviço/i, /pilates/i)
 
     expect(screen.getByRole('combobox', { name: /^paciente/i })).toHaveTextContent(
@@ -260,6 +337,7 @@ describe('diálogo de criação manual', () => {
     const { user } = await renderDialog()
     await openDialog(user)
 
+    await chooseOption(user, /^unidade/i, /unidade centro/i)
     await chooseOption(user, /^paciente/i, /ana paciente/i)
 
     expect(screen.getByRole('combobox', { name: /^paciente/i })).toHaveTextContent(
@@ -269,11 +347,13 @@ describe('diálogo de criação manual', () => {
 
   it('busca catálogos localmente por trecho e acentuação sem criar requests', async () => {
     apiScenario.catalogs.patients = [
-      { id: 'patient-a', name: 'Ána Paciente', tenantId: 'tenant-a' },
+      { ...patientListItems[0], name: 'Ána Paciente' },
       ...apiScenario.catalogs.patients.slice(1),
     ]
     const { user } = await renderDialog()
     await openDialog(user)
+
+    await chooseOption(user, /^unidade/i, /unidade centro/i)
 
     const requestsBeforeSearch = { ...apiScenario.catalogRequests }
     const patient = screen.getByRole('combobox', { name: /^paciente/i })
@@ -480,9 +560,9 @@ describe('diálogo de criação manual', () => {
 
     await submit(user)
 
-    const patient = screen.getByLabelText(/^paciente/i)
-    expect(patient).toHaveFocus()
-    expect(patient).toHaveAccessibleDescription(/selecione um paciente/i)
+    const unit = screen.getByLabelText(/^unidade/i)
+    expect(unit).toHaveFocus()
+    expect(unit).toHaveAccessibleDescription(/selecione uma unidade/i)
     expect(screen.getByRole('alert')).toHaveAttribute('aria-live', 'assertive')
   })
 
