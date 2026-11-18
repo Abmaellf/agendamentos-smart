@@ -1,44 +1,76 @@
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-
 import type { PaginationProps } from '@/@types/patient'
+import { Button } from '@/components/ui/button'
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'lucide-react'
 
 export function Pagination({
   pageIndex,
-  perPage,
+  totalPages,
   totalCount,
+  isLast,
+  onFirst,
+  onPrevious,
+  onNext,
+  onLast,
 }: PaginationProps) {
-  const pages = Math.ceil(totalCount / perPage) || 1
+  const normalizedTotalPages = Math.max(totalPages, 1)
+  const isFirst = pageIndex <= 0
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-4 border-t p-4 sm:flex-row sm:items-center sm:justify-between">
       <span className="text-muted-foreground text-sm">
         Total de {totalCount} item(s)
       </span>
 
-      <div className="flex items-center gap-6 lg:gap-8">
+      <div className="flex items-center gap-4">
         <div className="text-sm font-medium">
-          Página {pageIndex + 1} de {pages}
+          Página {Math.min(pageIndex + 1, normalizedTotalPages)} de{' '}
+          {normalizedTotalPages}
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="h-8 w-8 p-0">
-            <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">Primeira página</span>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={onFirst}
+            disabled={isFirst}
+            aria-label="Primeira página"
+          >
+            <ChevronsLeft aria-hidden="true" />
           </Button>
-
-          <Button variant="outline" className="h-8 w-8 p-0">
-            <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">Página anterior</span>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={onPrevious}
+            disabled={isFirst}
+            aria-label="Página anterior"
+          >
+            <ChevronLeft aria-hidden="true" />
           </Button>
-
-          <Button variant="outline" className="h-8 w-8 p-0">
-            <ChevronRight className="h-4 w-4" />
-            <span className="sr-only">Próxima página</span>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={onNext}
+            disabled={isLast}
+            aria-label="Próxima página"
+          >
+            <ChevronRight aria-hidden="true" />
           </Button>
-
-          <Button variant="outline" className="h-8 w-8 p-0">
-            <ChevronRight className="h-4 w-4" />
-            <span className="sr-only">Última página</span>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={onLast}
+            disabled={isLast}
+            aria-label="Última página"
+          >
+            <ChevronsRight aria-hidden="true" />
           </Button>
         </div>
       </div>

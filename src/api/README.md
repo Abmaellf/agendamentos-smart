@@ -21,17 +21,17 @@ Encapsular operações HTTP e utilitários de autenticação usados pelo fronten
 
 ## Pontos de entrada e fluxos de entrada
 
-| Export               | Consumidor ativo                 | Fluxo                          |
-| -------------------- | -------------------------------- | ------------------------------ |
-| `signIn`             | `page/auth/sign-in.tsx`          | formulário → mutation → API    |
-| `getProfile`         | `components/account-menu.tsx`    | Header → query → API           |
-| `registerUser`       | nenhum                           | órfão                          |
-| funções de `auth.ts` | nenhum                           | cadeia órfã com `storageProxy` |
+| Export               | Consumidor ativo              | Fluxo                          |
+| -------------------- | ----------------------------- | ------------------------------ |
+| `signIn`             | `page/auth/sign-in.tsx`       | formulário → mutation → API    |
+| `getProfile`         | `components/account-menu.tsx` | Header → query → API           |
+| `registerUser`       | nenhum                        | órfão                          |
+| funções de `auth.ts` | nenhum                        | cadeia órfã com `storageProxy` |
 
 ## Arquivos críticos
 
 - `sign-in.ts`, `get-profile.ts`: contratos atualmente executados nesta camada;
-- `features/patients/api/register-patient.ts`: adaptador de paciente migrado;
+- `features/patients/api/patients.ts`: listagem paginada e cadastro de pacientes via RTK Query;
 - `auth.ts`, `storageProxy.ts`: estratégia alternativa de token não conectada;
 - `register-user.ts`: intenção de cadastro ainda não ligada à tela;
 - `firstScreen/first-screen.tsx`: decisão de navegação inicial.

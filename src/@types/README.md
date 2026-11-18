@@ -36,13 +36,15 @@ próximos aos seus consumidores quando não representam contrato de domínio.
 - Contratos compartilhados devem ser exportados daqui e importados com
   `import type`.
 - Tipos triviais usados uma única vez, tipos derivados de schemas e estruturas
-de infraestrutura podem permanecer locais.
+  de infraestrutura podem permanecer locais.
 
 ## Mapa da auditoria
 
 | Contrato | Local canônico | Evidência/decisão |
-| --- | --- | --- |
-| `CreatePatient*`, `PatientContext*`, `PaginationProps` | `patient.ts` | Usados pela API, contexto, página e componentes de pacientes |
+| -------- | -------------- | ----------------- |
+
+| `PatientList*`, `PatientFilters`, `CreatePatient*`, `PaginationProps` | `patient.ts` | Contratos da API, página, filtros, cadastro e paginação de pacientes |
+
 | `Appointment*` e props da agenda | `appointment.ts` | Usados por API, grade, diálogo e cartões de agendamento |
 | `SessionProfile` | `session.ts` | Parser de sessão é consumido pela API de agendamentos |
 | `GetProfileResponse` | `profile.ts` | API Axios e endpoint RTK Query compartilham a resposta de perfil |
@@ -54,8 +56,7 @@ de infraestrutura podem permanecer locais.
 
 ## Lacunas
 
-Paciente ainda possui contratos legados de API/contexto que serão consolidados
-em changes funcionais posteriores, sem alterar endpoints nesta refatoração.
-Contratos futuros de `Tenant`, `Unit`, `Professional`, `Service`,
-`AppointmentSeries` e `AppointmentEvent` devem ser adicionados quando seus
-fluxos forem implementados, não como placeholders desta change.
+Os contratos de pacientes estão consolidados em RTK Query e não expõem mais
+tipos de contexto/Axios. `status` e `principalService` permanecem anuláveis até
+que o backend possua fonte de domínio confiável. Contratos futuros de edição,
+desativação e detalhe devem ser adicionados apenas com seus fluxos reais.

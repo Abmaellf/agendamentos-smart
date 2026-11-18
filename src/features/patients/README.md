@@ -2,44 +2,52 @@
 
 ## Objetivo
 
-Concentrar a listagem, filtro, criação legada e apresentação inicial de
-pacientes. A rota pública da feature permanece `/paciente` durante a
-refatoração.
+Concentrar a listagem paginada, filtros remotos, cadastro e apresentação de
+pacientes. A rota pública da feature permanece `/paciente`.
 
 ## Estrutura
 
 ```text
 patients/
-├── api/          # adaptadores HTTP de pacientes
-├── components/   # tabela, filtro, diálogos e paginação da feature
-├── model/        # PatientContext legado mantido dentro do domínio
-├── pages/        # composição da rota /paciente
-├── __tests__/    # integração da lista, filtro e criação
+├── api/
+│   └── patients.ts
+├── components/
+│   ├── add-patient-modal.tsx
+│   ├── pagination.tsx
+│   ├── patient-status-badge.tsx
+│   ├── patient-table-filter.tsx
+│   └── patient-table-rows.tsx
+├── model/
+│   └── patient-errors.ts
+├── pages/
+│   └── patients-page.tsx
+├── __tests__/
+│   ├── patient-create.integration.test.tsx
+│   └── patients-page.integration.test.tsx
 └── README.md
 ```
 
-## Fluxos existentes
+## Fluxos
 
-- montagem da tela → `GET patient/list` → `PatientContext` → tabela;
-- filtro → valida o nome → repete `GET patient/list` sem filtro remoto;
-- cadastro pelo modal → `POST /patient/save` via RTK Query;
-- cadastro pelo diálogo local → `POST patients` via contexto.
+- listagem → `GET /patient/list` via RTK Query;
+- filtros/paginação → parâmetros `name`, `status`, `serviceId`, `page`, `size`;
+- cadastro → `POST /patient/save` com `name` e `unitIds`;
+- sucesso de cadastro → invalidação de `PatientCatalog/LIST`;
+- sessão/unidades/serviços → hooks de catálogo compartilhados com agenda.
 
-Os dois fluxos de criação permanecem identificáveis nesta change. A
-unificação, a escolha do contrato definitivo e a atualização do cache são
-escopo de uma change funcional posterior.
+## Regras de vínculo
 
-## Contratos e dependências
+- a clínica é derivada e autorizada pelo backend;
+- `BASIC` usa exclusivamente `activeUnitId` da sessão;
+- `ADMIN` escolhe uma ou mais unidades do catálogo autorizado;
+- controles do frontend não substituem autorização do backend.
 
-Os contratos compartilhados de paciente e dos formulários da feature ficam em
-`src/@types/patient.ts`. A feature usa componentes visuais de
-`src/components/ui`, o `FormField` compartilhado para a apresentação do campo
-de nome no modal RTK Query e clientes HTTP compartilhados de `src/lib`, mas não
-move regras de pacientes para componentes globais. Os dois fluxos de criação
-continuam com seus contratos e estados próprios.
+## Ausência de dados
 
-## Lacunas preservadas
+`status` e `principalService` podem ser nulos enquanto o backend não tiver uma
+fonte de domínio confiável. A tela apresenta `—` e nunca usa valores fixos.
 
-Busca remota, paginação, edição, detalhes, desativação, estados completos de
-carregamento/erro/vazio e a duplicidade dos cadastros ainda não constituem uma
-implementação funcional completa. A refatoração não corrige esses débitos.
+## Limites atuais
+
+Detalhe, edição e desativação permanecem desabilitados até existirem contratos
+HTTP, autorização e testes próprios.
