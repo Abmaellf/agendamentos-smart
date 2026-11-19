@@ -92,9 +92,7 @@ describe('integração da criação com a agenda semanal', () => {
     expect(screen.getByText(/60 min/i)).toBeVisible()
     expect(screen.getByText(/R\$\s*150,00/i)).toBeVisible()
     expect(apiScenario.appointments).toHaveLength(1)
-    await waitFor(() =>
-      expect(apiScenario.appointmentQueries).toHaveLength(2),
-    )
+    await waitFor(() => expect(apiScenario.appointmentQueries).toHaveLength(2))
   })
 
   it('permite criar para outro paciente em um horário já ocupado quando a API aceita a vaga', async () => {
@@ -118,10 +116,10 @@ describe('integração da criação com a agenda semanal', () => {
     await screen.findByTestId('appointment-appointment-existing-group')
     await fillAndSubmitAppointment(user, /bia paciente/i)
 
-    await waitFor(() =>
-      expect(apiScenario.createRequests).toHaveLength(1),
-    )
-    expect(apiScenario.createRequests[0]).toMatchObject({ patientId: 'patient-b' })
+    await waitFor(() => expect(apiScenario.createRequests).toHaveLength(1))
+    expect(apiScenario.createRequests[0]).toMatchObject({
+      patientId: 'patient-b',
+    })
     expect(
       await screen.findByTestId('appointment-appointment-new-group'),
     ).toHaveAttribute('data-lane-count', '2')
@@ -165,7 +163,9 @@ describe('integração da criação com a agenda semanal', () => {
   it('apresenta o cabeçalho e o menu central da referência visual', async () => {
     renderAppointmentsPage()
 
-    expect(await screen.findByRole('heading', { name: 'Agendamentos' })).toBeVisible()
+    expect(
+      await screen.findByRole('heading', { name: 'Agendamentos' }),
+    ).toBeVisible()
     expect(
       screen.getByText('Visualize e gerencie os atendimentos da semana.'),
     ).toBeVisible()
@@ -183,9 +183,10 @@ describe('integração da criação com a agenda semanal', () => {
       'aria-disabled',
       'true',
     )
-    expect(
-      within(menu).getByRole('button', { name: 'Lista' }),
-    ).toHaveAttribute('aria-disabled', 'true')
+    expect(within(menu).getByRole('button', { name: 'Lista' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    )
   })
 
   it('mantém a agenda semanal sem consulta nova ao interagir com modos futuros', async () => {
@@ -204,9 +205,7 @@ describe('integração da criação com a agenda semanal', () => {
     await user.click(within(menu).getByRole('button', { name: 'Lista' }))
 
     expect(apiScenario.appointmentQueries).toHaveLength(queryCount)
-    expect(
-      screen.getByText(/nenhum agendamento nesta semana/i),
-    ).toBeVisible()
+    expect(screen.getByText(/nenhum agendamento nesta semana/i)).toBeVisible()
     expect(screen.getByRole('button', { name: 'Dia' })).toHaveAttribute(
       'aria-disabled',
       'true',
@@ -291,9 +290,7 @@ describe('integração da criação com a agenda semanal', () => {
 
     const first = await screen.findByTestId('appointment-appointment-first')
     const second = screen.getByTestId('appointment-appointment-second')
-    const afterHours = screen.getByTestId(
-      'appointment-appointment-after-hours',
-    )
+    const afterHours = screen.getByTestId('appointment-appointment-after-hours')
 
     expect(first).toHaveAttribute('data-top-minutes', '180')
     expect(first).toHaveAttribute('data-height-minutes', '60')
@@ -321,13 +318,21 @@ describe('integração da criação com a agenda semanal', () => {
     for (let index = 0; index < 5; index += 1) {
       const patientFullName = `Paciente${index + 1} da turma`
       const patientName = `Paciente${index + 1}`
-      const card = await screen.findByTestId(`appointment-appointment-group-${index + 1}`)
+      const card = await screen.findByTestId(
+        `appointment-appointment-group-${index + 1}`,
+      )
 
       expect(card).toHaveAttribute('data-lane', String(index))
       expect(card).toHaveAttribute('data-lane-count', '5')
       expect(card).toHaveAttribute('data-density', 'compact')
-      expect(card).toHaveAttribute('title', expect.stringContaining(patientFullName))
-      expect(card).toHaveAttribute('aria-label', expect.stringContaining(patientFullName))
+      expect(card).toHaveAttribute(
+        'title',
+        expect.stringContaining(patientFullName),
+      )
+      expect(card).toHaveAttribute(
+        'aria-label',
+        expect.stringContaining(patientFullName),
+      )
       expect(within(card).getByText(patientName)).toBeVisible()
       expect(within(card).getByText('Pilates')).toBeVisible()
       expect(card).toHaveClass('overflow-hidden')
@@ -481,9 +486,9 @@ describe('integração da criação com a agenda semanal', () => {
     const user = userEvent.setup()
     renderAppointmentsPage()
 
-    expect(
-      screen.getAllByLabelText(/selecionar data da agenda/i),
-    ).toHaveLength(1)
+    expect(screen.getAllByLabelText(/selecionar data da agenda/i)).toHaveLength(
+      1,
+    )
     expect(
       await screen.findAllByRole('button', { name: /novo agendamento/i }),
     ).toHaveLength(1)
@@ -500,7 +505,7 @@ describe('integração da criação com a agenda semanal', () => {
     ['FALTA', 'bg-appointment-red', 'text-white'],
     ['REAGENDADO', 'bg-appointment-yellow', 'text-black'],
     ['CANCELADO', 'bg-appointment-graphite', 'text-white'],
-    ['EMATENDIMENTO', 'bg-appointment-green', 'text-white'],
+    ['ATENDENDO', 'bg-appointment-green', 'text-white'],
     ['FINALIZADO', 'bg-appointment-green', 'text-white'],
   ] as const)(
     'aplica o token visual e o contraste do status %s',
@@ -544,7 +549,10 @@ describe('integração da criação com a agenda semanal', () => {
     expect(within(card).getByText('AGENDADO')).toHaveClass('sr-only')
     expect(card).toHaveClass('overflow-hidden')
     expect(card).not.toHaveClass('overflow-auto')
-    expect(card).toHaveAttribute('aria-label', expect.stringContaining(patientName))
+    expect(card).toHaveAttribute(
+      'aria-label',
+      expect.stringContaining(patientName),
+    )
     expect(card).toHaveAttribute('aria-label', expect.stringContaining('10:00'))
   })
 

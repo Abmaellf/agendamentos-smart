@@ -1,7 +1,4 @@
-import type {
-  CardPatientProps,
-  StatusPresentation,
-} from '@/@types/appointment'
+import type { CardPatientProps, StatusPresentation } from '@/@types/appointment'
 import type { AppointmentStatus } from '@/@types/appointment'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
@@ -14,8 +11,7 @@ const statusPresentation = {
   },
   FALTA: {
     label: 'Em atendimento',
-    className:
-      'border-white bg-appointment-rescheduled text-white',
+    className: 'border-white bg-appointment-rescheduled text-white',
   },
   REAGENDADO: {
     label: 'Cancelado',
@@ -25,8 +21,8 @@ const statusPresentation = {
     label: 'Cancelado',
     className: 'border-white bg-[#121214] text-white',
   },
-  EMATENDIMENTO: {
-    label: 'Concluído',
+  ATENDENDO: {
+    label: 'Atendimento iniciado',
     className: 'border-white bg-brand text-[#29292e]',
   },
   FINALIZADO: {

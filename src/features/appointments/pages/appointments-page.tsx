@@ -11,6 +11,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 
 import type { AppointmentStatus } from '@/@types/appointment'
+import type { Appointment } from '@/@types/appointment'
 import { useAppShellDate } from '@/_layout/app-shell-context'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -20,6 +21,8 @@ import {
   useGetAppointmentsQuery,
 } from '@/features/appointments/api/appointments'
 import { cn } from '@/lib/utils'
+
+import { AppointmentDetailsDialog } from '../components/appointment-details-dialog'
 
 import {
   buildVisualAppointmentLayout,
@@ -37,7 +40,7 @@ const appointmentStatusClassNames = {
   FALTA: 'bg-appointment-red text-white',
   REAGENDADO: 'bg-appointment-yellow text-black',
   CANCELADO: 'bg-appointment-graphite text-white',
-  EMATENDIMENTO: 'bg-appointment-green text-white',
+  ATENDENDO: 'bg-appointment-green text-white',
   FINALIZADO: 'bg-appointment-green text-white',
 } satisfies Record<AppointmentStatus, string>
 
@@ -49,7 +52,7 @@ const appointmentStatusLabels = {
   FALTA: 'Falta',
   REAGENDADO: 'Aguardando atendimento',
   CANCELADO: 'Cancelado',
-  EMATENDIMENTO: 'Atendida',
+  ATENDENDO: 'Atendimento iniciado',
   FINALIZADO: 'Atendida',
 } satisfies Record<AppointmentStatus, string>
 
@@ -130,6 +133,8 @@ export function AppointmentsPage() {
     DEFAULT_DAY_COLUMN_WIDTH_PX,
   )
   const [hoveredHour, setHoveredHour] = useState<number | null>(null)
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null)
 
   useEffect(() => {
     const element = firstDayColumnRef.current
@@ -168,9 +173,7 @@ export function AppointmentsPage() {
     (_, index) => WEEK_GRID_START_HOUR + index,
   )
   const visualHourRows = useMemo(() => {
-    const heights = new Map(
-      hourLabels.map((hour) => [hour, HOUR_HEIGHT_PX]),
-    )
+    const heights = new Map(hourLabels.map((hour) => [hour, HOUR_HEIGHT_PX]))
 
     baseVisualWeeklyGrid.forEach((day) => {
       const groups = new Map<number, typeof day.appointments>()
@@ -196,11 +199,15 @@ export function AppointmentsPage() {
         const requiredHeight = Math.max(
           ...group.map(
             (appointment) =>
-              appointment.visualTopPx + appointment.visualHeightPx -
+              appointment.visualTopPx +
+              appointment.visualHeightPx -
               (hour - WEEK_GRID_START_HOUR) * HOUR_HEIGHT_PX,
           ),
         )
-        heights.set(hour, Math.max(heights.get(hour) ?? HOUR_HEIGHT_PX, requiredHeight))
+        heights.set(
+          hour,
+          Math.max(heights.get(hour) ?? HOUR_HEIGHT_PX, requiredHeight),
+        )
       })
     })
 
@@ -223,8 +230,7 @@ export function AppointmentsPage() {
           const baseGroupTopPx =
             (groupStartMinutes - WEEK_GRID_START_HOUR * 60) * MINUTE_HEIGHT_PX
           const expandedGroupTopPx = row
-            ? row.topPx +
-              (groupStartMinutes - hour * 60) * MINUTE_HEIGHT_PX
+            ? row.topPx + (groupStartMinutes - hour * 60) * MINUTE_HEIGHT_PX
             : baseGroupTopPx
 
           return {
@@ -241,8 +247,7 @@ export function AppointmentsPage() {
     .reduce(
       (latest, appointment) =>
         Math.max(latest, appointment.visualTopPx + appointment.visualHeightPx),
-      (WEEK_GRID_END_MINUTES - WEEK_GRID_START_HOUR * 60) *
-        MINUTE_HEIGHT_PX,
+      (WEEK_GRID_END_MINUTES - WEEK_GRID_START_HOUR * 60) * MINUTE_HEIGHT_PX,
     )
   const matrixHeight = Math.max(
     visualHourRows.reduce((total, row) => total + row.heightPx, 0),
@@ -252,6 +257,10 @@ export function AppointmentsPage() {
   function retry() {
     void sessionQuery.refetch()
     if (session) void appointmentsQuery.refetch()
+  }
+
+  function openAppointmentDetails(appointment: Appointment) {
+    setSelectedAppointment(appointment)
   }
 
   return (
@@ -360,7 +369,10 @@ export function AppointmentsPage() {
             >
               <div className="min-w-[70rem]">
                 <div className="grid grid-cols-[4.75rem_repeat(5,minmax(13rem,1fr))] border-b border-[#dfe9ef] bg-[#f8fbfd]">
-                  <div className="border-r border-[#dfe9ef]" aria-hidden="true" />
+                  <div
+                    className="border-r border-[#dfe9ef]"
+                    aria-hidden="true"
+                  />
                   {weeklyGrid.map((day) => {
                     const isSelected = day.key === selectedDayKey
                     const isToday = day.key === todayKey
@@ -481,7 +493,7 @@ export function AppointmentsPage() {
                             isSelected && 'bg-[#f4fcf8]/70',
                           )}
                         >
-                          {hourLabels.map((hour) => (
+                          {hourLabels.map((hour) =>
                             (() => {
                               const row = visualHourRows.find(
                                 (item) => item.hour === hour,
@@ -507,13 +519,16 @@ export function AppointmentsPage() {
                                   }}
                                 />
                               )
-                            })()
-                          ))}
+                            })(),
+                          )}
 
                           {day.appointments.map((positioned) => {
                             const statusLabel =
-                              appointmentStatusLabels[positioned.appointment.status]
-                            const patientFullName = positioned.appointment.patient.name
+                              appointmentStatusLabels[
+                                positioned.appointment.status
+                              ]
+                            const patientFullName =
+                              positioned.appointment.patient.name
                             const appointmentHour = Math.min(
                               Math.max(
                                 Math.floor(positioned.startMinutes / 60),
@@ -533,15 +548,39 @@ export function AppointmentsPage() {
                                 data-lane-count={positioned.laneCount}
                                 data-visual-row={positioned.visualRow}
                                 data-visual-column={positioned.visualColumn}
-                                data-visual-row-count={positioned.visualRowCount}
-                                data-visual-column-count={positioned.visualColumnCount}
+                                data-visual-row-count={
+                                  positioned.visualRowCount
+                                }
+                                data-visual-column-count={
+                                  positioned.visualColumnCount
+                                }
                                 data-hover-hour={appointmentHour}
                                 data-density={
-                                  positioned.laneCount > 2 ? 'compact' : 'regular'
+                                  positioned.laneCount > 2
+                                    ? 'compact'
+                                    : 'regular'
                                 }
                                 aria-label={`${patientFullName}, ${positioned.appointment.service.name}, ${positioned.localTime}, ${statusLabel}`}
                                 title={`${patientFullName} — ${positioned.appointment.service.name} — ${statusLabel}`}
-                                onMouseEnter={() => setHoveredHour(appointmentHour)}
+                                role="button"
+                                tabIndex={0}
+                                onClick={() =>
+                                  openAppointmentDetails(positioned.appointment)
+                                }
+                                onKeyDown={(event) => {
+                                  if (
+                                    event.key === 'Enter' ||
+                                    event.key === ' '
+                                  ) {
+                                    event.preventDefault()
+                                    openAppointmentDetails(
+                                      positioned.appointment,
+                                    )
+                                  }
+                                }}
+                                onMouseEnter={() =>
+                                  setHoveredHour(appointmentHour)
+                                }
                                 onMouseLeave={() => setHoveredHour(null)}
                                 className={cn(
                                   'absolute z-[2] flex min-w-0 flex-col justify-center gap-0.5 overflow-hidden rounded-[0.35rem] border border-white/80 leading-tight shadow-[0_4px_10px_rgb(32_32_36_/_16%)] transition-[transform,box-shadow,filter] duration-[160ms] hover:z-[3] hover:-translate-y-0.5 hover:saturate-[1.04] hover:shadow-[0_8px_16px_rgb(32_32_36_/_22%)]',
@@ -571,9 +610,7 @@ export function AppointmentsPage() {
                                 <span className="truncate">
                                   {positioned.appointment.service.name}
                                 </span>
-                                <span className="sr-only">
-                                  {statusLabel}
-                                </span>
+                                <span className="sr-only">{statusLabel}</span>
                                 <span className="sr-only">
                                   {positioned.appointment.status}
                                 </span>
@@ -624,6 +661,14 @@ export function AppointmentsPage() {
           </section>
         ) : null}
       </main>
+      <AppointmentDetailsDialog
+        appointment={selectedAppointment}
+        open={selectedAppointment !== null}
+        onOpenChange={(open) => {
+          if (!open) setSelectedAppointment(null)
+        }}
+        onStatusUpdated={setSelectedAppointment}
+      />
     </>
   )
 }

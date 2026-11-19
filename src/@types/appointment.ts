@@ -67,11 +67,13 @@ export interface CreateAppointmentInput {
 
 export type AppointmentStatus =
   | 'AGENDADO'
+  | 'ATENDENDO'
   | 'FALTA'
   | 'REAGENDADO'
   | 'CANCELADO'
-  | 'EMATENDIMENTO'
   | 'FINALIZADO'
+
+export type AppointmentStatusCommand = 'ATENDENDO' | 'CANCELADO'
 
 export interface Appointment {
   id: string
@@ -123,6 +125,13 @@ export interface CreateAppointmentDialogProps {
   defaultDate?: string
   triggerLabel?: string
   triggerAriaLabel?: string
+}
+
+export interface AppointmentDetailsDialogProps {
+  appointment: Appointment | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onStatusUpdated: (appointment: Appointment) => void
 }
 
 export interface AppointmentFormState {

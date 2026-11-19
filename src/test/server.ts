@@ -28,11 +28,15 @@ interface ApiScenario {
   createDelayMs: number
   createErrorCode: string | null
   createNetworkError: boolean
+  statusUpdateDelayMs: number
+  statusUpdateErrorCode: string | null
+  statusUpdateNetworkError: boolean
   appointmentDelayMs: number
   appointmentErrorStatus: number | null
   createdAppointment: TestAppointment
   appointments: TestAppointment[]
   createRequests: Record<string, unknown>[]
+  statusUpdateRequests: { id: string; status: string }[]
   professionalQueries: string[]
   appointmentQueries: URLSearchParams[]
   catalogRequests: Record<CatalogName, number>
@@ -60,11 +64,15 @@ function initialScenario(): ApiScenario {
     createDelayMs: 0,
     createErrorCode: null,
     createNetworkError: false,
+    statusUpdateDelayMs: 0,
+    statusUpdateErrorCode: null,
+    statusUpdateNetworkError: false,
     appointmentDelayMs: 0,
     appointmentErrorStatus: null,
     createdAppointment,
     appointments: [],
     createRequests: [],
+    statusUpdateRequests: [],
     professionalQueries: [],
     appointmentQueries: [],
     catalogRequests: {
@@ -201,9 +209,7 @@ async function appointmentPatientCatalogResponse(request: Request) {
   }))
 
   return HttpResponse.json(
-    apiScenario.collectionResponse === 'array'
-      ? options
-      : { content: options },
+    apiScenario.collectionResponse === 'array' ? options : { content: options },
   )
 }
 
@@ -342,6 +348,63 @@ const handlers = [
     apiScenario.appointments.push(apiScenario.createdAppointment)
     return HttpResponse.json(apiScenario.createdAppointment, { status: 201 })
   }),
+  http.patch(
+    'http://localhost:8080/api/appointments/:id/status',
+    async ({ params, request }) => {
+      const payload = (await request.json()) as { status?: string }
+      const id = String(params.id)
+      apiScenario.statusUpdateRequests.push({
+        id,
+        status: String(payload.status),
+      })
+
+      if (apiScenario.statusUpdateDelayMs > 0) {
+        await delay(apiScenario.statusUpdateDelayMs)
+      }
+
+      if (apiScenario.statusUpdateNetworkError) {
+        return HttpResponse.error()
+      }
+
+      if (apiScenario.statusUpdateErrorCode) {
+        return HttpResponse.json(
+          {
+            code: apiScenario.statusUpdateErrorCode,
+            message: 'Alteração de status recusada pelo domínio',
+            fieldErrors: {},
+          },
+          {
+            status:
+              apiScenario.statusUpdateErrorCode === 'TENANT_RESOURCE_NOT_FOUND'
+                ? 404
+                : 409,
+          },
+        )
+      }
+
+      const index = apiScenario.appointments.findIndex(
+        (appointment) => appointment.id === id,
+      )
+      if (index < 0) {
+        return HttpResponse.json(
+          {
+            code: 'TENANT_RESOURCE_NOT_FOUND',
+            message: 'Cadastro não encontrado',
+          },
+          { status: 404 },
+        )
+      }
+
+      const updatedAppointment = {
+        ...apiScenario.appointments[index],
+        status:
+          payload.status as (typeof apiScenario.appointments)[number]['status'],
+        updatedAt: '2026-08-13T16:00:00.000Z',
+      }
+      apiScenario.appointments[index] = updatedAppointment
+      return HttpResponse.json(updatedAppointment)
+    },
+  ),
 ]
 
 export const server = setupServer(...handlers)
