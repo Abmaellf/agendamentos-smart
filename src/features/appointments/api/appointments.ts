@@ -1,6 +1,7 @@
 import type {
   Appointment,
   AppointmentSession,
+  AppointmentStatusCommand,
   CreateAppointmentInput,
   PatientOption,
   ProfessionalOption,
@@ -77,6 +78,17 @@ export const appointmentsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'Appointment', id: 'LIST' }],
     }),
+    updateAppointmentStatus: builder.mutation<
+      Appointment,
+      { id: string; status: AppointmentStatusCommand }
+    >({
+      query: ({ id, status }) => ({
+        url: `/api/appointments/${id}/status`,
+        method: 'PATCH',
+        data: { status },
+      }),
+      invalidatesTags: [{ type: 'Appointment', id: 'LIST' }],
+    }),
     getAppointments: builder.query<
       Appointment[],
       { unitId: string; from: string; to: string }
@@ -91,6 +103,7 @@ export const appointmentsApi = baseApi.injectEndpoints({
 
 export const {
   useCreateAppointmentMutation,
+  useUpdateAppointmentStatusMutation,
   useGetAppointmentPatientsQuery,
   useGetAppointmentSessionQuery,
   useGetAppointmentsQuery,

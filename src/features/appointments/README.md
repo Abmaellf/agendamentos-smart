@@ -62,6 +62,35 @@ A consulta de agenda só inicia após a sessão. O diálogo usa `skip` enquanto
 fechado e a mutação de criação invalida
 `Appointment/LIST`, fazendo a semana visível ser consultada novamente.
 
+Ao selecionar um cartão da agenda, `AppointmentsPage` abre o modal de detalhes
+do paciente. O modal apresenta os dados disponíveis no contrato de
+`Appointment`, permite fechar pelo controle, por `Escape` ou pelo overlay e
+mantém recursos ainda não entregues desabilitados com a indicação `Em breve`.
+Telefone, e-mail, nascimento, sala, observações, cadastro completo, edição e
+conclusão permanecem fora do escopo deste incremento.
+
+### Status do atendimento
+
+O modal apresenta os estados com o seguinte mapeamento:
+
+- `AGENDADO`: `Aguardando atendimento`;
+- `ATENDENDO`: `Atendimento iniciado`;
+- `CANCELADO`: `Cancelado`;
+- `FALTA`: `Falta`;
+- `FINALIZADO`: `Atendida`.
+
+Enquanto o status for `AGENDADO`, `Iniciar agendamento` envia
+`PATCH /api/appointments/{id}/status` com `ATENDENDO` e `Cancelar agendamento`
+envia o mesmo endpoint com `CANCELADO`. O frontend não faz atualização
+otimista: mantém o status confirmado pela API, invalida a lista após sucesso e
+exibe o erro de domínio ou de rede no próprio modal.
+
+`FALTA` é uma decisão autoritativa da API. O monitoramento do backend avalia o
+horário absoluto do agendamento e, dez minutos após o início, altera para
+`FALTA` quando não houve confirmação de `ATENDENDO`; a agenda retorna esse
+estado nas consultas subsequentes. Se `ATENDENDO` já foi confirmado antes do
+limite, o monitoramento não converte o agendamento.
+
 ## Regras do domínio
 
 - Cada agendamento pertence a um paciente, uma unidade e um serviço.
@@ -81,6 +110,5 @@ uma vaga, bloquear sobreposição do próprio paciente ou profissional e recusar
 capacidade esgotada. Quando aceitos, os registros simultâneos aparecem lado a
 lado na grade semanal, com cartão e estado próprios por paciente.
 
-Estados além de `AGENDADO`, recorrência, remarcação e cancelamento fazem parte
-da especificação do MVP, mas ainda não estão implementados integralmente neste
-módulo.
+Recorrência, remarcação e os recursos exibidos como `Em breve` fazem parte de
+incrementos posteriores e não são alterados por este módulo.

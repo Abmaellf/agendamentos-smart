@@ -23,10 +23,10 @@ export interface TestAppointment {
   price: number
   status:
     | 'AGENDADO'
+    | 'ATENDENDO'
     | 'FALTA'
     | 'REAGENDADO'
     | 'CANCELADO'
-    | 'EMATENDIMENTO'
     | 'FINALIZADO'
   createdBy: string
   createdAt: string
