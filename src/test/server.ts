@@ -33,6 +33,10 @@ interface ApiScenario {
   statusUpdateNetworkError: boolean
   appointmentDelayMs: number
   appointmentErrorStatus: number | null
+  startCurrentHourRequests: { unitId: string; hourStart: string }[]
+  startCurrentHourDelayMs: number
+  startCurrentHourErrorCode: string | null
+  startCurrentHourNetworkError: boolean
   createdAppointment: TestAppointment
   appointments: TestAppointment[]
   createRequests: Record<string, unknown>[]
@@ -69,6 +73,10 @@ function initialScenario(): ApiScenario {
     statusUpdateNetworkError: false,
     appointmentDelayMs: 0,
     appointmentErrorStatus: null,
+    startCurrentHourRequests: [],
+    startCurrentHourDelayMs: 0,
+    startCurrentHourErrorCode: null,
+    startCurrentHourNetworkError: false,
     createdAppointment,
     appointments: [],
     createRequests: [],
@@ -317,6 +325,62 @@ const handlers = [
         : { content: apiScenario.appointments },
     )
   }),
+  http.post(
+    'http://localhost:8080/api/appointments/start-current-hour',
+    async ({ request }) => {
+      const payload = (await request.json()) as {
+        unitId?: string
+        hourStart?: string
+      }
+      const input = {
+        unitId: String(payload.unitId),
+        hourStart: String(payload.hourStart),
+      }
+      apiScenario.startCurrentHourRequests.push(input)
+
+      if (apiScenario.startCurrentHourDelayMs > 0) {
+        await delay(apiScenario.startCurrentHourDelayMs)
+      }
+      if (apiScenario.startCurrentHourNetworkError) return HttpResponse.error()
+      if (apiScenario.startCurrentHourErrorCode) {
+        return HttpResponse.json(
+          {
+            code: apiScenario.startCurrentHourErrorCode,
+            message: 'Início coletivo recusado pelo domínio',
+          },
+          { status: apiScenario.startCurrentHourErrorCode === 'APPOINTMENT_HOUR_NOT_CURRENT' ? 409 : 422 },
+        )
+      }
+
+      const updated = apiScenario.appointments.filter(
+        (appointment) =>
+          appointment.unitId === input.unitId &&
+          appointment.startsAt >= input.hourStart &&
+          appointment.startsAt <
+            new Date(new Date(input.hourStart).getTime() + 3_600_000).toISOString() &&
+          (appointment.status === 'AGENDADO' || appointment.status === 'FALTA'),
+      )
+      apiScenario.appointments = apiScenario.appointments.map((appointment) =>
+        updated.includes(appointment)
+          ? { ...appointment, status: 'ATENDENDO' }
+          : appointment,
+      )
+      return HttpResponse.json({
+        unitId: input.unitId,
+        timeZone: 'America/Cuiaba',
+        hourStart: input.hourStart,
+        hourEnd: new Date(
+          new Date(input.hourStart).getTime() + 3_600_000,
+        ).toISOString(),
+        evaluatedAt: input.hourStart,
+        targetStatus: 'ATENDENDO',
+        matchedCount: updated.length,
+        updatedCount: updated.length,
+        skippedCount: 0,
+        skippedByStatus: {},
+      })
+    },
+  ),
   http.post('http://localhost:8080/api/appointments', async ({ request }) => {
     const payload = (await request.json()) as Record<string, unknown>
     apiScenario.createRequests.push(payload)
