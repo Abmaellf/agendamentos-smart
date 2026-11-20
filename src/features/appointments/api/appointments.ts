@@ -6,6 +6,8 @@ import type {
   PatientOption,
   ProfessionalOption,
   ServiceOption,
+  StartCurrentHourInput,
+  StartCurrentHourResponse,
   UnitOption,
 } from '@/@types/appointment'
 import { baseApi } from '@/lib/base-api'
@@ -89,6 +91,17 @@ export const appointmentsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'Appointment', id: 'LIST' }],
     }),
+    startCurrentHour: builder.mutation<
+      StartCurrentHourResponse,
+      StartCurrentHourInput
+    >({
+      query: (data) => ({
+        url: '/api/appointments/start-current-hour',
+        method: 'POST',
+        data,
+      }),
+      invalidatesTags: [{ type: 'Appointment', id: 'LIST' }],
+    }),
     getAppointments: builder.query<
       Appointment[],
       { unitId: string; from: string; to: string }
@@ -104,6 +117,7 @@ export const appointmentsApi = baseApi.injectEndpoints({
 export const {
   useCreateAppointmentMutation,
   useUpdateAppointmentStatusMutation,
+  useStartCurrentHourMutation,
   useGetAppointmentPatientsQuery,
   useGetAppointmentSessionQuery,
   useGetAppointmentsQuery,

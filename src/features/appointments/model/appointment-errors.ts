@@ -16,6 +16,10 @@ const messages: Record<string, string> = {
     'Este agendamento não permite essa mudança de status.',
   APPOINTMENT_NO_SHOW_DEADLINE:
     'O prazo expirou e o agendamento foi marcado como falta.',
+  APPOINTMENT_HOUR_NOT_CURRENT:
+    'O horário mudou. Abra a ação na faixa atual.',
+  INVALID_APPOINTMENT_HOUR: 'A faixa selecionada não representa uma hora válida.',
+  UNIT_TIME_ZONE_INVALID: 'O fuso horário da unidade é inválido.',
 }
 
 export function appointmentErrorMessage(error: unknown) {
@@ -56,4 +60,23 @@ export function appointmentStatusErrorMessage(error: unknown) {
   if (apiMessage) return apiMessage
 
   return 'Não foi possível atualizar o status. Tente novamente.'
+}
+
+export function startCurrentHourErrorMessage(error: unknown) {
+  const data =
+    typeof error === 'object' && error !== null && 'data' in error
+      ? error.data
+      : undefined
+  const code =
+    typeof data === 'object' && data !== null && 'code' in data
+      ? (data as AppointmentApiError).code
+      : undefined
+  const apiMessage =
+    typeof data === 'object' && data !== null && 'message' in data
+      ? (data as AppointmentApiError).message
+      : undefined
+
+  if (code && messages[code]) return messages[code]
+  if (apiMessage) return apiMessage
+  return 'Não foi possível iniciar os atendimentos. Tente novamente.'
 }

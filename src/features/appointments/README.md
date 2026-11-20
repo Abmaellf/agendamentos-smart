@@ -62,6 +62,28 @@ A consulta de agenda só inicia após a sessão. O diálogo usa `skip` enquanto
 fechado e a mutação de criação invalida
 `Appointment/LIST`, fazendo a semana visível ser consultada novamente.
 
+### Iniciar atendimentos da hora corrente
+
+Na célula da data corrente e da hora corrente da unidade, a agenda exibe um
+botão flutuante verde com `+`. A hora é calculada pelo fuso IANA retornado no
+catálogo da unidade, e não pelo fuso do navegador; a atualização do relógio
+ocorre periodicamente e ao retornar para a aba. O botão abre a opção
+`Iniciar todos` acima da célula, sem alterar dados ao ser apenas aberto.
+
+`Iniciar todos` envia uma única chamada `POST
+/api/appointments/start-current-hour` com apenas `unitId` e `hourStart` em
+ISO-8601. A API irmã é a autoridade para confirmar a presença e transformar
+`AGENDADO` e `FALTA` em `ATENDENDO` na faixa semiaberta da hora. Isso inclui
+faltas porque a confirmação explícita indica que o paciente está presente no
+local. Estados `CANCELADO`, `FINALIZADO` e os demais estados não elegíveis são
+preservados e aparecem nas contagens de ignorados.
+
+A opção fica desabilitada sem registros elegíveis ou durante o envio. Sucesso
+fecha a opção e atualiza a consulta da semana; falhas de domínio ou rede são
+mostradas sem atualização otimista e sem chamadas individuais. `Escape` fecha
+a opção e devolve o foco ao botão `+`; a troca da semana, da unidade ou da
+faixa corrente também fecha uma opção aberta.
+
 Ao selecionar um cartão da agenda, `AppointmentsPage` abre o modal de detalhes
 do paciente. O modal apresenta os dados disponíveis no contrato de
 `Appointment`, permite fechar pelo controle, por `Escape` ou pelo overlay e

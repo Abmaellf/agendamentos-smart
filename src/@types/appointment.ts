@@ -75,6 +75,24 @@ export type AppointmentStatus =
 
 export type AppointmentStatusCommand = 'ATENDENDO' | 'CANCELADO'
 
+export interface StartCurrentHourInput {
+  unitId: string
+  hourStart: string
+}
+
+export interface StartCurrentHourResponse {
+  unitId: string
+  timeZone: string
+  hourStart: string
+  hourEnd: string
+  evaluatedAt: string
+  targetStatus: 'ATENDENDO'
+  matchedCount: number
+  updatedCount: number
+  skippedCount: number
+  skippedByStatus: Partial<Record<AppointmentStatus, number>>
+}
+
 export interface Appointment {
   id: string
   tenantId: string

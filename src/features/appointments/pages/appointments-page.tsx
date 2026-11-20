@@ -3,9 +3,11 @@ import { ptBR } from 'date-fns/locale/pt-BR'
 import {
   CalendarDays,
   CalendarRange,
+  CheckCircle2,
   CircleAlert,
   List,
   LoaderCircle,
+  Plus,
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
@@ -17,12 +19,16 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
+  useGetUnitsQuery,
   useGetAppointmentSessionQuery,
   useGetAppointmentsQuery,
+  useStartCurrentHourMutation,
 } from '@/features/appointments/api/appointments'
 import { cn } from '@/lib/utils'
 
 import { AppointmentDetailsDialog } from '../components/appointment-details-dialog'
+import { startCurrentHourErrorMessage } from '../model/appointment-errors'
+import { getCurrentHourContext } from '../model/current-hour'
 
 import {
   buildVisualAppointmentLayout,
@@ -112,6 +118,10 @@ export function AppointmentsPage() {
 
   const sessionQuery = useGetAppointmentSessionQuery()
   const session = sessionQuery.data
+  const unitsQuery = useGetUnitsQuery(undefined, { skip: !session })
+  const activeUnit = unitsQuery.data?.find(
+    (unit) => unit.id === session?.activeUnitId,
+  )
   const appointmentsQuery = useGetAppointmentsQuery(
     {
       unitId: session?.activeUnitId ?? '',
@@ -135,6 +145,72 @@ export function AppointmentsPage() {
   const [hoveredHour, setHoveredHour] = useState<number | null>(null)
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null)
+  const [clockNow, setClockNow] = useState(() => new Date())
+  const [expandedHourKey, setExpandedHourKey] = useState<string | null>(null)
+  const [actionFeedback, setActionFeedback] = useState<{
+    tone: 'success' | 'error'
+    message: string
+  } | null>(null)
+  const [startCurrentHour, startCurrentHourState] =
+    useStartCurrentHourMutation()
+  const actionToggleRef = useRef<HTMLButtonElement | null>(null)
+  const actionContainerRef = useRef<HTMLDivElement | null>(null)
+  const actionContextRef = useRef<string | null>(null)
+
+  const currentHour = useMemo(() => {
+    if (!activeUnit?.timeZone) return null
+    try {
+      return getCurrentHourContext(clockNow, activeUnit.timeZone)
+    } catch {
+      return null
+    }
+  }, [activeUnit?.timeZone, clockNow])
+
+  useEffect(() => {
+    const updateClock = () => setClockNow(new Date())
+    const interval = window.setInterval(updateClock, 15_000)
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') updateClock()
+    }
+
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [])
+
+  const currentHourKey = currentHour
+    ? `${currentHour.dateKey}-${currentHour.hour}`
+    : null
+
+  useEffect(() => {
+    setExpandedHourKey(null)
+  }, [currentHourKey, selectedDate])
+
+  useEffect(() => {
+    if (!expandedHourKey) return
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      setExpandedHourKey(null)
+      actionToggleRef.current?.focus()
+    }
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (!actionContainerRef.current?.contains(event.target as Node)) {
+        setExpandedHourKey(null)
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('pointerdown', onPointerDown)
+    }
+  }, [expandedHourKey])
 
   useEffect(() => {
     const element = firstDayColumnRef.current
@@ -167,6 +243,9 @@ export function AppointmentsPage() {
     [dayColumnWidth, weeklyGrid],
   )
   const selectedDayKey = format(selectedDate, 'yyyy-MM-dd')
+  actionContextRef.current = session && currentHour
+    ? `${session.activeUnitId}-${selectedDayKey}-${currentHourKey}`
+    : null
   const todayKey = format(new Date(), 'yyyy-MM-dd')
   const hourLabels = Array.from(
     { length: WEEK_GRID_END_HOUR - WEEK_GRID_START_HOUR + 1 },
@@ -263,6 +342,44 @@ export function AppointmentsPage() {
     setSelectedAppointment(appointment)
   }
 
+  async function startAllInCurrentHour() {
+    if (!session || !currentHour || !activeUnit || startCurrentHourState.isLoading) {
+      return
+    }
+
+    const requestContext = actionContextRef.current
+    setActionFeedback(null)
+
+    try {
+      const result = await startCurrentHour({
+        unitId: session.activeUnitId,
+        hourStart: currentHour.hourStart,
+      }).unwrap()
+      if (actionContextRef.current !== requestContext) return
+      setExpandedHourKey(null)
+      try {
+        await appointmentsQuery.refetch().unwrap()
+        setActionFeedback({
+          tone: 'success',
+          message:
+            result.updatedCount > 0
+              ? `${result.updatedCount} atendimento${result.updatedCount === 1 ? '' : 's'} iniciado${result.updatedCount === 1 ? '' : 's'}${result.skippedCount > 0 ? `; ${result.skippedCount} agendamento${result.skippedCount === 1 ? '' : 's'} não alterado${result.skippedCount === 1 ? '' : 's'}` : ''}.`
+              : 'Nenhum agendamento foi iniciado.',
+        })
+      } catch {
+        setActionFeedback({
+          tone: 'error',
+          message:
+            'Atendimentos iniciados; não foi possível atualizar a agenda.',
+        })
+      }
+    } catch (error) {
+      if (actionContextRef.current !== requestContext) return
+      setExpandedHourKey(null)
+      setActionFeedback({ tone: 'error', message: startCurrentHourErrorMessage(error) })
+    }
+  }
+
   return (
     <>
       <main className="flex min-h-[calc(100vh-5rem)] flex-col gap-1 bg-[#f4f8fa] pb-6">
@@ -346,6 +463,25 @@ export function AppointmentsPage() {
                 Tentar novamente
               </Button>
             </AlertDescription>
+          </Alert>
+        ) : null}
+
+        {actionFeedback ? (
+          <Alert
+            role="status"
+            className={cn(
+              feedbackPanelClassName,
+              actionFeedback.tone === 'success'
+                ? 'border-[#b7e8d0] bg-[#f0fcf6]'
+                : 'border-destructive/20',
+            )}
+          >
+            {actionFeedback.tone === 'success' ? (
+              <CheckCircle2 aria-hidden="true" className="text-brand" />
+            ) : (
+              <CircleAlert aria-hidden="true" className="text-destructive" />
+            )}
+            <AlertTitle>{actionFeedback.message}</AlertTitle>
           </Alert>
         ) : null}
 
@@ -479,6 +615,25 @@ export function AppointmentsPage() {
 
                     {visualWeeklyGrid.map((day, dayIndex) => {
                       const isSelected = day.key === selectedDayKey
+                      const currentRow = currentHour
+                        ? visualHourRows.find(
+                            (row) => row.hour === currentHour.hour,
+                          )
+                        : undefined
+                      const isCurrentHourDay =
+                        currentHour?.dateKey === day.key && currentRow !== undefined
+                      const eligibleCount = isCurrentHourDay
+                        ? day.appointments.filter(
+                            (appointment) =>
+                              Math.floor(appointment.startMinutes / 60) ===
+                                currentHour?.hour &&
+                              (appointment.appointment.status === 'AGENDADO' ||
+                                appointment.appointment.status === 'FALTA'),
+                          ).length
+                        : 0
+                      const actionKey = isCurrentHourDay
+                        ? `${day.key}-${currentHour?.hour}`
+                        : null
 
                       return (
                         <section
@@ -521,6 +676,58 @@ export function AppointmentsPage() {
                               )
                             })(),
                           )}
+
+                          {isCurrentHourDay && currentRow && currentHour ? (
+                            <div
+                              ref={actionContainerRef}
+                              className="absolute right-2 z-[4]"
+                              style={{
+                                top: `${Math.max(currentRow.topPx + 6, 4)}px`,
+                              }}
+                            >
+                              {expandedHourKey === actionKey ? (
+                                <Button
+                                  type="button"
+                                  data-testid="start-current-hour-action"
+                                  disabled={
+                                    eligibleCount === 0 ||
+                                    startCurrentHourState.isLoading
+                                  }
+                                  onClick={(event) => {
+                                    event.stopPropagation()
+                                    void startAllInCurrentHour()
+                                  }}
+                                  className="absolute right-0 bottom-[calc(100%+0.5rem)] h-10 whitespace-nowrap rounded-full bg-[#078f58] px-4 text-sm font-bold text-white shadow-[0_8px_18px_rgb(4_92_57_/_28%)] hover:bg-[#057949] focus-visible:ring-[#078f58]"
+                                  aria-label={`Iniciar todos os agendamentos de ${currentHour.hour}:00 nesta unidade`}
+                                >
+                                  {startCurrentHourState.isLoading
+                                    ? 'Iniciando...'
+                                    : 'Iniciar todos'}
+                                </Button>
+                              ) : null}
+                              <Button
+                                type="button"
+                                data-testid="start-current-hour-toggle"
+                                ref={actionToggleRef}
+                                aria-label={`Ações da hora ${String(currentHour.hour).padStart(2, '0')}:00`}
+                                aria-expanded={expandedHourKey === actionKey}
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  setExpandedHourKey((current) =>
+                                    current === actionKey ? null : actionKey,
+                                  )
+                                }}
+                                className="size-14 rounded-full bg-[#08a45d] p-0 text-white shadow-[0_10px_22px_rgb(4_92_57_/_30%)] hover:bg-[#078f58] focus-visible:ring-[#08a45d]"
+                              >
+                                <Plus aria-hidden="true" className="size-8" />
+                              </Button>
+                              {eligibleCount === 0 ? (
+                                <span className="sr-only">
+                                  Nenhum agendamento para iniciar nesta faixa
+                                </span>
+                              ) : null}
+                            </div>
+                          ) : null}
 
                           {day.appointments.map((positioned) => {
                             const statusLabel =
