@@ -1,8 +1,15 @@
 import { Building, ChevronDown, Download, LogOut } from 'lucide-react'
 import { useRef, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 
 import avatar from '@/assets/abm_avatar.png'
 import { useGetProfileQuery } from '@/api/get-profile'
+import { useLogoutMutation } from '@/api/session'
+import { baseApi } from '@/lib/base-api'
+import { clearSessionExpirationSignal } from '@/lib/session-client'
+import type { AppDispatch } from '@/lib/store'
 
 import { Button } from './ui/button'
 import {
@@ -29,13 +36,31 @@ interface AccountMenuProps {
 export default function AccountMenu({ avatarSrc = avatar }: AccountMenuProps) {
   const profileTriggerRef = useRef<HTMLButtonElement>(null)
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
+  const navigate = useNavigate()
   const { data: profile, isError, isLoading } = useGetProfileQuery()
+  const [logout, { isLoading: isLoggingOut }] = useLogoutMutation()
 
   const profileUnavailable = isLoading || isError || !profile
 
+  async function handleLogout() {
+    try {
+      await logout().unwrap()
+      toast.success('Sessão encerrada')
+    } catch {
+      toast.success('Sessão encerrada localmente')
+    } finally {
+      dispatch(baseApi.util.resetApiState())
+      clearSessionExpirationSignal()
+      setIsMenuOpen(false)
+      navigate('/sign-in', { replace: true })
+    }
+  }
+
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button
             ref={profileTriggerRef}
@@ -71,9 +96,16 @@ export default function AccountMenu({ avatarSrc = avatar }: AccountMenuProps) {
             <span>Perfil</span>
           </DropdownMenuItem>
 
-          <DropdownMenuItem className="text-rose-500 dark:text-rose-400">
+          <DropdownMenuItem
+            disabled={isLoggingOut}
+            onSelect={(event) => {
+              event.preventDefault()
+              void handleLogout()
+            }}
+            className="text-rose-500 dark:text-rose-400"
+          >
             <LogOut className="mr-2 size-4" />
-            <span>Sair</span>
+            <span>{isLoggingOut ? 'Saindo...' : 'Sair'}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -2,21 +2,21 @@
 
 ## Objetivo do módulo
 
-Decidir a primeira rota do usuário com base na presença do cookie `jwt`.
+Decidir a primeira rota do usuário validando a sessão HttpOnly pela API.
 
 ## Responsabilidades e funcionalidades existentes
 
-`FirstScreen` apresenta um ícone de carregamento, espera `1000 ms` e navega para `/sign-in` sem cookie ou `/appointments` com cookie.
+`FirstScreen` apresenta um ícone de carregamento, chama `GET /auth/me` pela camada de sessão e navega para `/sign-in` quando a sessão não pode ser renovada ou para `/appointments` quando é válida.
 
 ## Dependências internas e externas
 
-- externas: React, React Router, react-cookie e Lucide;
-- internas: nenhuma chamada de API;
+- externas: React, React Router e Lucide;
+- internas: `lib/session-client`;
 - módulos relacionados: `Router.tsx`, `page/auth` e `_layout/app`.
 
 ## Ponto de entrada e fluxo de entrada
 
-É montado exclusivamente pela rota `/`. Entrada: cookie `jwt`; saída: navegação para login ou agenda.
+É montado exclusivamente pela rota `/`. Entrada: sessão enviada automaticamente pelo navegador; saída: navegação para login ou agenda.
 
 ## Arquivo crítico
 
@@ -32,6 +32,6 @@ Decidir a primeira rota do usuário com base na presença do cookie `jwt`.
 ## Observações técnicas e débitos
 
 - A pasta está sob `api`, embora o componente pertença à autenticação/roteamento.
-- Presença de cookie não comprova validade ou expiração.
+- A validação usa o endpoint autenticado e o refresh coordenado; a presença do cookie não é lida pelo JavaScript.
 - A proteção não se aplica a acessos diretos às rotas internas.
-- O comentário menciona `100 ms`, mas o temporizador usa `1000 ms`.
+- Não há espera artificial no bootstrap; o carregamento termina após a validação da sessão.

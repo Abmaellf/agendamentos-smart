@@ -122,6 +122,45 @@ describe('AppTopbar', () => {
     )
   })
 
+  it('encerra a sessão pelo item Sair do menu de conta', async () => {
+    const user = userEvent.setup()
+    let logoutRequests = 0
+    server.use(
+      http.post('http://localhost:8080/auth/logout', () => {
+        logoutRequests += 1
+        return new HttpResponse(null, { status: 204 })
+      }),
+    )
+
+    renderTopbar()
+
+    await user.click(
+      await screen.findByRole('button', { name: /abrir menu do perfil/i }),
+    )
+    await user.click(screen.getByRole('menuitem', { name: 'Sair' }))
+
+    await waitFor(() => expect(logoutRequests).toBe(1))
+    expect(await screen.findByText('Sessão encerrada')).toBeVisible()
+  })
+
+  it('limpa a sessão local quando o logout falha na API', async () => {
+    const user = userEvent.setup()
+    server.use(
+      http.post('http://localhost:8080/auth/logout', () =>
+        HttpResponse.json({}, { status: 503 }),
+      ),
+    )
+
+    renderTopbar()
+
+    await user.click(
+      await screen.findByRole('button', { name: /abrir menu do perfil/i }),
+    )
+    await user.click(screen.getByRole('menuitem', { name: 'Sair' }))
+
+    expect(await screen.findByText('Sessão encerrada localmente')).toBeVisible()
+  })
+
   it('usa o hamburger para recolher a sidebar em tela ampla', async () => {
     const user = userEvent.setup()
     const onToggleSidebar = vi.fn()

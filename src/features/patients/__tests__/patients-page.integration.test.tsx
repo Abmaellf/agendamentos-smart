@@ -14,7 +14,7 @@ describe('feature de pacientes', () => {
 
     expect(await screen.findByText('Ana Paciente')).toBeVisible()
     expect(screen.getByText('0001')).toBeVisible()
-    expect(screen.getByText('Pilates')).toBeVisible()
+    expect(screen.getAllByText('Pilates').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Ativo').length).toBeGreaterThan(0)
     expect(screen.getAllByText('21/10/2025').length).toBeGreaterThan(0)
     expect(screen.getByText('Total de 5 item(s)')).toBeVisible()

@@ -22,7 +22,7 @@ identidade visual da Equilíbrio Fisioterapia & Pilates.
 
 ## Pontos de entrada e fluxos de entrada
 
-- `/sign-in` → `POST /auth/login` → sucesso: `/appointments`; falha: toast;
+- `/sign-in` → `POST /auth/login` → cookies HttpOnly → sucesso: `/appointments`; falha: toast;
 - `/sign-up` → ação “Efetuar login” → `/sign-in`; o botão “Salvar cadastro” é
   visual e não executa mutation nesta etapa.
 
@@ -47,13 +47,13 @@ identidade visual da Equilíbrio Fisioterapia & Pilates.
 - Administrador define a senha inicial dos usuários criados; ela é temporária e deve ser trocada no primeiro acesso.
 - O MVP não possui recuperação de senha por e-mail. Somente administrador pode redefinir a senha de outro usuário.
 - Perfil básico pode criar apenas outro usuário básico; somente administrador cria ou promove administrador.
-- Senha, token e dados pessoais não podem aparecer em URL, log ou resposta de perfil.
+- Senha, token e dados pessoais não podem aparecer em URL, log ou resposta de perfil/login; o frontend não persiste segredos de sessão.
 
 ## Observações técnicas e débitos
 
 - O schema de login exige somente strings, sem mínimo ou validação de e-mail do Zod.
 - O login não imprime token, usuário ou dados pessoais no console.
-- O cliente não armazena o token; depende de comportamento do backend/cookie não comprovado aqui.
+- O cliente não recebe nem armazena access/refresh token; a sessão depende dos cookies HttpOnly e da camada `lib/session-client`.
 - `SignUp` não usa React Hook Form, não chama `registerUser` e não persiste clínica.
 - O texto “Acompanhe suas vendas pelo painel do parceiro” é mantido por
   compatibilidade visual com a referência, embora o produto principal seja a

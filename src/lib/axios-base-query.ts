@@ -1,7 +1,7 @@
 import type { AxiosError, AxiosRequestConfig } from 'axios'
 import type { BaseQueryFn } from '@reduxjs/toolkit/query'
 
-import { api } from './axios'
+import { requestWithSession } from './session-client'
 
 export interface AxiosBaseQueryArgs {
   url: string
@@ -9,6 +9,7 @@ export interface AxiosBaseQueryArgs {
   data?: unknown
   params?: AxiosRequestConfig['params']
   headers?: AxiosRequestConfig['headers']
+  skipSessionRefresh?: boolean
 }
 
 export interface AxiosBaseQueryError {
@@ -20,14 +21,15 @@ export const axiosBaseQuery: BaseQueryFn<
   AxiosBaseQueryArgs,
   unknown,
   AxiosBaseQueryError
-> = async ({ url, method, data, params, headers }) => {
+> = async ({ url, method, data, params, headers, skipSessionRefresh }) => {
   try {
-    const response = await api.request({
+    const response = await requestWithSession({
       url,
       method,
       data,
       params,
       headers,
+      skipSessionRefresh,
     })
 
     return { data: response.data }
