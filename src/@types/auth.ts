@@ -4,7 +4,6 @@ export interface SignInBody {
 }
 
 export interface SignInResponse {
-  token?: unknown
   user?: unknown
 }
 

@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
 import { profileApi } from '@/api/get-profile'
+import { patientApi } from '@/features/patients/api/patients'
 import { signInApi } from '@/api/sign-in'
 import { createTestStore } from '@/test/render'
 import { server } from '@/test/server'
@@ -37,7 +38,9 @@ describe('endpoints remotos legados', () => {
     server.use(
       http.post('http://localhost:8080/auth/login', async ({ request }) => {
         body = await request.json()
-        return HttpResponse.json({ token: 'session-token', user: { id: 'user-a' } })
+        return HttpResponse.json({
+          user: { id: 'user-a', login: 'ana@clinica.test', role: 'ADMIN' },
+        })
       }),
     )
     const store = createTestStore()
@@ -51,7 +54,9 @@ describe('endpoints remotos legados', () => {
           }),
         )
         .unwrap(),
-    ).resolves.toEqual({ token: 'session-token', user: { id: 'user-a' } })
+    ).resolves.toEqual({
+      user: { id: 'user-a', login: 'ana@clinica.test', role: 'ADMIN' },
+    })
     expect(body).toEqual({ login: 'ana@clinica.test', password: 'secret' })
   })
 
@@ -69,12 +74,15 @@ describe('endpoints remotos legados', () => {
 
     await expect(
       store
-      // .dispatch(
-      //   registerPatientApi.endpoints.registerPatient.initiate({ name: 'Ana' }),
-      // )
-      // .unwrap(),
+        .dispatch(
+          patientApi.endpoints.registerPatient.initiate({
+            name: 'Ana',
+            unitIds: [],
+          }),
+        )
+        .unwrap(),
     ).resolves.toEqual({})
-    expect(body).toEqual({ name: 'Ana' })
+    expect(body).toEqual({ name: 'Ana', unitIds: [] })
     expect(contentType).toContain('application/json')
   })
 })

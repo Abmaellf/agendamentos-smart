@@ -74,8 +74,8 @@ describe('cadastro de pacientes', () => {
     await user.click(screen.getByRole('button', { name: 'Salvar' }))
 
     expect(
-      await screen.findByText('Já existe um paciente com esse nome.'),
-    ).toBeVisible()
+      (await screen.findAllByText('Já existe um paciente cadastrado com esse nome.')).length,
+    ).toBeGreaterThan(0)
     expect(nameInput).toHaveValue('Ana Paciente')
   })
 

@@ -9,8 +9,8 @@ coleções remotas de domínio.
 
 - pacientes usam RTK Query dentro de `features/patients`;
 - `App.tsx` não monta mais `PatientProvider`;
-- `useGlobalContext.tsx` permanece como esqueleto legado de autenticação e deve
-  ser concluído ou removido em change própria.
+- Não há contexto de autenticação ativo; a sessão é mantida por cookies
+  `HttpOnly` e pelo cache RTK Query.
 
 ## Regras
 

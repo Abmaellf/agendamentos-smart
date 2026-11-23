@@ -52,6 +52,10 @@ interface ApiScenario {
   patientQueries: URLSearchParams[]
   appointmentPatientQueries: URLSearchParams[]
   createdPatient: TestPatientListItem
+  refreshRequests: number
+  refreshErrorStatus: number | null
+  logoutRequests: number
+  logoutErrorStatus: number | null
 }
 
 function initialScenario(): ApiScenario {
@@ -97,6 +101,10 @@ function initialScenario(): ApiScenario {
     patientQueries: [],
     appointmentPatientQueries: [],
     createdPatient,
+    refreshRequests: 0,
+    refreshErrorStatus: null,
+    logoutRequests: 0,
+    logoutErrorStatus: null,
   }
 }
 
@@ -249,6 +257,24 @@ const handlers = [
       clinicName: 'Equilíbrio',
       unitName: 'Matriz',
     })
+  }),
+  http.post('http://localhost:8080/auth/refresh', () => {
+    apiScenario.refreshRequests += 1
+
+    if (apiScenario.refreshErrorStatus) {
+      return HttpResponse.json({}, { status: apiScenario.refreshErrorStatus })
+    }
+
+    return new HttpResponse(null, { status: 204 })
+  }),
+  http.post('http://localhost:8080/auth/logout', () => {
+    apiScenario.logoutRequests += 1
+
+    if (apiScenario.logoutErrorStatus) {
+      return HttpResponse.json({}, { status: apiScenario.logoutErrorStatus })
+    }
+
+    return new HttpResponse(null, { status: 204 })
   }),
   http.get('http://localhost:8080/patient/list', ({ request }) =>
     patientListResponse(request),

@@ -10,29 +10,29 @@ Encapsular operações HTTP e utilitários de autenticação usados pelo fronten
 - perfil por `GET auth/me`;
 - operações de pacientes foram movidas para `features/patients/api`;
 - função desconectada de cadastro de usuário por `POST /auth/register/:id`;
-- utilitários desconectados de token em `localStorage`;
-- redirecionamento inicial por cookie em `firstScreen/`, embora esse componente não seja uma API.
+- renovação e encerramento da sessão por cookies `HttpOnly` em `session.ts`;
+- redirecionamento inicial validado pela API em `firstScreen/`, embora esse componente não seja uma API.
 
 ## Dependências internas e externas
 
-- internas: `lib/axios`, `constants/authorizationConstants` e `storageProxy`;
-- externas: Axios indiretamente, React/Router/Cookies no componente `firstScreen`;
+- internas: `lib/axios`, `lib/session-client` e `lib/base-api`;
+- externas: Axios indiretamente, React/Router no componente `firstScreen`;
 - módulos relacionados: autenticação, Header, pacientes, contexto e `env.ts`.
 
 ## Pontos de entrada e fluxos de entrada
 
 | Export               | Consumidor ativo              | Fluxo                          |
 | -------------------- | ----------------------------- | ------------------------------ |
-| `signIn`             | `page/auth/sign-in.tsx`       | formulário → mutation → API    |
+| `signIn`             | `page/auth/sign-in.tsx`       | formulário → mutation → cookies HttpOnly → API |
 | `getProfile`         | `components/account-menu.tsx` | Header → query → API           |
+| `sessionApi.logout`  | `components/account-menu.tsx` | menu “Sair” → `POST /auth/logout` |
 | `registerUser`       | nenhum                        | órfão                          |
-| funções de `auth.ts` | nenhum                        | cadeia órfã com `storageProxy` |
 
 ## Arquivos críticos
 
 - `sign-in.ts`, `get-profile.ts`: contratos atualmente executados nesta camada;
 - `features/patients/api/patients.ts`: listagem paginada e cadastro de pacientes via RTK Query;
-- `auth.ts`, `storageProxy.ts`: estratégia alternativa de token não conectada;
+- `session.ts`: encerramento explícito da sessão sem receber tokens no JavaScript;
 - `register-user.ts`: intenção de cadastro ainda não ligada à tela;
 - `firstScreen/first-screen.tsx`: decisão de navegação inicial.
 
@@ -49,9 +49,9 @@ Encapsular operações HTTP e utilitários de autenticação usados pelo fronten
 
 ## Observações técnicas e débitos
 
-- Há logs de token, usuário, perfil e respostas; devem ser removidos.
+- Logs de autenticação não devem registrar tokens, usuário, perfil ou respostas sensíveis.
 - `GetProfileResponse` inclui `password`, ampliando exposição de dado sensível.
 - Endpoints alternam barra inicial, singular e plural.
-- Não há interceptores, tipos de erro, cancelamento ou tratamento comum de `401`.
+- `lib/session-client.ts` coordena refresh single-flight, retry único e expiração global de sessão.
 - A função `registerUser` busca perfil antes do cadastro e usa o `id` superior da resposta; o contrato de backend não está documentado para confirmar se esse é o identificador esperado.
 - O componente de redirecionamento deve migrar para a camada de roteamento/autenticação.

@@ -10,24 +10,28 @@ import { AppLayout } from './_layout/app'
 import Configuration from './page/Configuration'
 import { SignUp } from './page/auth/sign-up'
 import { FirstScreen } from './api/firstScreen/first-screen'
+import { SessionExpiredRedirect } from './components/session-expired-redirect'
 
 export function Router() {
   return (
-    <Routes>
-      <Route path="/" element={<FirstScreen />} />
+    <>
+      <SessionExpiredRedirect />
+      <Routes>
+        <Route path="/" element={<FirstScreen />} />
 
-      <Route element={<AuthLayout />}>
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/sign-up" element={<SignUp />} />
-      </Route>
+        <Route element={<AuthLayout />}>
+          <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/sign-up" element={<SignUp />} />
+        </Route>
 
-      <Route element={<AppLayout />}>
-        <Route path="/appointments" element={<AppointmentsPage />} />
-        <Route path="/paciente" element={<Patient />} />
-        <Route path="/doctor" element={<Doctor />} />
-        <Route path="/configuration" element={<Configuration />} />
-        <Route path="/services/packages" element={<PackagesPage />} />
-      </Route>
-    </Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/appointments" element={<AppointmentsPage />} />
+          <Route path="/paciente" element={<Patient />} />
+          <Route path="/doctor" element={<Doctor />} />
+          <Route path="/configuration" element={<Configuration />} />
+          <Route path="/services/packages" element={<PackagesPage />} />
+        </Route>
+      </Routes>
+    </>
   )
 }

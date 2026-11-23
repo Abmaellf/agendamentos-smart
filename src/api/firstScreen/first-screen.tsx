@@ -1,26 +1,37 @@
 import { Loader2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCookies } from "react-cookie";
+
+import { requestWithSession } from "@/lib/session-client";
 
 export function FirstScreen() {
-  const [cookies] = useCookies(["jwt"]);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // pequeno delay para garantir que os cookies foram carregados
-    const timer = setTimeout(() => {
-      if (!cookies.jwt) {
-        navigate("/sign-in");
-      } else {
-        navigate("/appointments");
-      }
-      setLoading(false);
-    }, 1000); // 100ms geralmente resolve
+    let active = true;
 
-    return () => clearTimeout(timer);
-  }, [cookies, navigate]);
+    requestWithSession({ url: '/auth/me', method: 'GET' })
+      .then(() => {
+        if (active) {
+          navigate('/appointments', { replace: true });
+        }
+      })
+      .catch(() => {
+        if (active) {
+          navigate('/sign-in', { replace: true });
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [navigate]);
 
   if (loading) {
     return <Loader2Icon className="animate-spin w-6 h-6" />;

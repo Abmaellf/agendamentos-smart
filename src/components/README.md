@@ -30,6 +30,7 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 
 - `AppLayout` entra por `AppTopbar` e `AppSidebar`, com a mesma definição tipada de entradas em ambos os breakpoints;
 - `AppTopbar` concentra o hamburger, busca local, navegação temporal, ação de agendamento, notificações apresentacionais e menu de perfil;
+- `account-menu.tsx` encerra a sessão por `POST /auth/logout`, limpa o cache autenticado e redireciona para `/sign-in` mesmo quando a API já não está disponível;
 - `AppointmentsPage` usa apenas componentes de `features/appointments`;
 - `Patient` é composto por `features/patients`; componentes específicos não
   entram mais por esta camada compartilhada;

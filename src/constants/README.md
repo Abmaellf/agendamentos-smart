@@ -6,21 +6,21 @@ Centralizar identificadores estáveis usados por mais de uma operação.
 
 ## Responsabilidades e funcionalidades existentes
 
-Define `AUTHORIZATION_KEY`, chave destinada a armazenar autorização no `localStorage`.
+Não há mais constantes de autenticação neste módulo: a sessão usa cookies `HttpOnly` e não é armazenada pelo JavaScript.
 
 ## Dependências internas e externas
 
-- interna: consumida apenas por `src/api/auth.ts`;
+- interna: nenhuma;
 - externa: nenhuma;
-- módulos relacionados: `src/api/storageProxy.ts` e autenticação.
+- módulos relacionados: `src/api/session.ts` e `src/lib/session-client.ts`.
 
 ## Ponto de entrada e fluxo de entrada
 
-`authorizationConstants.ts` → `api/auth.ts` → `storageProxy.ts`. A cadeia não possui consumidor ativo.
+O módulo não participa da autenticação; cookies e renovação são responsabilidade da API e da camada de sessão HTTP.
 
 ## Arquivo crítico
 
-- `authorizationConstants.ts`: única constante do módulo.
+- Nenhum arquivo de autenticação é mantido aqui.
 
 ## Regras próprias do módulo
 
