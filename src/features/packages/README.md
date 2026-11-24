@@ -34,11 +34,20 @@ administrativo e não pode ser usado em novas contratações.
 ## Agendamento por pacote
 
 O botão global `Agendamento de Pacotes` abre o mesmo contexto de agendamento,
-com paciente, pacote, data inicial e horário manual. Os dias do pacote são
-pré-preenchidos, mas podem ser ajustados apenas para a contratação. A prévia
-chama `POST /api/package-appointments/preview` sem reservar sessões; a
-confirmação chama `POST /api/package-appointments/confirm` com fingerprint e
+com unidade, paciente, pacote, data inicial e horário manual. Para `ADMIN`, a
+unidade é escolhida entre as unidades autorizadas da clínica; para `BASIC`, ela
+é fixada em `activeUnitId` da sessão. Pacientes e pacotes só são consultados
+depois que a unidade efetiva estiver definida e são filtrados por ela. Os dias
+do pacote são pré-preenchidos, mas podem ser ajustados apenas para a
+contratação. A prévia chama `POST /api/package-appointments/preview` sem
+reservar sessões e envia `unitId`; a confirmação chama
+`POST /api/package-appointments/confirm` com `unitId`, fingerprint e
 `Idempotency-Key`.
+
+O frontend usa esses filtros para orientar a seleção, mas a API permanece a
+autoridade para validar clínica, unidade, paciente, pacote e permissões. A
+validação correspondente no backend é uma dependência da API irmã e não está
+presente neste checkout.
 
 O backend gera exatamente a quantidade de sessões percorrendo os dias efetivos
 no fuso da unidade, reutiliza as regras do agendamento manual e grava uma
