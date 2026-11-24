@@ -316,6 +316,9 @@ const handlers = [
     return HttpResponse.json(response, { status: 201 })
   }),
   http.get('http://localhost:8080/api/units', () => catalogResponse('units')),
+  http.get('http://localhost:8080/api/service-packages', () =>
+    HttpResponse.json({ content: [] }),
+  ),
   http.get('http://localhost:8080/api/services', () =>
     catalogResponse('services'),
   ),
