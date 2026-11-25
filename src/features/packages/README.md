@@ -9,8 +9,8 @@ unidade: serviço, sessões, valor total, dias da semana e situação.
 
 `/services/packages` consulta sessão, catálogos de unidade/serviço e
 `/api/service-packages`. A página oferece filtros, listagem mestre em tabela,
-paginação, detalhe contextual, criação/edição em modal e
-ativação/desativação. As mutations invalidam a tag RTK Query `ServicePackage`,
+paginação em um container responsivo amplo, detalhe em modal, criação/edição em
+modal e ativação/desativação. As mutations invalidam a tag RTK Query `ServicePackage`,
 mantendo a lista atualizada.
 
 Os dias aceitos são `SUNDAY` a `SATURDAY`; a frequência exibida vem do backend
@@ -44,13 +44,16 @@ backend passar a aplicar `page`/`size` e retornar os metadados.
 
 ## Componentes e estados da listagem
 
-`PackagesPage` orquestra filtros aplicados, página, seleção, detalhe e modo do
-modal. A apresentação foi dividida em componentes da própria feature:
+`PackagesPage` orquestra filtros aplicados, página, seleção, detalhe modal e
+modo do modal de criação/edição. Em telas amplas, a listagem usa um container
+mais largo; em telas estreitas, o overflow horizontal fica restrito à tabela.
+A apresentação foi dividida em componentes da própria feature:
 
 - `PackageTableFilter`: rascunho e aplicação/limpeza dos filtros;
 - `PackageTable`: tabela mestre, seleção e ações administrativas;
 - `PackagePagination`: navegação baseada nos metadados da página;
-- `PackageDetailPanel`: detalhe contextual lado a lado ou empilhado;
+- `PackageDetailPanel`: detalhe do pacote em diálogo modal responsivo, com foco
+  acessível e ações administrativas;
 - `PackageFormModal`: criação e edição no mesmo formulário modal.
 
 A tela comunica carregamento inicial e atualização, erro com tentativa

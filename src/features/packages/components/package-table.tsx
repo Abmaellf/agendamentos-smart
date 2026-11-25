@@ -20,7 +20,7 @@ interface PackageTableProps {
   isLoading?: boolean
   isFetching?: boolean
   statusUpdating?: boolean
-  onSelect: (item: ServicePackage) => void
+  onSelect: (item: ServicePackage, trigger?: HTMLElement) => void
   onEdit: (item: ServicePackage, trigger: HTMLElement) => void
   onToggleStatus: (item: ServicePackage) => void
 }
@@ -52,7 +52,7 @@ export function PackageTable({
     if (event.target !== event.currentTarget) return
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
-      onSelect(item)
+      onSelect(item, event.currentTarget)
     }
   }
 
@@ -115,7 +115,7 @@ export function PackageTable({
                         variant="outline"
                         onClick={(event) => {
                           event.stopPropagation()
-                          onSelect(item)
+                          onSelect(item, event.currentTarget)
                         }}
                       >
                         Detalhes
