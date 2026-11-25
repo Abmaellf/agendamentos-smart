@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
@@ -6,13 +6,13 @@ import { adminSession, basicSession } from '@/test/builders/appointment'
 import { renderWithProviders } from '@/test/render'
 import { apiScenario } from '@/test/server'
 
-import { AddPatientModal } from '../components/add-patient-modal'
+import { PatientFormModal } from '../components/patient-form-modal'
 
 describe('cadastro de pacientes', () => {
   it('deriva a unidade ativa ao cadastrar como BASIC', async () => {
     apiScenario.session = basicSession
     const user = userEvent.setup()
-    renderWithProviders(<AddPatientModal />)
+    renderWithProviders(<PatientFormModal />)
 
     await user.click(screen.getByRole('button', { name: /novo paciente/i }))
     expect(await screen.findByText('Unidade Centro')).toBeVisible()
@@ -40,7 +40,7 @@ describe('cadastro de pacientes', () => {
       timeZone: 'America/Cuiaba',
     })
     const user = userEvent.setup()
-    renderWithProviders(<AddPatientModal />)
+    renderWithProviders(<PatientFormModal />)
 
     await user.click(screen.getByRole('button', { name: /novo paciente/i }))
     await user.click(
@@ -65,7 +65,7 @@ describe('cadastro de pacientes', () => {
     apiScenario.session = basicSession
     apiScenario.patientCreateErrorCode = 'PATIENT_ALREADY_EXISTS'
     const user = userEvent.setup()
-    renderWithProviders(<AddPatientModal />)
+    renderWithProviders(<PatientFormModal />)
 
     await user.click(screen.getByRole('button', { name: /novo paciente/i }))
     await screen.findByText('Unidade Centro')
@@ -85,7 +85,7 @@ describe('cadastro de pacientes', () => {
       activeUnitId: 'unit-outside-catalog',
     }
     const user = userEvent.setup()
-    renderWithProviders(<AddPatientModal />)
+    renderWithProviders(<PatientFormModal />)
 
     await user.click(screen.getByRole('button', { name: /novo paciente/i }))
 
@@ -95,5 +95,18 @@ describe('cadastro de pacientes', () => {
       ),
     ).toBeVisible()
     expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled()
+  })
+
+  it('fecha o cadastro por cancelamento e devolve o foco ao acionador', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<PatientFormModal />)
+
+    const trigger = screen.getByRole('button', { name: /novo paciente/i })
+    await user.click(trigger)
+
+    const dialog = await screen.findByRole('dialog', { name: 'Novo Paciente' })
+    await user.click(within(dialog).getByRole('button', { name: 'Cancelar' }))
+
+    await waitFor(() => expect(trigger).toHaveFocus())
   })
 })

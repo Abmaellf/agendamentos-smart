@@ -42,7 +42,7 @@ const emptyForm: CreatePatientFormValues = {
   unitIds: [],
 }
 
-export function AddPatientModal() {
+export function PatientFormModal() {
   const [open, setOpen] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
   const sessionQuery = useGetAppointmentSessionQuery(undefined, {
@@ -259,3 +259,5 @@ export function AddPatientModal() {
     </Dialog>
   )
 }
+
+export const AddPatientModal = PatientFormModal

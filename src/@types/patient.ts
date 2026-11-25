@@ -65,6 +65,16 @@ export interface PatientTableFilterProps {
 
 export interface PatientTableRowsProps {
   patient: PatientListItem
+  selected?: boolean
+  onSelect: (patient: PatientListItem, trigger: HTMLElement) => void
+}
+
+export interface PatientTableProps {
+  patients: PatientListItem[]
+  selectedId?: string | null
+  isLoading?: boolean
+  isFetching?: boolean
+  onSelect: (patient: PatientListItem, trigger: HTMLElement) => void
 }
 
 export interface PaginationProps {

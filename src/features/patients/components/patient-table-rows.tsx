@@ -1,7 +1,8 @@
 import type { PatientTableRowsProps } from '@/@types/patient'
+import type { KeyboardEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { ArrowRight, Search, Stethoscope, Trash2 } from 'lucide-react'
+import { Search, Stethoscope } from 'lucide-react'
 import { PatientStatusBadge } from './patients-status-badge'
 
 
@@ -26,17 +27,40 @@ function formatDate(value: string) {
   return new Intl.DateTimeFormat('pt-BR').format(date)
 }
 
-export default function PatientTableRows({ patient }: PatientTableRowsProps) {
+export default function PatientTableRows({
+  patient,
+  selected = false,
+  onSelect,
+}: PatientTableRowsProps) {
+  function handleKeyDown(event: KeyboardEvent<HTMLTableRowElement>) {
+    if (event.target !== event.currentTarget) return
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onSelect(patient, event.currentTarget)
+    }
+  }
+
   return (
-    <TableRow className="odd:bg-white even:bg-emerald-50/40">
+    <TableRow
+      tabIndex={0}
+      data-state={selected ? 'selected' : undefined}
+      aria-selected={selected}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          onSelect(patient, event.currentTarget)
+        }
+      }}
+      onKeyDown={handleKeyDown}
+      className="cursor-pointer odd:bg-white even:bg-emerald-50/40 focus-visible:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-600 data-[state=selected]:bg-emerald-100"
+    >
       <TableCell>
         <Button
           type="button"
           variant="outline"
           size="icon"
-          aria-label={`Ver detalhes de ${patient.name}`}
-          title="Detalhes serão disponibilizados em uma próxima etapa"
-          disabled
+          aria-label={`Detalhes de ${patient.name}`}
+          title={`Detalhes de ${patient.name}`}
+          onClick={(event) => onSelect(patient, event.currentTarget)}
         >
           <Search aria-hidden="true" />
         </Button>
@@ -79,28 +103,7 @@ export default function PatientTableRows({ patient }: PatientTableRowsProps) {
       <TableCell>{formatDate(patient.createdAt)}</TableCell>
 
       <TableCell>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            title="Edição será disponibilizada em uma próxima etapa"
-            disabled
-          >
-            <ArrowRight aria-hidden="true" />
-            Editar
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            title="Desativação será disponibilizada em uma próxima etapa"
-            disabled
-          >
-            <Trash2 aria-hidden="true" />
-            Desativar
-          </Button>
-        </div>
+        <span className="text-muted-foreground text-sm">—</span>
       </TableCell>
     </TableRow>
   )

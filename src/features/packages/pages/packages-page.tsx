@@ -13,6 +13,8 @@ import {
   useGetUnitsQuery,
 } from '@/features/appointments/api/appointments'
 import { Button } from '@/components/ui/button'
+import { DataTableCard } from '@/components/data-table-shell'
+import { PageContainer, PageHeader } from '@/components/page-shell'
 
 import {
   type ServicePackage,
@@ -218,21 +220,16 @@ export function PackagesPage() {
   }
 
   return (
-    <main className="min-h-full overflow-x-hidden bg-slate-50/70 px-4 pt-20 pb-8 sm:px-6 lg:px-8">
-      <section className="mx-auto w-full max-w-[2048px] space-y-6">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-[#20382d]">
-              Pacotes de serviços
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Consulte, compare e configure sessões, dias e valores por unidade.
-            </p>
-          </div>
+    <PageContainer>
+      <PageHeader
+        title="Pacotes de serviços"
+        description="Consulte, compare e configure sessões, dias e valores por unidade."
+        actions={
           <Button type="button" onClick={openCreateModal}>
             Novo pacote
           </Button>
-        </header>
+        }
+      />
 
         <PackageTableFilter
           value={filters}
@@ -257,9 +254,18 @@ export function PackagesPage() {
           </p>
         ) : null}
 
-        <section
-          aria-label="Lista de pacotes"
-          className="overflow-hidden rounded-xl border bg-white shadow-sm"
+        <DataTableCard
+          ariaLabel="Lista de pacotes"
+          footer={
+            <PackagePagination
+              page={packages.data?.page ?? page}
+              totalPages={packages.data?.totalPages ?? 0}
+              totalElements={packages.data?.totalElements ?? 0}
+              last={packages.data?.last ?? true}
+              disabled={packages.isFetching}
+              onPageChange={(nextPage) => setPage(Math.max(nextPage, 0))}
+            />
+          }
         >
           <PackageTable
             items={items}
@@ -271,15 +277,7 @@ export function PackagesPage() {
             onEdit={openEditModal}
             onToggleStatus={(item) => void toggleStatus(item)}
           />
-          <PackagePagination
-            page={packages.data?.page ?? page}
-            totalPages={packages.data?.totalPages ?? 0}
-            totalElements={packages.data?.totalElements ?? 0}
-            last={packages.data?.last ?? true}
-            disabled={packages.isFetching}
-            onPageChange={(nextPage) => setPage(Math.max(nextPage, 0))}
-          />
-        </section>
+        </DataTableCard>
 
         <PackageDetailPanel
           open={detailOpen}
@@ -304,7 +302,6 @@ export function PackagesPage() {
           onOpenChange={handleModalOpenChange}
           onSubmit={(values) => void submit(values)}
         />
-      </section>
-    </main>
+    </PageContainer>
   )
 }
