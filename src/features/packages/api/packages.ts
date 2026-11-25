@@ -43,19 +43,103 @@ export interface ServicePackageFilters {
   name?: string
 }
 
-function contentOf(value: unknown): ServicePackage[] {
-  if (Array.isArray(value)) return value as ServicePackage[]
-  return (value as { content?: ServicePackage[] }).content ?? []
+export interface ServicePackageListQuery extends ServicePackageFilters {
+  page: number
+  size: number
+}
+
+export interface ServicePackagePage {
+  content: ServicePackage[]
+  page: number
+  size: number
+  totalElements: number
+  totalPages: number
+  last: boolean
+}
+
+interface PageFallback {
+  page: number
+  size: number
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null
+}
+
+function numberOr(value: unknown, fallback: number) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+}
+
+export function normalizeServicePackagePage(
+  value: unknown,
+  fallback: PageFallback = { page: 0, size: 10 },
+): ServicePackagePage {
+  const record = asRecord(value)
+  const content = Array.isArray(value)
+    ? (value as ServicePackage[])
+    : Array.isArray(record?.content)
+      ? (record.content as ServicePackage[])
+      : []
+  const hasPaginationMetadata =
+    record &&
+    typeof record.page === 'number' &&
+    typeof record.size === 'number' &&
+    typeof record.totalElements === 'number' &&
+    typeof record.totalPages === 'number' &&
+    typeof record.last === 'boolean'
+
+  if (hasPaginationMetadata) {
+    return {
+      content,
+      page: numberOr(record.page, fallback.page),
+      size: numberOr(record.size, fallback.size),
+      totalElements: numberOr(record.totalElements, content.length),
+      totalPages: numberOr(record.totalPages, content.length ? 1 : 0),
+      last: Boolean(record.last),
+    }
+  }
+
+  return {
+    content,
+    page: 0,
+    size: fallback.size,
+    totalElements: content.length,
+    totalPages: content.length ? 1 : 0,
+    last: true,
+  }
 }
 
 export const packagesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getServicePackages: builder.query<
-      ServicePackage[],
-      ServicePackageFilters | void
+      ServicePackagePage,
+      ServicePackageListQuery | void
     >({
-      query: (params) => ({ url: '/api/service-packages', params }),
-      transformResponse: contentOf,
+      query: (params) => {
+        const query = params ?? { page: 0, size: 10 }
+        const { page, size, unitId, serviceId, active, totalSessions, name } =
+          query
+
+        return {
+          url: '/api/service-packages',
+          params: {
+            page,
+            size,
+            ...(unitId ? { unitId } : {}),
+            ...(serviceId ? { serviceId } : {}),
+            ...(active === undefined ? {} : { active }),
+            ...(totalSessions === undefined ? {} : { totalSessions }),
+            ...(name ? { name } : {}),
+          },
+        }
+      },
+      transformResponse: (value, _meta, arg) =>
+        normalizeServicePackagePage(value, {
+          page: arg?.page ?? 0,
+          size: arg?.size ?? 10,
+        }),
       providesTags: ['ServicePackage'],
     }),
     getServicePackage: builder.query<ServicePackage, string>({

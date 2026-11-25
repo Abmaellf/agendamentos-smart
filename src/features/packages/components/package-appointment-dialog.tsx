@@ -67,10 +67,16 @@ export function PackageAppointmentDialog({
     skip: !open || !effectiveUnitId,
   })
   const packagesQuery = useGetServicePackagesQuery(
-    { active: true, unitId: effectiveUnitId || undefined },
+    {
+      active: true,
+      unitId: effectiveUnitId || undefined,
+      page: 0,
+      size: 100,
+    },
     { skip: !open || !effectiveUnitId },
   )
-  const selectedPackage = packagesQuery.data?.find(
+  const packageItems = packagesQuery.data?.content ?? []
+  const selectedPackage = packageItems.find(
     (item) => item.id === packageId,
   )
   const professionalsQuery = useGetProfessionalsQuery(
@@ -84,10 +90,10 @@ export function PackageAppointmentDialog({
   const availablePatients = patientsQuery.data ?? []
   const availablePackages = useMemo(
     () =>
-      packagesQuery.data?.filter(
+      packageItems.filter(
         (item) => item.active && item.unitId === effectiveUnitId,
       ) ?? [],
-    [effectiveUnitId, packagesQuery.data],
+    [effectiveUnitId, packageItems],
   )
   const basicUnitUnavailable =
     unitIsReadOnly &&

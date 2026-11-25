@@ -8,9 +8,10 @@ unidade: serviço, sessões, valor total, dias da semana e situação.
 ## Fluxo atual
 
 `/services/packages` consulta sessão, catálogos de unidade/serviço e
-`/api/service-packages`. A página oferece filtros, criação, detalhe/edição por
-card e ativação/desativação. As mutations invalidam a tag RTK Query
-`ServicePackage`, mantendo a lista atualizada.
+`/api/service-packages`. A página oferece filtros, listagem mestre em tabela,
+paginação, detalhe contextual, criação/edição em modal e
+ativação/desativação. As mutations invalidam a tag RTK Query `ServicePackage`,
+mantendo a lista atualizada.
 
 Os dias aceitos são `SUNDAY` a `SATURDAY`; a frequência exibida vem do backend
 e é derivada do conjunto de dias. O valor é enviado como decimal textual no
@@ -30,6 +31,32 @@ imutabilidade.
 
 Não existe exclusão física. Um pacote inativo permanece visível no histórico
 administrativo e não pode ser usado em novas contratações.
+
+## Consulta paginada
+
+O contrato esperado pela listagem é uma resposta com `content`, `page`, `size`,
+`totalElements`, `totalPages` e `last`. A API irmã atualmente retorna apenas o
+envelope legado `{ content }` em `GET /api/service-packages`; o adaptador do
+frontend aceita as duas formas e trata o envelope legado como uma única página.
+Isso mantém o fluxo compatível durante a transição, mas não cria paginação real
+no cliente. A paginação server-side só estará plenamente disponível quando o
+backend passar a aplicar `page`/`size` e retornar os metadados.
+
+## Componentes e estados da listagem
+
+`PackagesPage` orquestra filtros aplicados, página, seleção, detalhe e modo do
+modal. A apresentação foi dividida em componentes da própria feature:
+
+- `PackageTableFilter`: rascunho e aplicação/limpeza dos filtros;
+- `PackageTable`: tabela mestre, seleção e ações administrativas;
+- `PackagePagination`: navegação baseada nos metadados da página;
+- `PackageDetailPanel`: detalhe contextual lado a lado ou empilhado;
+- `PackageFormModal`: criação e edição no mesmo formulário modal.
+
+A tela comunica carregamento inicial e atualização, erro com tentativa
+novamente, estado vazio, seleção ativa e ações nomeadas. A gestão continua
+restrita ao papel `ADMIN`; o frontend apenas apresenta a autorização e a API
+permanece a autoridade para escopo, validação e imutabilidade.
 
 ## Agendamento por pacote
 
