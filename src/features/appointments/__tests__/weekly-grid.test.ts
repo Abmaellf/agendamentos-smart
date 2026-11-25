@@ -8,6 +8,8 @@ import {
   appointmentLocalTime,
   buildVisualAppointmentLayout,
   buildWeeklyAppointmentGrid,
+  WEEK_GRID_END_HOUR,
+  WEEK_GRID_END_MINUTES,
 } from '../model/weekly-grid'
 
 const baseAppointment = createdAppointment as unknown as Appointment
@@ -17,6 +19,11 @@ function makeAppointment(overrides: Partial<Appointment> = {}) {
 }
 
 describe('modelo da grade horária semanal', () => {
+  it('mantém a janela visual estendida até 20:00', () => {
+    expect(WEEK_GRID_END_HOUR).toBe(20)
+    expect(WEEK_GRID_END_MINUTES).toBe(20 * 60)
+  })
+
   it('converte o horário normal e os minutos intermediários no fuso do agendamento', () => {
     const appointment = makeAppointment({
       startsAt: '2026-08-13T15:30:00.000Z',

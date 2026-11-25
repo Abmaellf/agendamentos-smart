@@ -3,7 +3,7 @@ import { addDays, format } from 'date-fns'
 import type { Appointment } from '@/@types/appointment'
 
 export const WEEK_GRID_START_HOUR = 7
-export const WEEK_GRID_END_HOUR = 18
+export const WEEK_GRID_END_HOUR = 20
 export const WEEK_GRID_HOUR_MINUTES = 60
 export const WEEK_GRID_START_MINUTES = WEEK_GRID_START_HOUR * 60
 export const WEEK_GRID_END_MINUTES = WEEK_GRID_END_HOUR * 60
