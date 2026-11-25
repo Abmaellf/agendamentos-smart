@@ -12,7 +12,8 @@ patients/
 ├── api/
 │   └── patients.ts
 ├── components/
-│   ├── add-patient-modal.tsx
+│   ├── patient-form-modal.tsx
+│   ├── patient-detail-modal.tsx
 │   ├── pagination.tsx
 │   ├── patient-status-badge.tsx
 │   ├── patient-table-filter.tsx
@@ -35,6 +36,12 @@ patients/
 - sucesso de cadastro → invalidação de `PatientCatalog/LIST`;
 - sessão/unidades/serviços → hooks de catálogo compartilhados com agenda.
 
+A composição da página usa `PageContainer`, `PageHeader` e `DataTableCard` de
+`src/components` para o resumo, o container responsivo e a superfície da
+listagem. Esses shells são apenas visuais; não conhecem paciente, tenant,
+papel ou endpoints. O detalhe é específico da feature e usa os dados
+autorizados já retornados pela listagem.
+
 ## Regras de vínculo
 
 - a clínica é derivada e autorizada pelo backend;
@@ -49,5 +56,6 @@ fonte de domínio confiável. A tela apresenta `—` e nunca usa valores fixos.
 
 ## Limites atuais
 
-Detalhe, edição e desativação permanecem desabilitados até existirem contratos
-HTTP, autorização e testes próprios.
+O detalhe visual é aberto em modal com os campos disponíveis na listagem.
+Edição e desativação permanecem desabilitadas até existirem contratos HTTP,
+autorização e testes próprios.

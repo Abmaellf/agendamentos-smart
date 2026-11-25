@@ -56,6 +56,13 @@ A apresentação foi dividida em componentes da própria feature:
   acessível e ações administrativas;
 - `PackageFormModal`: criação e edição no mesmo formulário modal.
 
+As páginas de pacientes e pacotes compartilham somente shells visuais em
+`src/components/page-shell.tsx` e `src/components/data-table-shell.tsx`:
+`PageContainer`, `PageHeader` e `DataTableCard`. Esses componentes recebem
+conteúdo e ações por propriedades, não consultam API e não carregam regras de
+pacote; filtros, tabela, paginação, detalhe e formulário continuam específicos
+da feature.
+
 A tela comunica carregamento inicial e atualização, erro com tentativa
 novamente, estado vazio, seleção ativa e ações nomeadas. A gestão continua
 restrita ao papel `ADMIN`; o frontend apenas apresenta a autorização e a API

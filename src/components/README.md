@@ -13,6 +13,8 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
 | `account-menu.tsx`    | Perfil da clínica/usuário            | Ativo                       |
 | `form-field.tsx`      | Rótulo, controle e erro acessíveis   | Ativo                       |
 | `searchable-select.tsx` | Combobox local para catálogos       | Ativo                       |
+| `page-shell.tsx`      | Container e resumo visual de páginas | Ativo                       |
+| `data-table-shell.tsx` | Superfície visual para tabelas e rodapé | Ativo                    |
 | `Card`                | Cartões antigos da agenda            | Legado sem consumidor       |
 | `WeekDate`            | Rótulos antigos dos dias úteis       | Legado sem consumidor       |
 | `nav-link.tsx`        | Link com estado atual                | Órfão                       |
@@ -47,12 +49,21 @@ Reunir elementos visuais reutilizados por layouts e páginas, além de component
   propriedades e não consulta API. O controle pode ser desabilitado pela
   feature quando o papel não puder editar o escopo, sem assumir autorização no
   navegador;
+- `page-shell.tsx`: `PageContainer` e `PageHeader` padronizam fundo,
+  espaçamento, largura responsiva, identificação, título, descrição e slot de
+  ações. Recebem conteúdo por propriedades e não importam features;
+- `data-table-shell.tsx`: `DataTableCard` padroniza a superfície da listagem,
+  borda, raio, sombra, overflow e slot de rodapé. Não conhece colunas, dados,
+  paginação, API, tenant ou papel de usuário;
 - `features/appointments/pages/appointments-page.tsx`: fonte da grade semanal;
 - `ui/`: base visual da maioria dos formulários.
 
 ## Regras próprias do módulo
 
 - Componentes compartilhados devem ser predominantemente visuais; regras de agenda, autorização e persistência entram por propriedades/hooks tipados.
+- Shells de página e tabela devem permanecer apresentacionais, não consultar
+  API e não importar módulos de domínio; estado, callbacks e autorização ficam
+  nas features consumidoras.
 - `FormField` recebe o controle e o erro por propriedades; validação e estado
   continuam nos componentes das features consumidoras.
 - A interface pode ocultar ou desabilitar ações por papel, mas o adaptador/API deve repetir a autorização.
