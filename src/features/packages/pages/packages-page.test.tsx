@@ -54,8 +54,12 @@ describe('PackagesPage', () => {
     expect(
       await screen.findByRole('heading', { name: /pacotes de serviços/i }),
     ).toBeVisible()
+    expect(screen.getByRole('main')).toHaveClass('overflow-x-hidden')
+    expect(screen.getByRole('form', { name: 'Filtros de pacotes' })).toBeVisible()
     expect(await screen.findByText('Fisioterapia 10 sessões')).toBeVisible()
     expect(screen.getByRole('columnheader', { name: 'Pacote' })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Detalhes' })).toBeVisible()
+    expect(screen.getByText('Total de 11 pacote(s)')).toBeVisible()
     expect(screen.queryByRole('article')).not.toBeInTheDocument()
     expect(screen.getByText('10')).toBeVisible()
     expect(screen.getByText('2 por semana')).toBeVisible()
@@ -103,7 +107,7 @@ describe('PackagesPage', () => {
     expect(screen.getByText('Selecione ao menos um dia.')).toBeVisible()
   })
 
-  it('seleciona o mestre, exibe o detalhe e abre a edição no mesmo modal', async () => {
+  it('abre o detalhe em modal e preserva a origem ao editar', async () => {
     const user = userEvent.setup()
     server.use(
       http.get('http://localhost:8080/api/service-packages', () =>
@@ -119,11 +123,17 @@ describe('PackagesPage', () => {
     await user.click(
       await screen.findByRole('button', { name: 'Detalhes' }),
     )
-    expect(await screen.findByRole('complementary', { name: 'Detalhe do pacote' })).toBeVisible()
-    expect(screen.getByText('Recuperação funcional')).toBeVisible()
-    expect(screen.getByText('Segunda, Quarta')).toBeVisible()
+    const detailDialog = await screen.findByRole('dialog', {
+      name: 'Fisioterapia 10 sessões',
+    })
+    expect(detailDialog).toBeVisible()
+    expect(detailDialog).toContainElement(document.activeElement as HTMLElement)
+    expect(within(detailDialog).getByText('Recuperação funcional')).toBeVisible()
+    expect(within(detailDialog).getByText('Segunda, Quarta')).toBeVisible()
 
-    await user.click(screen.getByRole('button', { name: 'Editar pacote' }))
+    await user.click(
+      within(detailDialog).getByRole('button', { name: 'Editar pacote' }),
+    )
     const editDialog = await screen.findByRole('dialog', { name: 'Editar pacote' })
     expect(editDialog).toBeVisible()
     expect(within(editDialog).getByLabelText('Nome')).toHaveValue(
@@ -131,8 +141,79 @@ describe('PackagesPage', () => {
     )
 
     await user.click(within(editDialog).getByRole('button', { name: 'Cancelar' }))
-    await user.click(screen.getByRole('button', { name: 'Fechar detalhe do pacote' }))
-    expect(screen.queryByRole('complementary', { name: 'Detalhe do pacote' })).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Detalhes' })).toHaveFocus(),
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Detalhes' }))
+    const reopenedDetail = await screen.findByRole('dialog', {
+      name: 'Fisioterapia 10 sessões',
+    })
+    await user.click(
+      within(reopenedDetail).getByRole('button', {
+        name: 'Fechar detalhe do pacote',
+      }),
+    )
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: 'Fisioterapia 10 sessões' })).not.toBeInTheDocument(),
+    )
+  })
+
+  it('abre o detalhe pela seleção de teclado e comunica carregamento', async () => {
+    const user = userEvent.setup()
+    server.use(
+      http.get('http://localhost:8080/api/service-packages', () =>
+        HttpResponse.json({ content: [servicePackage] }),
+      ),
+      http.get(
+        'http://localhost:8080/api/service-packages/package-1',
+        async () => {
+          await new Promise((resolve) => setTimeout(resolve, 50))
+          return HttpResponse.json(servicePackage)
+        },
+      ),
+    )
+    renderWithProviders(<PackagesPage />)
+
+    const row = await screen.findByRole('row', {
+      name: /fisioterapia 10 sessões/i,
+    })
+    row.focus()
+    await user.keyboard('{Enter}')
+
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'Carregando detalhe do pacote',
+    )
+    expect(
+      await screen.findByRole('dialog', { name: 'Fisioterapia 10 sessões' }),
+    ).toBeVisible()
+  })
+
+  it('mantém a listagem e informa erro ao carregar o detalhe', async () => {
+    const user = userEvent.setup()
+    server.use(
+      http.get('http://localhost:8080/api/service-packages', () =>
+        HttpResponse.json({ content: [servicePackage] }),
+      ),
+      http.get(
+        'http://localhost:8080/api/service-packages/package-1',
+        () => HttpResponse.json({ message: 'Falha' }, { status: 500 }),
+      ),
+    )
+    renderWithProviders(<PackagesPage />)
+
+    await user.click(await screen.findByRole('button', { name: 'Detalhes' }))
+
+    expect(
+      await screen.findByText('Não foi possível carregar o detalhe deste pacote.'),
+    ).toBeVisible()
+    expect(screen.getByRole('alert')).toBeVisible()
+    expect(
+      within(screen.getByRole('main', { hidden: true })).getByRole('columnheader', {
+        name: 'Pacote',
+        hidden: true,
+      }),
+    ).toBeInTheDocument()
   })
 
   it('altera a situação sem remover o pacote da tabela', async () => {

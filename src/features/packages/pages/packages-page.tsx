@@ -64,8 +64,10 @@ export function PackagesPage() {
   const [filters, setFilters] = useState<ServicePackageFilters>({})
   const [page, setPage] = useState(0)
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const detailReturnFocus = useRef<HTMLElement | null>(null)
   const modalReturnFocus = useRef<HTMLElement | null>(null)
 
   const packages = useGetServicePackagesQuery(
@@ -110,29 +112,48 @@ export function PackagesPage() {
     setFilters(nextFilters)
     setPage(0)
     setSelectedId(null)
+    setDetailOpen(false)
   }
 
   function clearFilters() {
     setFilters({})
     setPage(0)
     setSelectedId(null)
+    setDetailOpen(false)
   }
 
-  function selectPackage(item: ServicePackage) {
+  function selectPackage(item: ServicePackage, trigger?: HTMLElement) {
     setSelectedId(item.id)
+    detailReturnFocus.current =
+      trigger ??
+      (document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null)
+    setDetailOpen(true)
   }
 
   function openCreateModal(event: MouseEvent<HTMLButtonElement>) {
     modalReturnFocus.current = event.currentTarget
+    setDetailOpen(false)
     setEditingId(null)
     setModalOpen(true)
   }
 
   function openEditModal(item: ServicePackage, trigger: HTMLElement) {
-    modalReturnFocus.current = trigger
+    modalReturnFocus.current = detailOpen
+      ? detailReturnFocus.current ?? trigger
+      : trigger
+    setDetailOpen(false)
     setSelectedId(item.id)
     setEditingId(item.id)
     setModalOpen(true)
+  }
+
+  function handleDetailOpenChange(open: boolean) {
+    setDetailOpen(open)
+    if (!open) {
+      requestAnimationFrame(() => detailReturnFocus.current?.focus())
+    }
   }
 
   function handleModalOpenChange(open: boolean) {
@@ -197,8 +218,8 @@ export function PackagesPage() {
   }
 
   return (
-    <main className="min-h-full bg-slate-50/70 px-4 pt-20 pb-8 sm:px-6 lg:px-8">
-      <section className="mx-auto w-full max-w-[1600px] space-y-6">
+    <main className="min-h-full overflow-x-hidden bg-slate-50/70 px-4 pt-20 pb-8 sm:px-6 lg:px-8">
+      <section className="mx-auto w-full max-w-[2048px] space-y-6">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-[#20382d]">
@@ -236,49 +257,40 @@ export function PackagesPage() {
           </p>
         ) : null}
 
-        <div
-          className={
-            selectedItem
-              ? 'grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,0.75fr)]'
-              : undefined
-          }
+        <section
+          aria-label="Lista de pacotes"
+          className="overflow-hidden rounded-xl border bg-white shadow-sm"
         >
-          <section
-            aria-label="Lista de pacotes"
-            className="overflow-hidden rounded-xl border bg-white shadow-sm"
-          >
-            <PackageTable
-              items={items}
-              selectedId={selectedId}
-              isLoading={packages.isLoading}
-              isFetching={packages.isFetching}
-              statusUpdating={changeStatusState.isLoading}
-              onSelect={selectPackage}
-              onEdit={openEditModal}
-              onToggleStatus={(item) => void toggleStatus(item)}
-            />
-            <PackagePagination
-              page={packages.data?.page ?? page}
-              totalPages={packages.data?.totalPages ?? 0}
-              totalElements={packages.data?.totalElements ?? 0}
-              last={packages.data?.last ?? true}
-              disabled={packages.isFetching}
-              onPageChange={(nextPage) => setPage(Math.max(nextPage, 0))}
-            />
-          </section>
+          <PackageTable
+            items={items}
+            selectedId={selectedId}
+            isLoading={packages.isLoading}
+            isFetching={packages.isFetching}
+            statusUpdating={changeStatusState.isLoading}
+            onSelect={selectPackage}
+            onEdit={openEditModal}
+            onToggleStatus={(item) => void toggleStatus(item)}
+          />
+          <PackagePagination
+            page={packages.data?.page ?? page}
+            totalPages={packages.data?.totalPages ?? 0}
+            totalElements={packages.data?.totalElements ?? 0}
+            last={packages.data?.last ?? true}
+            disabled={packages.isFetching}
+            onPageChange={(nextPage) => setPage(Math.max(nextPage, 0))}
+          />
+        </section>
 
-          {selectedItem ? (
-            <PackageDetailPanel
-              item={selectedItem}
-              isLoading={detailQuery.isLoading}
-              isError={detailQuery.isError}
-              statusUpdating={changeStatusState.isLoading}
-              onClose={() => setSelectedId(null)}
-              onEdit={openEditModal}
-              onToggleStatus={(item) => void toggleStatus(item)}
-            />
-          ) : null}
-        </div>
+        <PackageDetailPanel
+          open={detailOpen}
+          item={selectedItem}
+          isLoading={detailQuery.isLoading}
+          isError={detailQuery.isError}
+          statusUpdating={changeStatusState.isLoading}
+          onOpenChange={handleDetailOpenChange}
+          onEdit={openEditModal}
+          onToggleStatus={(item) => void toggleStatus(item)}
+        />
 
         <PackageFormModal
           open={modalOpen}
