@@ -248,7 +248,7 @@ export function AppointmentsPage() {
     : null
   const todayKey = format(new Date(), 'yyyy-MM-dd')
   const hourLabels = Array.from(
-    { length: WEEK_GRID_END_HOUR - WEEK_GRID_START_HOUR + 1 },
+    { length: WEEK_GRID_END_HOUR - WEEK_GRID_START_HOUR },
     (_, index) => WEEK_GRID_START_HOUR + index,
   )
   const visualHourRows = useMemo(() => {
@@ -297,6 +297,10 @@ export function AppointmentsPage() {
       return row
     })
   }, [baseVisualWeeklyGrid, hourLabels])
+  const gridHeightPx = visualHourRows.reduce(
+    (total, row) => total + row.heightPx,
+    0,
+  )
 
   const visualWeeklyGrid = useMemo(
     () =>
@@ -329,7 +333,7 @@ export function AppointmentsPage() {
       (WEEK_GRID_END_MINUTES - WEEK_GRID_START_HOUR * 60) * MINUTE_HEIGHT_PX,
     )
   const matrixHeight = Math.max(
-    visualHourRows.reduce((total, row) => total + row.heightPx, 0),
+    gridHeightPx,
     maxAppointmentEndPx,
   )
 
@@ -560,7 +564,8 @@ export function AppointmentsPage() {
                   <div
                     data-testid="weekly-appointments-time-ruler"
                     aria-label="Régua de horários da agenda"
-                    className="border-r border-[#dfe9ef] bg-[#f8fbfd] text-right text-xs font-semibold text-[#53657a]"
+                    className="relative border-r border-[#dfe9ef] bg-[#f8fbfd] text-right text-xs font-semibold text-[#53657a]"
+                    style={{ minHeight: `${matrixHeight}px` }}
                   >
                     {visualHourRows.map((row) => (
                       <div
@@ -591,6 +596,16 @@ export function AppointmentsPage() {
                         </time>
                       </div>
                     ))}
+                    <div
+                      data-hour={WEEK_GRID_END_HOUR}
+                      data-terminal="true"
+                      className="pointer-events-none absolute inset-x-0 h-0"
+                      style={{ top: `${gridHeightPx}px` }}
+                    >
+                      <time className="relative -top-2 inline-block bg-[#f8fbfd] pl-1">
+                        {String(WEEK_GRID_END_HOUR).padStart(2, '0')}:00
+                      </time>
+                    </div>
                   </div>
 
                   <div
@@ -634,6 +649,10 @@ export function AppointmentsPage() {
                       const actionKey = isCurrentHourDay
                         ? `${day.key}-${currentHour?.hour}`
                         : null
+                      const hasNextDay = dayIndex < visualWeeklyGrid.length - 1
+                      const actionAnchor = hasNextDay
+                        ? 'next-day-divider'
+                        : 'current-day-edge'
 
                       return (
                         <section
@@ -680,9 +699,14 @@ export function AppointmentsPage() {
                           {isCurrentHourDay && currentRow && currentHour ? (
                             <div
                               ref={actionContainerRef}
-                              className="absolute right-2 z-[4]"
+                              data-testid="start-current-hour-container"
+                              data-action-anchor={actionAnchor}
+                              className="absolute right-0 z-[4]"
                               style={{
                                 top: `${Math.max(currentRow.topPx + 6, 4)}px`,
+                                transform: hasNextDay
+                                  ? 'translateX(50%)'
+                                  : undefined,
                               }}
                             >
                               {expandedHourKey === actionKey ? (
@@ -697,7 +721,7 @@ export function AppointmentsPage() {
                                     event.stopPropagation()
                                     void startAllInCurrentHour()
                                   }}
-                                  className="absolute right-0 bottom-[calc(100%+0.5rem)] h-10 whitespace-nowrap rounded-full bg-[#078f58] px-4 text-sm font-bold text-white shadow-[0_8px_18px_rgb(4_92_57_/_28%)] hover:bg-[#057949] focus-visible:ring-[#078f58]"
+                                  className="absolute right-1/2 bottom-[calc(100%+0.5rem)] h-10 translate-x-1/2 whitespace-nowrap rounded-full bg-[#078f58] px-4 text-sm font-bold text-white shadow-[0_8px_18px_rgb(4_92_57_/_28%)] hover:bg-[#057949] focus-visible:ring-[#078f58]"
                                   aria-label={`Iniciar todos os agendamentos de ${currentHour.hour}:00 nesta unidade`}
                                 >
                                   {startCurrentHourState.isLoading
@@ -708,6 +732,8 @@ export function AppointmentsPage() {
                               <Button
                                 type="button"
                                 data-testid="start-current-hour-toggle"
+                                data-button-color="#6F3CFF"
+                                data-button-size="53px"
                                 ref={actionToggleRef}
                                 aria-label={`Ações da hora ${String(currentHour.hour).padStart(2, '0')}:00`}
                                 aria-expanded={expandedHourKey === actionKey}
@@ -717,9 +743,9 @@ export function AppointmentsPage() {
                                     current === actionKey ? null : actionKey,
                                   )
                                 }}
-                                className="size-14 rounded-full bg-[#08a45d] p-0 text-white shadow-[0_10px_22px_rgb(4_92_57_/_30%)] hover:bg-[#078f58] focus-visible:ring-[#08a45d]"
+                                className="size-[53px] rounded-full bg-[#6F3CFF]/80 p-0 text-white shadow-[0_10px_22px_rgb(111_60_255_/_24%)] hover:bg-[#6F3CFF]/90 focus-visible:ring-[#6F3CFF]"
                               >
-                                <Plus aria-hidden="true" className="size-8" />
+                                <Plus aria-hidden="true" className="size-7" />
                               </Button>
                               {eligibleCount === 0 ? (
                                 <span className="sr-only">

@@ -36,7 +36,21 @@ describe('ação coletiva da hora corrente', () => {
       </Routes>,
     )
 
-    await user.click(await screen.findByTestId('start-current-hour-toggle'))
+    const container = await screen.findByTestId('start-current-hour-container')
+    expect(container).toHaveAttribute('data-action-anchor', 'next-day-divider')
+    expect(container).toHaveStyle({ transform: 'translateX(50%)' })
+
+    const toggle = await screen.findByTestId('start-current-hour-toggle')
+    expect(toggle).toHaveAttribute('data-button-color', '#6F3CFF')
+    expect(toggle).toHaveAttribute('data-button-size', '53px')
+    expect(toggle).toHaveClass(
+      'size-[53px]',
+      'bg-[#6F3CFF]/80',
+      'hover:bg-[#6F3CFF]/90',
+      'focus-visible:ring-[#6F3CFF]',
+    )
+
+    await user.click(toggle)
     expect(screen.getByTestId('start-current-hour-action')).toBeVisible()
 
     await user.click(screen.getByTestId('start-current-hour-action'))
@@ -90,5 +104,20 @@ describe('ação coletiva da hora corrente', () => {
 
     expect(screen.queryByTestId('start-current-hour-action')).not.toBeInTheDocument()
     expect(apiScenario.startCurrentHourRequests).toHaveLength(0)
+  })
+
+  it('não exibe a ação quando a hora corrente já ultrapassou o limite da grade', async () => {
+    vi.setSystemTime(new Date('2026-08-14T00:30:00.000Z'))
+
+    renderWithProviders(
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/appointments" element={<AppointmentsPage />} />
+        </Route>
+      </Routes>,
+    )
+
+    await screen.findByTestId('weekly-appointments')
+    expect(screen.queryByTestId('start-current-hour-toggle')).not.toBeInTheDocument()
   })
 })

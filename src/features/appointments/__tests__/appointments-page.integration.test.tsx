@@ -231,6 +231,12 @@ describe('integração da criação com a agenda semanal', () => {
         ...createdAppointment,
         startsAt: '2026-08-13T14:00:00.000Z',
       },
+      {
+        ...createdAppointment,
+        id: 'appointment-near-grid-end',
+        startsAt: '2026-08-13T23:30:00.000Z',
+        durationMinutes: 30,
+      },
     ]
     renderAppointmentsPage()
 
@@ -254,7 +260,10 @@ describe('integração da criação com a agenda semanal', () => {
     ).toHaveTextContent('07:00')
     expect(
       within(weeklyGrid).getByTestId('weekly-appointments-time-ruler'),
-    ).toHaveTextContent('18:00')
+    ).toHaveTextContent('20:00')
+    expect(
+      within(weeklyGrid).getByTestId('appointment-appointment-near-grid-end'),
+    ).toHaveAttribute('data-top-minutes', '750')
     expect(within(weeklyGrid).getAllByRole('region')).toHaveLength(5)
     expect(within(weeklyGrid).getAllByLabelText('Calendário')).toHaveLength(5)
   })

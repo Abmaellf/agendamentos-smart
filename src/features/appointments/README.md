@@ -42,7 +42,7 @@ em `baseApi` → `axiosBaseQuery` → API.
 
 A página consome a data compartilhada pela casca, calcula o intervalo semanal,
 apresenta carregamento, erro e estado vazio e distribui os registros nos cinco
-dias úteis. O `AppTopbar` fornece a navegação temporal e abre o
+dias úteis em uma matriz com régua de 07:00 a 20:00. O `AppTopbar` fornece a navegação temporal e abre o
 `CreateAppointmentDialog`, que mantém a mesma implementação de criação e usa
 `FormField` e `SearchableSelect` compartilhados para a apresentação acessível
 dos controles de catálogo. Para a criação manual, Unidade é o contexto do
@@ -65,9 +65,12 @@ fechado e a mutação de criação invalida
 ### Iniciar atendimentos da hora corrente
 
 Na célula da data corrente e da hora corrente da unidade, a agenda exibe um
-botão flutuante verde com `+`. A hora é calculada pelo fuso IANA retornado no
-catálogo da unidade, e não pelo fuso do navegador; a atualização do relógio
-ocorre periodicamente e ao retornar para a aba. O botão abre a opção
+botão flutuante roxo translúcido com `+`, usando `#6F3CFF` e aproximadamente
+53 px de diâmetro. Quando houver uma próxima coluna visível, o centro do botão
+fica sobre a linha divisória entre o dia atual e o próximo; na última coluna,
+ele permanece ancorado à borda interna do dia. A hora é calculada pelo fuso IANA
+retornado no catálogo da unidade, e não pelo fuso do navegador; a atualização do
+relógio ocorre periodicamente e ao retornar para a aba. O botão abre a opção
 `Iniciar todos` acima da célula, sem alterar dados ao ser apenas aberto.
 
 `Iniciar todos` envia uma única chamada `POST
