@@ -110,6 +110,7 @@ function firstName(value: string) {
 }
 
 const DEFAULT_DAY_COLUMN_WIDTH_PX = 320
+const CURRENT_HOUR_ACTION_CORNER_SIZE_PX = 72
 
 export function AppointmentsPage() {
   const { selectedDate } = useAppShellDate()
@@ -143,6 +144,7 @@ export function AppointmentsPage() {
     DEFAULT_DAY_COLUMN_WIDTH_PX,
   )
   const [hoveredHour, setHoveredHour] = useState<number | null>(null)
+  const [hoveredDayHour, setHoveredDayHour] = useState<string | null>(null)
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null)
   const [clockNow, setClockNow] = useState(() => new Date())
@@ -575,10 +577,22 @@ export function AppointmentsPage() {
                         data-row-height={row.heightPx}
                         data-hovered={hoveredHour === row.hour}
                         tabIndex={0}
-                        onMouseEnter={() => setHoveredHour(row.hour)}
-                        onMouseLeave={() => setHoveredHour(null)}
-                        onFocus={() => setHoveredHour(row.hour)}
-                        onBlur={() => setHoveredHour(null)}
+                        onMouseEnter={() => {
+                          setHoveredHour(row.hour)
+                          setHoveredDayHour(null)
+                        }}
+                        onMouseLeave={() => {
+                          setHoveredHour(null)
+                          setHoveredDayHour(null)
+                        }}
+                        onFocus={() => {
+                          setHoveredHour(row.hour)
+                          setHoveredDayHour(null)
+                        }}
+                        onBlur={() => {
+                          setHoveredHour(null)
+                          setHoveredDayHour(null)
+                        }}
                         className={cn(
                           'relative border-b border-[#dfe9ef] pr-2 outline-none transition-colors',
                           hoveredHour === row.hour && 'bg-[#dff7eb]',
@@ -637,6 +651,25 @@ export function AppointmentsPage() {
                         : undefined
                       const isCurrentHourDay =
                         currentHour?.dateKey === day.key && currentRow !== undefined
+                      const currentHourAppointments =
+                        isCurrentHourDay && currentHour
+                          ? day.appointments.filter(
+                              (appointment) =>
+                                Math.floor(appointment.startMinutes / 60) ===
+                                currentHour.hour,
+                            )
+                          : []
+                      const currentHourGroupBottomPx =
+                        isCurrentHourDay && currentRow
+                          ? Math.max(
+                              currentRow.topPx + currentRow.heightPx,
+                              ...currentHourAppointments.map(
+                                (appointment) =>
+                                  appointment.visualTopPx +
+                                  appointment.visualHeightPx,
+                              ),
+                            )
+                          : 0
                       const eligibleCount = isCurrentHourDay
                         ? day.appointments.filter(
                             (appointment) =>
@@ -649,10 +682,6 @@ export function AppointmentsPage() {
                       const actionKey = isCurrentHourDay
                         ? `${day.key}-${currentHour?.hour}`
                         : null
-                      const hasNextDay = dayIndex < visualWeeklyGrid.length - 1
-                      const actionAnchor = hasNextDay
-                        ? 'next-day-divider'
-                        : 'current-day-edge'
 
                       return (
                         <section
@@ -672,6 +701,7 @@ export function AppointmentsPage() {
                               const row = visualHourRows.find(
                                 (item) => item.hour === hour,
                               )
+                              const cellKey = `${day.key}-${hour}`
 
                               return (
                                 <div
@@ -679,13 +709,21 @@ export function AppointmentsPage() {
                                   data-hour={hour}
                                   data-row-top={row?.topPx}
                                   data-row-height={row?.heightPx}
-                                  data-hovered={hoveredHour === hour}
+                                  data-hovered={hoveredDayHour === cellKey}
                                   aria-hidden="true"
-                                  onMouseEnter={() => setHoveredHour(hour)}
-                                  onMouseLeave={() => setHoveredHour(null)}
+                                  onMouseEnter={() => {
+                                    setHoveredHour(hour)
+                                    setHoveredDayHour(cellKey)
+                                  }}
+                                  onMouseLeave={() => {
+                                    setHoveredHour(null)
+                                    setHoveredDayHour(null)
+                                  }}
                                   className={cn(
-                                    'pointer-events-auto absolute inset-x-0 z-0 border-b border-transparent transition-colors',
+                                    'pointer-events-auto absolute inset-x-0 z-0 border border-transparent transition-colors',
                                     hoveredHour === hour && 'bg-[#dff7eb]/70',
+                                    hoveredDayHour === cellKey &&
+                                      'border-[#6F3CFF]',
                                   )}
                                   style={{
                                     top: `${row?.topPx ?? (hour - WEEK_GRID_START_HOUR) * HOUR_HEIGHT_PX}px`,
@@ -696,17 +734,47 @@ export function AppointmentsPage() {
                             })(),
                           )}
 
+                          {isCurrentHourDay &&
+                          currentRow &&
+                          currentHour &&
+                          currentHourAppointments.length > 0 ? (
+                            <div
+                              aria-hidden="true"
+                              data-testid="current-hour-appointment-group"
+                              data-day={day.key}
+                              data-hour={currentHour.hour}
+                              data-appointment-count={
+                                currentHourAppointments.length
+                              }
+                              data-hovered={
+                                hoveredDayHour ===
+                                `${day.key}-${currentHour.hour}`
+                              }
+                              className={cn(
+                                'pointer-events-none absolute inset-x-0 z-[1] border border-transparent transition-[border-color,box-shadow,filter] duration-[160ms]',
+                                hoveredDayHour ===
+                                  `${day.key}-${currentHour.hour}` &&
+                                  'border-[#6F3CFF] shadow-[0_0_0_1px_rgb(111_60_255_/_28%)]',
+                              )}
+                              style={{
+                                top: `${currentRow.topPx}px`,
+                                height: `${currentHourGroupBottomPx - currentRow.topPx}px`,
+                              }}
+                            />
+                          ) : null}
+
                           {isCurrentHourDay && currentRow && currentHour ? (
                             <div
                               ref={actionContainerRef}
                               data-testid="start-current-hour-container"
-                              data-action-anchor={actionAnchor}
-                              className="absolute right-0 z-[4]"
+                              data-action-anchor="current-hour-group-bottom-right"
+                              className="pointer-events-none absolute right-0 z-[4] size-[72px]"
                               style={{
-                                top: `${Math.max(currentRow.topPx + 6, 4)}px`,
-                                transform: hasNextDay
-                                  ? 'translateX(50%)'
-                                  : undefined,
+                                top: `${Math.max(
+                                  currentRow.topPx,
+                                  currentHourGroupBottomPx -
+                                    CURRENT_HOUR_ACTION_CORNER_SIZE_PX,
+                                )}px`,
                               }}
                             >
                               {expandedHourKey === actionKey ? (
@@ -721,7 +789,7 @@ export function AppointmentsPage() {
                                     event.stopPropagation()
                                     void startAllInCurrentHour()
                                   }}
-                                  className="absolute right-1/2 bottom-[calc(100%+0.5rem)] h-10 translate-x-1/2 whitespace-nowrap rounded-full bg-[#078f58] px-4 text-sm font-bold text-white shadow-[0_8px_18px_rgb(4_92_57_/_28%)] hover:bg-[#057949] focus-visible:ring-[#078f58]"
+                                  className="pointer-events-auto absolute right-1/2 bottom-[calc(100%+0.5rem)] h-10 translate-x-1/2 whitespace-nowrap rounded-full bg-[#078f58] px-4 text-sm font-bold text-white shadow-[0_8px_18px_rgb(4_92_57_/_28%)] hover:bg-[#057949] focus-visible:ring-[#078f58]"
                                   aria-label={`Iniciar todos os agendamentos de ${currentHour.hour}:00 nesta unidade`}
                                 >
                                   {startCurrentHourState.isLoading
@@ -733,7 +801,6 @@ export function AppointmentsPage() {
                                 type="button"
                                 data-testid="start-current-hour-toggle"
                                 data-button-color="#6F3CFF"
-                                data-button-size="53px"
                                 ref={actionToggleRef}
                                 aria-label={`Ações da hora ${String(currentHour.hour).padStart(2, '0')}:00`}
                                 aria-expanded={expandedHourKey === actionKey}
@@ -743,9 +810,12 @@ export function AppointmentsPage() {
                                     current === actionKey ? null : actionKey,
                                   )
                                 }}
-                                className="size-[53px] rounded-full bg-[#6F3CFF]/80 p-0 text-white shadow-[0_10px_22px_rgb(111_60_255_/_24%)] hover:bg-[#6F3CFF]/90 focus-visible:ring-[#6F3CFF]"
+                                className="pointer-events-auto absolute right-0 bottom-0 size-12 rounded-full bg-transparent p-0 text-[#6F3CFF] shadow-none hover:bg-[#6F3CFF]/10 focus-visible:ring-[#6F3CFF]"
                               >
-                                <Plus aria-hidden="true" className="size-7" />
+                                <Plus
+                                  aria-hidden="true"
+                                  className="size-8 stroke-[1.5]"
+                                />
                               </Button>
                               {eligibleCount === 0 ? (
                                 <span className="sr-only">
@@ -811,10 +881,16 @@ export function AppointmentsPage() {
                                     )
                                   }
                                 }}
-                                onMouseEnter={() =>
+                                onMouseEnter={() => {
                                   setHoveredHour(appointmentHour)
-                                }
-                                onMouseLeave={() => setHoveredHour(null)}
+                                  setHoveredDayHour(
+                                    `${positioned.dateKey}-${appointmentHour}`,
+                                  )
+                                }}
+                                onMouseLeave={() => {
+                                  setHoveredHour(null)
+                                  setHoveredDayHour(null)
+                                }}
                                 className={cn(
                                   'absolute z-[2] flex min-w-0 flex-col justify-center gap-0.5 overflow-hidden rounded-[0.35rem] border border-white/80 leading-tight shadow-[0_4px_10px_rgb(32_32_36_/_16%)] transition-[transform,box-shadow,filter] duration-[160ms] hover:z-[3] hover:-translate-y-0.5 hover:saturate-[1.04] hover:shadow-[0_8px_16px_rgb(32_32_36_/_22%)]',
                                   positioned.laneCount > 2

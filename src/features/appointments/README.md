@@ -64,14 +64,19 @@ fechado e a mutação de criação invalida
 
 ### Iniciar atendimentos da hora corrente
 
-Na célula da data corrente e da hora corrente da unidade, a agenda exibe um
-botão flutuante roxo translúcido com `+`, usando `#6F3CFF` e aproximadamente
-53 px de diâmetro. Quando houver uma próxima coluna visível, o centro do botão
-fica sobre a linha divisória entre o dia atual e o próximo; na última coluna,
-ele permanece ancorado à borda interna do dia. A hora é calculada pelo fuso IANA
-retornado no catálogo da unidade, e não pelo fuso do navegador; a atualização do
-relógio ocorre periodicamente e ao retornar para a aba. O botão abre a opção
-`Iniciar todos` acima da célula, sem alterar dados ao ser apenas aberto.
+Cada combinação de dia e hora da agenda permanece sem linha roxa no estado
+normal, enquanto o hover verde continua atravessando toda a linha da hora. Ao
+posicionar o mouse sobre uma célula específica, ela recebe uma borda `solid` de
+`1px` na cor `#6F3CFF`; as demais células permanecem sem essa borda. O
+destaque desaparece ao sair, sem iniciar atualização ou chamada HTTP. Na hora
+corrente, a área pode abranger a altura efetiva dos cartões simultâneos.
+
+O botão circular `+` fica no canto inferior direito desse agrupamento, usando
+`border-radius: 50%` e sem diagonal ou área triangular adicional. O controle
+mantém nome acessível, foco por teclado e os estados de abertura/carregamento;
+ao ser apenas aberto, não altera dados. A hora é calculada pelo fuso IANA
+retornado no catálogo da unidade, e não pelo fuso do navegador; a atualização
+do relógio ocorre periodicamente e ao retornar para a aba.
 
 `Iniciar todos` envia uma única chamada `POST
 /api/appointments/start-current-hour` com apenas `unitId` e `hourStart` em

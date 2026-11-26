@@ -371,27 +371,34 @@ describe('integração da criação com a agenda semanal', () => {
     )
   })
 
-  it('destaca a linha horária inteira ao passar o cursor e remove o destaque ao sair', async () => {
+  it('destaca somente a célula de dia e hora sob o cursor', async () => {
     renderAppointmentsPage()
 
     const weeklyGrid = await screen.findByTestId('weekly-appointments')
-    const hourRows = weeklyGrid.querySelectorAll('[data-hour="7"]')
+    const mondayCell = weeklyGrid.querySelector(
+      '[data-testid="appointments-day-2026-08-10"] [data-hour="7"]',
+    ) as HTMLElement
+    const tuesdayCell = weeklyGrid.querySelector(
+      '[data-testid="appointments-day-2026-08-11"] [data-hour="7"]',
+    ) as HTMLElement
 
-    expect(hourRows).toHaveLength(6)
-    fireEvent.mouseEnter(hourRows[1] as HTMLElement)
+    fireEvent.mouseEnter(mondayCell)
 
-    expect(
-      weeklyGrid.querySelectorAll('[data-hour="7"][data-hovered="true"]'),
-    ).toHaveLength(6)
+    expect(mondayCell).toHaveAttribute('data-hovered', 'true')
+    expect(mondayCell).toHaveClass('border-[#6F3CFF]')
+    expect(mondayCell).toHaveClass('bg-[#dff7eb]/70')
+    expect(tuesdayCell).toHaveAttribute('data-hovered', 'false')
+    expect(tuesdayCell).toHaveClass('border-transparent')
+    expect(tuesdayCell).toHaveClass('bg-[#dff7eb]/70')
 
-    fireEvent.mouseLeave(hourRows[1] as HTMLElement)
+    fireEvent.mouseLeave(mondayCell)
 
-    expect(
-      weeklyGrid.querySelectorAll('[data-hour="7"][data-hovered="true"]'),
-    ).toHaveLength(0)
+    expect(mondayCell).toHaveAttribute('data-hovered', 'false')
+    expect(mondayCell).toHaveClass('border-transparent')
+    expect(mondayCell).not.toHaveClass('bg-[#dff7eb]/70')
   })
 
-  it('mantém o destaque da linha quando o cursor está sobre o card do paciente', async () => {
+  it('destaca a célula correspondente quando o cursor está sobre o card do paciente', async () => {
     apiScenario.appointments = [
       {
         ...createdAppointment,
@@ -402,18 +409,20 @@ describe('integração da criação com a agenda semanal', () => {
 
     const weeklyGrid = await screen.findByTestId('weekly-appointments')
     const card = await screen.findByTestId('appointment-appointment-created')
+    const cardCell = weeklyGrid.querySelector(
+      '[data-testid="appointments-day-2026-08-13"] [data-hour="7"]',
+    ) as HTMLElement
 
     fireEvent.mouseEnter(card)
 
-    expect(
-      weeklyGrid.querySelectorAll('[data-hour="7"][data-hovered="true"]'),
-    ).toHaveLength(6)
+    expect(cardCell).toHaveAttribute('data-hovered', 'true')
+    expect(cardCell).toHaveClass('border-[#6F3CFF]')
+    expect(cardCell).toHaveClass('bg-[#dff7eb]/70')
 
     fireEvent.mouseLeave(card)
 
-    expect(
-      weeklyGrid.querySelectorAll('[data-hour="7"][data-hovered="true"]'),
-    ).toHaveLength(0)
+    expect(cardCell).toHaveAttribute('data-hovered', 'false')
+    expect(cardCell).toHaveClass('border-transparent')
   })
 
   it('exibe a legenda completa e mantém a matriz rolável em telas estreitas', async () => {
