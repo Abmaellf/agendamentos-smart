@@ -299,3 +299,77 @@ Isso é esperado, pois o Compose de produção não publica a porta do PostgreSQ
 - [ ] Porta `8080` fechada no firewall externo.
 - [ ] Porta `5432` fechada no firewall externo.
 
+## 14. Migração para o domínio próprio do frontend
+
+O frontend passou a ser publicado em `https://compromiz.com.br`. Para evitar
+que o navegador trate a sessão como cookie de terceiro, a API deverá ser
+publicada também sob o mesmo site:
+
+```text
+Frontend: https://compromiz.com.br
+API:      https://api.compromiz.com.br
+```
+
+Essa migração ainda depende de execução no repositório/servidor da API irmã e
+não deve ser considerada concluída apenas pela criação do domínio do frontend.
+
+### Configuração do DNS e do Caddy
+
+Criar o registro DNS:
+
+```text
+api.compromiz.com.br → 62.238.8.131
+```
+
+No arquivo de ambiente externo usado pelo Compose de produção, configurar:
+
+```env
+API_DOMAIN=api.compromiz.com.br
+JWT_COOKIE_SECURE=true
+JWT_COOKIE_SAME_SITE=None
+```
+
+O valor de `API_DOMAIN` é usado pelo Caddy e não deve ser colocado nas
+variáveis `JWT_COOKIE_*`. O proxy deve terminar TLS para o novo host e
+encaminhar para a API interna sem publicar a porta `8080`.
+
+### Configuração do CORS da API
+
+Em `SecurityConfiguration.java`, adicionar a origem exata do frontend e manter
+credenciais e preflight:
+
+```java
+config.setAllowedOrigins(List.of(
+        "https://compromiz.com.br",
+        "https://agendamentos-smart.vercel.app",
+        "http://localhost:3000",
+        "http://localhost:5173"
+));
+config.setAllowedMethods(List.of(
+        "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+config.setAllowedHeaders(List.of("*"));
+config.setAllowCredentials(true);
+```
+
+O preflight deve responder diretamente `200` ou `204`, sem `Location`:
+
+```bash
+curl -i -X OPTIONS https://api.compromiz.com.br/auth/login \
+  -H 'Origin: https://compromiz.com.br' \
+  -H 'Access-Control-Request-Method: POST' \
+  -H 'Access-Control-Request-Headers: content-type'
+```
+
+### Configuração do frontend
+
+Na Vercel, atualizar a variável de produção e gerar novo build:
+
+```env
+VITE_API_URL=https://api.compromiz.com.br
+```
+
+Após limpar os cookies antigos e autenticar novamente, o Network deve mostrar
+`Cookie: jwt=...` em `GET /auth/me`, resposta `200` e carregamento dos endpoints
+protegidos. A validação deve ser repetida em navegação normal, privada e em
+dispositivo móvel.
+
